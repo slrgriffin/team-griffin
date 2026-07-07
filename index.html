@@ -266,9 +266,12 @@ function renderActionItems(items, week){
 document.getElementById('main').addEventListener('click', (e) => {
   const chip = e.target.closest('.task-chip');
   if(chip){
+    if(chip.dataset.pending) return; // ignore a fast second tap while the first is still in flight
+    chip.dataset.pending = '1';
     const date = chip.dataset.taskDate, idx = chip.dataset.taskIndex;
     chip.classList.toggle('done'); // optimistic — confirmed after GitHub Pages rebuilds (~30-90s)
     fetch(`${SCRIPT_URL}?mode=toggleTask&date=${date}&index=${idx}`, { mode: 'no-cors' }).catch(()=>{});
+    setTimeout(() => { delete chip.dataset.pending; }, 1200);
     return;
   }
   const row = e.target.closest('.check-row');
