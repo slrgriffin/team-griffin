@@ -1,0 +1,44 @@
+{
+  "weeklyPattern": {
+    "Monday":    { "n": ["Parcor Flip · 4:00–5:15 pm @ SI"], "a": ["Roller Shooting · 5:15–6:00 pm @ Silver Creek"], "f": [] },
+    "Tuesday":   { "n": ["Roller League · 4:00–4:45 pm @ Silver Creek", "Little Giants · 7:00–7:45 pm @ Milpitas"], "a": ["Roller League · 4:00–4:45 pm @ Silver Creek", "Little Giants · 7:00–7:45 pm @ Milpitas"], "f": [] },
+    "Wednesday": { "n": ["Parcor · 5:30–6:45 pm @ SJ"], "a": ["Parcor · 5:30–6:45 pm @ SJ"], "f": [] },
+    "Thursday":  { "n": ["Parcor · 5:30–6:45 pm @ SJ"], "a": ["TKD Advanced · 4:00–4:45 pm @ Santa Teresa", "Parcor · 5:30–6:45 pm @ SJ"], "f": [] },
+    "Friday":    { "n": ["TKD Black Belt · 6:00–6:45 pm @ Santa Teresa", "TKD XMA · 6:45–7:30 pm @ Santa Teresa"], "a": ["TKD Advanced · 4:00–4:45 pm @ Santa Teresa", "TKD XMA · 6:45–7:30 pm @ Santa Teresa"], "f": [] },
+    "Saturday":  { "n": ["Roller Game · 10:00–10:45 am @ Silver Creek"], "a": ["Roller Game · 10:00–10:45 am @ Silver Creek"], "f": [] },
+    "Sunday":    { "n": [], "a": [], "f": [] }
+  },
+  "dateOverrides": {
+    "2026-07-06": {
+      "n": ["Topgolf · 12:30–2:30 pm", "Parcor Flip · 4:00–5:15 pm @ SI"],
+      "a": ["Dentist · 9:30 am @ Blossom Hill", "Topgolf · 12:30–2:30 pm", "Roller Shooting · 5:15–6:00 pm @ Silver Creek"],
+      "f": ["Family Dinner · 7:00 pm"]
+    },
+    "2026-07-07": {
+      "n": ["With KP · 10:00–11:00 am", "Roller League · 4:00–4:45 pm @ Silver Creek", "Little Giants · 7:00–7:45 pm @ Milpitas"],
+      "a": ["Roller League · 4:00–4:45 pm @ Silver Creek", "Little Giants · 7:00–7:45 pm @ Milpitas"],
+      "f": []
+    },
+    "2026-07-08": { "n": ["Parcor · 5:30–6:45 pm @ SJ"], "a": ["Hockey Tournament · Los Angeles (All Day)"], "f": [] },
+    "2026-07-09": { "n": ["Parcor · 5:30–6:45 pm @ SJ"], "a": ["Hockey Tournament · Los Angeles (All Day)"], "f": [] },
+    "2026-07-10": { "n": ["TKD Black Belt · 6:00–6:45 pm @ Santa Teresa", "TKD XMA · 6:45–7:30 pm @ Santa Teresa"], "a": ["Hockey Tournament · Los Angeles (All Day)"], "f": [] },
+    "2026-07-11": { "n": ["Roller Game · 10:00–10:45 am @ Silver Creek"], "a": ["Hockey Tournament · Los Angeles (Final Day)"], "f": [] },
+    "2026-07-12": { "vac": "🌲 Maine vacation begins! (Nollen & Austin)" },
+    "2026-07-13": { "vac": "Vacation – Maine" },
+    "2026-07-14": { "vac": "Vacation – Maine" },
+    "2026-07-15": { "vac": "Vacation – Maine" },
+    "2026-07-16": { "vac": "Vacation – Maine" },
+    "2026-07-17": { "vac": "Vacation – Maine" },
+    "2026-07-18": { "vac": "Vacation – Maine" },
+    "2026-07-19": { "vac": "🌊 Cape Cod vacation begins! (Nollen & Austin)" },
+    "2026-07-20": { "vac": "Vacation – Cape Cod" },
+    "2026-07-21": { "vac": "Vacation – Cape Cod" },
+    "2026-07-22": { "vac": "Vacation – Cape Cod" },
+    "2026-07-23": { "vac": "Last day of Cape Cod vacation" },
+    "2026-07-24": { "vac": "Driving back home" }
+  },
+  "weeklyNotes": {
+    "2026-07-06": ["JUSTIN — Contact Stem Tree about camp", "JUSTIN — Discuss with KP about onboarding Nollen for ADHD class and therapy"]
+  },
+  "dailyReminders": ["Remember to do exercises", "Remember to read for 20 minutes"]
+}
