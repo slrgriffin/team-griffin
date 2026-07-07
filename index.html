@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Team Griffin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EDE4D3;
+    --paper-deep:#E3D7C0;
+    --ink:#2B2B26;
+    --ink-soft:#5B564C;
+    --pine:#2F4538;
+    --pine-deep:#233327;
+    --nollen:#C1652F;
+    --austin:#3B6E8F;
+    --family:#8A6A2F;
+    --line:#C9BB9E;
+    --card:#FBF8F1;
+    --good:#4C7A52;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(255,255,255,0.35), transparent 40%),
+      radial-gradient(circle at 90% 80%, rgba(0,0,0,0.04), transparent 45%);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:720px;margin:0 auto;padding:0 0 3rem;}
+
+  header{
+    background:linear-gradient(180deg,var(--pine) 0%,var(--pine-deep) 100%);
+    color:#F3EEE1;
+    padding:1.75rem 1.5rem 1.5rem;
+    border-bottom:4px solid #1a251d;
+  }
+  .eyebrow{
+    font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;
+    color:#B9C9BB;font-weight:600;margin-bottom:.35rem;
+  }
+  h1{
+    font-family:'Fraunces',serif;font-weight:700;font-size:2rem;
+    margin:0 0 .15rem;letter-spacing:-.01em;
+  }
+  .week-range{color:#D8CFB6;font-size:.9rem;margin-bottom:1.1rem;}
+
+  .progress-row{display:flex;align-items:center;gap:.75rem;}
+  .progress-track{
+    flex:1;height:8px;border-radius:5px;background:rgba(255,255,255,.15);
+    overflow:hidden;
+  }
+  .progress-fill{height:100%;background:#D9A441;border-radius:5px;transition:width .4s ease;}
+  .progress-label{font-size:.72rem;color:#D8CFB6;white-space:nowrap;font-variant-numeric:tabular-nums;}
+
+  main{padding:1.5rem 1.25rem 0;}
+
+  .section-label{
+    font-family:'Fraunces',serif;font-weight:600;font-size:1.05rem;
+    color:var(--pine-deep);margin:1.75rem 0 .75rem;display:flex;align-items:center;gap:.5rem;
+  }
+  .section-label:first-child{margin-top:0;}
+
+  .day-card{
+    background:var(--card);border:1px solid var(--line);border-radius:10px;
+    margin-bottom:.85rem;overflow:hidden;
+    box-shadow:0 1px 2px rgba(0,0,0,.04);
+  }
+  .day-card.today{border-color:var(--pine);box-shadow:0 0 0 2px rgba(47,69,56,.15);}
+  .day-head{
+    display:flex;align-items:center;gap:.7rem;padding:.7rem .9rem;
+    border-bottom:1px dashed var(--line);background:rgba(0,0,0,.015);
+  }
+  .day-badge{
+    width:2.5rem;height:2.5rem;border-radius:50%;background:var(--pine);color:#fff;
+    display:flex;align-items:center;justify-content:center;flex-direction:column;
+    font-family:'Fraunces',serif;font-weight:600;line-height:1;flex-shrink:0;
+  }
+  .day-badge .num{font-size:1rem;}
+  .day-badge .mon{font-size:.55rem;text-transform:uppercase;letter-spacing:.04em;opacity:.85;}
+  .day-name{font-weight:600;font-size:.95rem;}
+  .today-pill{
+    margin-left:auto;background:var(--pine);color:#fff;font-size:.65rem;font-weight:700;
+    letter-spacing:.06em;padding:.2rem .5rem;border-radius:99px;text-transform:uppercase;
+  }
+  .day-body{padding:.75rem .9rem .85rem;}
+  .vac-banner{
+    padding:.75rem .9rem;font-size:.9rem;font-weight:500;color:var(--ink);
+    background:repeating-linear-gradient(135deg,rgba(217,164,65,.16),rgba(217,164,65,.16) 10px,rgba(217,164,65,.28) 10px,rgba(217,164,65,.28) 20px);
+  }
+  .person-row{display:flex;gap:.5rem;margin-bottom:.45rem;align-items:flex-start;}
+  .person-row:last-child{margin-bottom:0;}
+  .person-tag{
+    flex-shrink:0;font-size:.68rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;
+    padding:.2rem .45rem;border-radius:5px;color:#fff;margin-top:.05rem;
+  }
+  .tag-n{background:var(--nollen);}
+  .tag-a{background:var(--austin);}
+  .tag-f{background:var(--family);}
+  .person-items{font-size:.85rem;color:var(--ink-soft);line-height:1.5;}
+  .free-day{font-size:.85rem;color:var(--ink-soft);font-style:italic;}
+
+  .checklist-box{
+    background:var(--card);border:1px solid var(--line);border-radius:10px;padding:.4rem .5rem;
+  }
+  .check-row{
+    display:flex;align-items:flex-start;gap:.6rem;padding:.55rem .5rem;
+    border-bottom:1px solid var(--line);cursor:pointer;
+  }
+  .check-row:last-child{border-bottom:none;}
+  .check-box{
+    width:1.15rem;height:1.15rem;border-radius:5px;border:2px solid var(--ink-soft);
+    flex-shrink:0;margin-top:.1rem;display:flex;align-items:center;justify-content:center;
+    transition:.15s;
+  }
+  .check-row.done .check-box{background:var(--good);border-color:var(--good);}
+  .check-box svg{width:.7rem;height:.7rem;opacity:0;transition:.15s;}
+  .check-row.done .check-box svg{opacity:1;}
+  .check-label{font-size:.87rem;line-height:1.4;}
+  .check-row.done .check-label{color:var(--ink-soft);text-decoration:line-through;}
+  .empty-note{font-size:.8rem;color:var(--ink-soft);font-style:italic;padding:.5rem;}
+  .hint{font-size:.74rem;color:var(--ink-soft);margin-top:.5rem;padding:0 .1rem;line-height:1.4;}
+
+  .state-msg{padding:2.5rem 1rem;text-align:center;color:var(--ink-soft);font-size:.9rem;}
+  footer{
+    text-align:center;padding:1.5rem 1.25rem 0;font-size:.72rem;color:var(--ink-soft);
+  }
+  footer a{color:var(--pine);}
+  .refresh-btn{
+    background:none;border:1px solid var(--line);color:var(--pine-deep);font-size:.75rem;
+    padding:.35rem .8rem;border-radius:99px;cursor:pointer;font-family:inherit;font-weight:600;
+  }
+  .refresh-btn:hover{background:rgba(0,0,0,.03);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Team Griffin</div>
+    <h1 id="week-title">This Week</h1>
+    <div class="week-range" id="week-range">Loading…</div>
+    <div class="progress-row">
+      <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+      <div class="progress-label" id="progress-label">Summer &rsquo;26</div>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="state-msg" id="loading">Loading schedule…</div>
+  </main>
+
+  <footer>
+    <div id="sync-note">—</div>
+    <div style="margin-top:.6rem"><button class="refresh-btn" id="refresh-btn">↻ Refresh</button></div>
+  </footer>
+</div>
+
+<script>
+const RAW_JSON_URL = './schedule.json';
+const SEASON_START = '2026-06-15';
+const SEASON_END   = '2026-08-14';
+const DAY_MS = 86400000;
+
+function isoDate(d){ return d.toISOString().slice(0,10); }
+function parseISO(s){ const [y,m,dd]=s.split('-').map(Number); return new Date(y,m-1,dd); }
+function dayName(d){ return d.toLocaleDateString('en-US',{weekday:'long'}); }
+function monthAbbr(d){ return d.toLocaleDateString('en-US',{month:'short'}); }
+
+function mondayOf(d){
+  const dow = d.getDay(); // 0 Sun..6 Sat
+  const diff = dow === 0 ? 6 : dow - 1;
+  const m = new Date(d);
+  m.setDate(d.getDate() - diff);
+  m.setHours(0,0,0,0);
+  return m;
+}
+
+const today = new Date();
+today.setHours(0,0,0,0);
+const todayStr = isoDate(today);
+const weekMonday = mondayOf(today);
+const weekMondayStr = isoDate(weekMonday);
+
+function renderPersonRow(cls, tag, items){
+  if(!items || !items.length) return '';
+  return `<div class="person-row">
+    <span class="person-tag ${cls}">${tag}</span>
+    <span class="person-items">${items.join(' &nbsp;·&nbsp; ')}</span>
+  </div>`;
+}
+
+function renderDayCard(date, data){
+  const dStr = isoDate(date);
+  const isToday = dStr === todayStr;
+  const override = (data.dateOverrides || {})[dStr];
+  const dn = dayName(date);
+
+  let bodyHtml;
+  if(override && override.vac){
+    bodyHtml = `<div class="vac-banner">${override.vac}</div>`;
+  } else {
+    const day = override || (data.weeklyPattern || {})[dn] || {n:[],a:[],f:[]};
+    const rows = [
+      renderPersonRow('tag-n','Nollen', day.n),
+      renderPersonRow('tag-a','Austin', day.a),
+      renderPersonRow('tag-f','Family', day.f),
+    ].join('');
+    bodyHtml = rows
+      ? `<div class="day-body">${rows}</div>`
+      : `<div class="day-body"><div class="free-day">Nothing scheduled</div></div>`;
+  }
+
+  return `<div class="day-card${isToday ? ' today':''}">
+    <div class="day-head">
+      <div class="day-badge"><span class="num">${date.getDate()}</span><span class="mon">${monthAbbr(date)}</span></div>
+      <div class="day-name">${dn}</div>
+      ${isToday ? '<div class="today-pill">Today</div>' : ''}
+    </div>
+    ${bodyHtml}
+  </div>`;
+}
+
+// ── Local, per-device checklist storage (plain localStorage — this page
+//    runs as a normal website, not a Claude artifact) ───────────────────
+function getStored(key){
+  try{
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : [];
+  }catch(e){ return []; }
+}
+function setStored(key, val){
+  try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){ /* ignore */ }
+}
+
+function renderChecklist(containerId, items, storageKey, emptyText){
+  const el = document.getElementById(containerId);
+  if(!items || !items.length){
+    el.innerHTML = `<div class="empty-note">${emptyText}</div>`;
+    return;
+  }
+  const done = getStored(storageKey);
+  el.innerHTML = items.map((label, i) => {
+    const isDone = done.includes(i);
+    return `<div class="check-row${isDone?' done':''}" data-i="${i}">
+      <div class="check-box"><svg viewBox="0 0 20 20" fill="none"><path d="M4 10l4 4 8-8" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="check-label">${label}</div>
+    </div>`;
+  }).join('');
+
+  el.querySelectorAll('.check-row').forEach(row => {
+    row.addEventListener('click', () => {
+      const i = Number(row.dataset.i);
+      let d = getStored(storageKey);
+      d = d.includes(i) ? d.filter(x => x !== i) : [...d, i];
+      setStored(storageKey, d);
+      row.classList.toggle('done');
+    });
+  });
+}
+
+function render(data){
+  document.getElementById('loading')?.remove?.();
+
+  const sunday = new Date(weekMonday); sunday.setDate(weekMonday.getDate()+6);
+  document.getElementById('week-range').textContent =
+    `${weekMonday.toLocaleDateString('en-US',{month:'short',day:'numeric'})} – ${sunday.toLocaleDateString('en-US',{month:'short',day:'numeric'})}`;
+
+  const weekNum = Math.floor((weekMonday - parseISO(SEASON_START)) / (7*DAY_MS)) + 1;
+  document.getElementById('week-title').textContent = `Week ${weekNum} of 9`;
+
+  const start = parseISO(SEASON_START), end = parseISO(SEASON_END);
+  const pct = Math.min(100, Math.max(0, ((today-start)/(end-start))*100));
+  const dayNum = Math.round((today-start)/DAY_MS)+1;
+  const totalDays = Math.round((end-start)/DAY_MS)+1;
+  document.getElementById('progress-fill').style.width = pct+'%';
+  document.getElementById('progress-label').textContent = `Day ${dayNum} of ${totalDays} · Jun 15 – Aug 14`;
+
+  let cardsHtml = '';
+  for(let i=0;i<7;i++){
+    const d = new Date(weekMonday); d.setDate(weekMonday.getDate()+i);
+    cardsHtml += renderDayCard(d, data);
+  }
+
+  document.getElementById('main').innerHTML = `
+    <div class="section-label">📅 This Week</div>
+    ${cardsHtml}
+    <div class="section-label">📌 Daily Tasks</div>
+    <div class="checklist-box" id="daily-tasks"></div>
+    <div class="section-label">✅ Action Items</div>
+    <div class="checklist-box" id="action-items"></div>
+    <div class="hint">Checking these off is just for tracking on this device. To permanently remove or change something for everyone, tell Claude in chat and it'll update the source.</div>
+  `;
+
+  renderChecklist('daily-tasks', data.dailyReminders, `tasks:${todayStr}`, 'Nothing set for today.');
+  renderChecklist('action-items', (data.weeklyNotes||{})[weekMondayStr], `actions:${weekMondayStr}`, 'No action items this week.');
+
+  document.getElementById('sync-note').textContent =
+    `Synced from GitHub · ${new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}`;
+}
+
+function renderError(msg){
+  document.getElementById('main').innerHTML = `<div class="state-msg">⚠️ ${msg}</div>`;
+  document.getElementById('week-range').textContent = 'Unable to load';
+}
+
+async function load(){
+  document.getElementById('main').innerHTML = '<div class="state-msg" id="loading">Loading schedule…</div>';
+  try{
+    const res = await fetch(RAW_JSON_URL + '?t=' + Date.now());
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    render(data);
+  }catch(err){
+    renderError(`Could not load schedule.json (${err.message}).`);
+  }
+}
+
+document.getElementById('refresh-btn').addEventListener('click', load);
+load();
+</script>
+</body>
+</html>
