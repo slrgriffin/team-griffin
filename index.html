@@ -89,6 +89,15 @@
     letter-spacing:.06em;padding:.2rem .5rem;border-radius:99px;text-transform:uppercase;
   }
   .day-body{padding:.75rem .9rem .85rem;}
+  .day-tasks{display:flex;flex-wrap:wrap;gap:.4rem;padding:.6rem .9rem .75rem;border-top:1px dashed var(--line);}
+  .task-chip{
+    display:flex;align-items:center;gap:.35rem;font-size:.72rem;font-weight:600;
+    padding:.3rem .6rem;border-radius:99px;background:var(--paper-deep);color:var(--ink-soft);
+    cursor:pointer;border:1px solid var(--line);user-select:none;transition:.15s;
+  }
+  .task-chip .dot{width:.55rem;height:.55rem;border-radius:50%;border:2px solid var(--ink-soft);flex-shrink:0;}
+  .task-chip.done{background:var(--good);color:#fff;border-color:var(--good);}
+  .task-chip.done .dot{background:#fff;border-color:#fff;}
   .vac-banner{
     padding:.75rem .9rem;font-size:.9rem;font-weight:500;color:var(--ink);
     background:repeating-linear-gradient(135deg,rgba(217,164,65,.16),rgba(217,164,65,.16) 10px,rgba(217,164,65,.28) 10px,rgba(217,164,65,.28) 20px);
@@ -215,6 +224,15 @@ function renderDayCard(date, data){
       : `<div class="day-body"><div class="free-day">Nothing scheduled</div></div>`;
   }
 
+  const doneIdx = (data.taskCompletions||{})[dStr] || [];
+  const tasksHtml = (data.dailyReminders||[]).map((label,i) => {
+    const short = label.replace(/^Remember to /i, '');
+    const isDone = doneIdx.includes(i);
+    return `<div class="task-chip${isDone?' done':''}" data-task-date="${dStr}" data-task-index="${i}">
+      <span class="dot"></span>${short}
+    </div>`;
+  }).join('');
+
   return `<div class="day-card${isToday ? ' today':''}">
     <div class="day-head">
       <div class="day-badge"><span class="num">${date.getDate()}</span><span class="mon">${monthAbbr(date)}</span></div>
@@ -222,36 +240,13 @@ function renderDayCard(date, data){
       ${isToday ? '<div class="today-pill">Today</div>' : ''}
     </div>
     ${bodyHtml}
+    <div class="day-tasks">${tasksHtml}</div>
   </div>`;
 }
 
 // ── Checklist actions write straight to schedule.json via Apps Script,
 //    which holds the GitHub token server-side. The browser never sees it.
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw76raQJy3ermBwW4rpBbSR6LCMGztbj-vL4R-LPqBmp6an_jaDp6l4clOPje6F-NJu2A/exec';
-
-function rowHtml(i, label, done){
-  return `<div class="check-row${done?' done':''}" data-i="${i}">
-    <div class="check-box"><svg viewBox="0 0 20 20" fill="none"><path d="M4 10l4 4 8-8" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-    <div class="check-label">${label}</div>
-  </div>`;
-}
-
-// Daily tasks: two-way toggle, completion recorded per-date in schedule.json.
-function renderDailyTasks(items, date, completedIdx){
-  const el = document.getElementById('daily-tasks');
-  if(!items || !items.length){
-    el.innerHTML = '<div class="empty-note">Nothing set for today.</div>';
-    return;
-  }
-  el.innerHTML = items.map((label,i) => rowHtml(i, label, completedIdx.includes(i))).join('');
-  el.querySelectorAll('.check-row').forEach(row => {
-    row.addEventListener('click', () => {
-      const i = Number(row.dataset.i);
-      row.classList.toggle('done'); // optimistic — confirmed on next refresh
-      fetch(`${SCRIPT_URL}?mode=toggleTask&date=${date}&index=${i}`, { mode: 'no-cors' }).catch(()=>{});
-    });
-  });
-}
 
 // Action items: one-way — checking removes it from schedule.json for good.
 function renderActionItems(items, week){
@@ -260,17 +255,31 @@ function renderActionItems(items, week){
     el.innerHTML = '<div class="empty-note">No action items this week.</div>';
     return;
   }
-  el.innerHTML = items.map((label,i) => rowHtml(i, label, false)).join('');
-  el.querySelectorAll('.check-row').forEach(row => {
-    row.addEventListener('click', () => {
-      const i = Number(row.dataset.i);
-      row.style.opacity = '0.4';
-      row.style.pointerEvents = 'none';
-      fetch(`${SCRIPT_URL}?mode=completeAction&week=${week}&index=${i}`, { mode: 'no-cors' }).catch(()=>{});
-      setTimeout(() => row.remove(), 300);
-    });
-  });
+  el.innerHTML = items.map((label,i) => `<div class="check-row" data-i="${i}" data-week="${week}">
+    <div class="check-box"><svg viewBox="0 0 20 20" fill="none"><path d="M4 10l4 4 8-8" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="check-label">${label}</div>
+  </div>`).join('');
 }
+
+// One delegated handler covers both day-card task chips and action items,
+// since #main's contents get replaced each render() but #main itself does not.
+document.getElementById('main').addEventListener('click', (e) => {
+  const chip = e.target.closest('.task-chip');
+  if(chip){
+    const date = chip.dataset.taskDate, idx = chip.dataset.taskIndex;
+    chip.classList.toggle('done'); // optimistic — confirmed after GitHub Pages rebuilds (~30-90s)
+    fetch(`${SCRIPT_URL}?mode=toggleTask&date=${date}&index=${idx}`, { mode: 'no-cors' }).catch(()=>{});
+    return;
+  }
+  const row = e.target.closest('.check-row');
+  if(row){
+    const i = row.dataset.i, week = row.dataset.week;
+    row.style.opacity = '0.4';
+    row.style.pointerEvents = 'none';
+    fetch(`${SCRIPT_URL}?mode=completeAction&week=${week}&index=${i}`, { mode: 'no-cors' }).catch(()=>{});
+    setTimeout(() => row.remove(), 300);
+  }
+});
 
 function render(data){
   document.getElementById('loading')?.remove?.();
@@ -298,15 +307,11 @@ function render(data){
   document.getElementById('main').innerHTML = `
     <div class="section-label">📅 This Week</div>
     ${cardsHtml}
-    <div class="section-label">📌 Daily Tasks</div>
-    <div class="checklist-box" id="daily-tasks"></div>
     <div class="section-label">✅ Action Items</div>
     <div class="checklist-box" id="action-items"></div>
-    <div class="hint">Checking these off is just for tracking on this device. To permanently remove or change something for everyone, tell Claude in chat and it'll update the source.</div>
+    <div class="hint">Daily task check-ins (on each day card) and action items both save straight to the shared schedule — visible to everyone who opens this page, usually within a minute or so.</div>
   `;
 
-  const completedIdx = (data.taskCompletions||{})[todayStr] || [];
-  renderDailyTasks(data.dailyReminders, todayStr, completedIdx);
   renderActionItems((data.weeklyNotes||{})[weekMondayStr], weekMondayStr);
 
   document.getElementById('sync-note').textContent =
