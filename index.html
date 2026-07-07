@@ -98,6 +98,11 @@
   .task-chip .dot{width:.55rem;height:.55rem;border-radius:50%;border:2px solid var(--ink-soft);flex-shrink:0;}
   .task-chip.done{background:var(--good);color:#fff;border-color:var(--good);}
   .task-chip.done .dot{background:#fff;border-color:#fff;}
+  .task-chip.pending{opacity:.55;}
+  .task-chip.unconfirmed{border-color:#B8492F;box-shadow:0 0 0 1px #B8492F inset;}
+  .check-row.pending{opacity:.5;pointer-events:none;}
+  .check-row.unconfirmed{background:rgba(184,73,47,.08);}
+  .tiny-warn{font-size:.68rem;color:#B8492F;font-weight:600;margin-top:.3rem;}
   .vac-banner{
     padding:.75rem .9rem;font-size:.9rem;font-weight:500;color:var(--ink);
     background:repeating-linear-gradient(135deg,rgba(217,164,65,.16),rgba(217,164,65,.16) 10px,rgba(217,164,65,.28) 10px,rgba(217,164,65,.28) 20px);
@@ -170,7 +175,7 @@
 </div>
 
 <script>
-const RAW_JSON_URL = './schedule.json';
+const RAW_JSON_URL = 'https://raw.githubusercontent.com/slrgriffin/team-griffin/main/schedule.json';
 const SEASON_START = '2026-06-15';
 const SEASON_END   = '2026-08-14';
 const DAY_MS = 86400000;
@@ -261,26 +266,74 @@ function renderActionItems(items, week){
   </div>`).join('');
 }
 
+// Polls the raw JSON (cache-busted each try) until `checkFn` confirms the
+// write actually landed, or gives up after ~40s and flags it as unconfirmed.
+async function confirmWrite(el, checkFn, onConfirmed, onGaveUp){
+  for(let i=0;i<8;i++){
+    await new Promise(r=>setTimeout(r,5000));
+    try{
+      const res = await fetch(RAW_JSON_URL + '?t=' + Date.now());
+      if(res.ok){
+        const d = await res.json();
+        if(checkFn(d)){ onConfirmed(); return; }
+      }
+    }catch(e){ /* keep polling */ }
+  }
+  onGaveUp();
+}
+
 // One delegated handler covers both day-card task chips and action items,
 // since #main's contents get replaced each render() but #main itself does not.
 document.getElementById('main').addEventListener('click', (e) => {
   const chip = e.target.closest('.task-chip');
   if(chip){
-    if(chip.dataset.pending) return; // ignore a fast second tap while the first is still in flight
+    if(chip.dataset.pending) return; // already confirming a previous tap
     chip.dataset.pending = '1';
-    const date = chip.dataset.taskDate, idx = chip.dataset.taskIndex;
-    chip.classList.toggle('done'); // optimistic — confirmed after GitHub Pages rebuilds (~30-90s)
+    chip.classList.remove('unconfirmed');
+    chip.classList.add('pending');
+    const date = chip.dataset.taskDate, idx = Number(chip.dataset.taskIndex);
+    chip.classList.toggle('done'); // optimistic flip, verified below
+    const expectDone = chip.classList.contains('done');
     fetch(`${SCRIPT_URL}?mode=toggleTask&date=${date}&index=${idx}`, { mode: 'no-cors' }).catch(()=>{});
-    setTimeout(() => { delete chip.dataset.pending; }, 1200);
+
+    confirmWrite(
+      chip,
+      (d) => {
+        const list = (d.taskCompletions||{})[date] || [];
+        return list.includes(idx) === expectDone;
+      },
+      () => { chip.classList.remove('pending'); delete chip.dataset.pending; },
+      () => {
+        chip.classList.remove('pending');
+        chip.classList.add('unconfirmed');
+        delete chip.dataset.pending;
+      }
+    );
     return;
   }
+
   const row = e.target.closest('.check-row');
   if(row){
-    const i = row.dataset.i, week = row.dataset.week;
-    row.style.opacity = '0.4';
-    row.style.pointerEvents = 'none';
+    if(row.dataset.pending) return;
+    row.dataset.pending = '1';
+    row.classList.add('pending');
+    const i = Number(row.dataset.i), week = row.dataset.week;
+    const label = row.querySelector('.check-label')?.textContent || '';
     fetch(`${SCRIPT_URL}?mode=completeAction&week=${week}&index=${i}`, { mode: 'no-cors' }).catch(()=>{});
-    setTimeout(() => row.remove(), 300);
+
+    confirmWrite(
+      row,
+      (d) => !((d.weeklyNotes||{})[week] || []).includes(label),
+      () => row.remove(),
+      () => {
+        row.classList.remove('pending');
+        row.classList.add('unconfirmed');
+        delete row.dataset.pending;
+        if(!row.querySelector('.tiny-warn')){
+          row.insertAdjacentHTML('beforeend', '<div class="tiny-warn">Didn\'t confirm — try again?</div>');
+        }
+      }
+    );
   }
 });
 
@@ -312,7 +365,7 @@ function render(data){
     ${cardsHtml}
     <div class="section-label">✅ Action Items</div>
     <div class="checklist-box" id="action-items"></div>
-    <div class="hint">Daily task check-ins (on each day card) and action items both save straight to the shared schedule — visible to everyone who opens this page, usually within a minute or so.</div>
+    <div class="hint">Tap a task or action item and it saves to the shared schedule for everyone. It dims briefly while confirming (~10–40s); if a red outline appears instead, it didn't land — try again.</div>
   `;
 
   renderActionItems((data.weeklyNotes||{})[weekMondayStr], weekMondayStr);
