@@ -229,11 +229,11 @@ function renderDayCard(date, data){
       : `<div class="day-body"><div class="free-day">Nothing scheduled</div></div>`;
   }
 
-  const doneIdx = (data.taskCompletions||{})[dStr] || [];
-  const tasksHtml = (data.dailyReminders||[]).map((label,i) => {
-    const short = label.replace(/^Remember to /i, '');
-    const isDone = doneIdx.includes(i);
-    return `<div class="task-chip${isDone?' done':''}" data-task-date="${dStr}" data-task-index="${i}">
+  const doneMap = (data.taskCompletions||{})[dStr] || {};
+  const tasksHtml = (data.dailyReminders||[]).map((t) => {
+    const short = t.label.replace(/^Remember to /i, '');
+    const isDone = !!doneMap[t.id];
+    return `<div class="task-chip${isDone?' done':''}" data-task-date="${dStr}" data-task-id="${t.id}">
       <span class="dot"></span>${short}
     </div>`;
   }).join('');
@@ -253,16 +253,19 @@ function renderDayCard(date, data){
 //    which holds the GitHub token server-side. The browser never sees it.
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw76raQJy3ermBwW4rpBbSR6LCMGztbj-vL4R-LPqBmp6an_jaDp6l4clOPje6F-NJu2A/exec';
 
-// Action items: one-way — checking removes it from schedule.json for good.
+// Action items: checking marks completed:true in schedule.json (kept, not deleted).
+// Only not-yet-completed items are shown, but data-i preserves the item's real
+// position in the underlying array so the write targets the right element.
 function renderActionItems(items, week){
   const el = document.getElementById('action-items');
-  if(!items || !items.length){
+  const pending = (items||[]).map((item,i) => ({...item, i})).filter(x => !x.completed);
+  if(!pending.length){
     el.innerHTML = '<div class="empty-note">No action items this week.</div>';
     return;
   }
-  el.innerHTML = items.map((label,i) => `<div class="check-row" data-i="${i}" data-week="${week}">
+  el.innerHTML = pending.map(({text,i}) => `<div class="check-row" data-i="${i}" data-week="${week}">
     <div class="check-box"><svg viewBox="0 0 20 20" fill="none"><path d="M4 10l4 4 8-8" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-    <div class="check-label">${label}</div>
+    <div class="check-label">${text}</div>
   </div>`).join('');
 }
 
@@ -291,17 +294,14 @@ document.getElementById('main').addEventListener('click', (e) => {
     chip.dataset.pending = '1';
     chip.classList.remove('unconfirmed');
     chip.classList.add('pending');
-    const date = chip.dataset.taskDate, idx = Number(chip.dataset.taskIndex);
+    const date = chip.dataset.taskDate, taskId = chip.dataset.taskId;
     chip.classList.toggle('done'); // optimistic flip, verified below
     const expectDone = chip.classList.contains('done');
-    fetch(`${SCRIPT_URL}?mode=toggleTask&date=${date}&index=${idx}`, { mode: 'no-cors' }).catch(()=>{});
+    fetch(`${SCRIPT_URL}?mode=toggleTask&date=${date}&taskId=${taskId}`, { mode: 'no-cors' }).catch(()=>{});
 
     confirmWrite(
       chip,
-      (d) => {
-        const list = (d.taskCompletions||{})[date] || [];
-        return list.includes(idx) === expectDone;
-      },
+      (d) => !!((d.taskCompletions||{})[date]||{})[taskId] === expectDone,
       () => { chip.classList.remove('pending'); delete chip.dataset.pending; },
       () => {
         chip.classList.remove('pending');
@@ -318,12 +318,11 @@ document.getElementById('main').addEventListener('click', (e) => {
     row.dataset.pending = '1';
     row.classList.add('pending');
     const i = Number(row.dataset.i), week = row.dataset.week;
-    const label = row.querySelector('.check-label')?.textContent || '';
     fetch(`${SCRIPT_URL}?mode=completeAction&week=${week}&index=${i}`, { mode: 'no-cors' }).catch(()=>{});
 
     confirmWrite(
       row,
-      (d) => !((d.weeklyNotes||{})[week] || []).includes(label),
+      (d) => !!(((d.weeklyNotes||{})[week]||[])[i]||{}).completed,
       () => row.remove(),
       () => {
         row.classList.remove('pending');
