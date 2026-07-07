@@ -225,40 +225,49 @@ function renderDayCard(date, data){
   </div>`;
 }
 
-// ── Local, per-device checklist storage (plain localStorage — this page
-//    runs as a normal website, not a Claude artifact) ───────────────────
-function getStored(key){
-  try{
-    const raw = localStorage.getItem(key);
-    return raw ? JSON.parse(raw) : [];
-  }catch(e){ return []; }
-}
-function setStored(key, val){
-  try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){ /* ignore */ }
+// ── Checklist actions write straight to schedule.json via Apps Script,
+//    which holds the GitHub token server-side. The browser never sees it.
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw76raQJy3ermBwW4rpBbSR6LCMGztbj-vL4R-LPqBmp6an_jaDp6l4clOPje6F-NJu2A/exec';
+
+function rowHtml(i, label, done){
+  return `<div class="check-row${done?' done':''}" data-i="${i}">
+    <div class="check-box"><svg viewBox="0 0 20 20" fill="none"><path d="M4 10l4 4 8-8" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="check-label">${label}</div>
+  </div>`;
 }
 
-function renderChecklist(containerId, items, storageKey, emptyText){
-  const el = document.getElementById(containerId);
+// Daily tasks: two-way toggle, completion recorded per-date in schedule.json.
+function renderDailyTasks(items, date, completedIdx){
+  const el = document.getElementById('daily-tasks');
   if(!items || !items.length){
-    el.innerHTML = `<div class="empty-note">${emptyText}</div>`;
+    el.innerHTML = '<div class="empty-note">Nothing set for today.</div>';
     return;
   }
-  const done = getStored(storageKey);
-  el.innerHTML = items.map((label, i) => {
-    const isDone = done.includes(i);
-    return `<div class="check-row${isDone?' done':''}" data-i="${i}">
-      <div class="check-box"><svg viewBox="0 0 20 20" fill="none"><path d="M4 10l4 4 8-8" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="check-label">${label}</div>
-    </div>`;
-  }).join('');
-
+  el.innerHTML = items.map((label,i) => rowHtml(i, label, completedIdx.includes(i))).join('');
   el.querySelectorAll('.check-row').forEach(row => {
     row.addEventListener('click', () => {
       const i = Number(row.dataset.i);
-      let d = getStored(storageKey);
-      d = d.includes(i) ? d.filter(x => x !== i) : [...d, i];
-      setStored(storageKey, d);
-      row.classList.toggle('done');
+      row.classList.toggle('done'); // optimistic — confirmed on next refresh
+      fetch(`${SCRIPT_URL}?mode=toggleTask&date=${date}&index=${i}`, { mode: 'no-cors' }).catch(()=>{});
+    });
+  });
+}
+
+// Action items: one-way — checking removes it from schedule.json for good.
+function renderActionItems(items, week){
+  const el = document.getElementById('action-items');
+  if(!items || !items.length){
+    el.innerHTML = '<div class="empty-note">No action items this week.</div>';
+    return;
+  }
+  el.innerHTML = items.map((label,i) => rowHtml(i, label, false)).join('');
+  el.querySelectorAll('.check-row').forEach(row => {
+    row.addEventListener('click', () => {
+      const i = Number(row.dataset.i);
+      row.style.opacity = '0.4';
+      row.style.pointerEvents = 'none';
+      fetch(`${SCRIPT_URL}?mode=completeAction&week=${week}&index=${i}`, { mode: 'no-cors' }).catch(()=>{});
+      setTimeout(() => row.remove(), 300);
     });
   });
 }
@@ -296,8 +305,9 @@ function render(data){
     <div class="hint">Checking these off is just for tracking on this device. To permanently remove or change something for everyone, tell Claude in chat and it'll update the source.</div>
   `;
 
-  renderChecklist('daily-tasks', data.dailyReminders, `tasks:${todayStr}`, 'Nothing set for today.');
-  renderChecklist('action-items', (data.weeklyNotes||{})[weekMondayStr], `actions:${weekMondayStr}`, 'No action items this week.');
+  const completedIdx = (data.taskCompletions||{})[todayStr] || [];
+  renderDailyTasks(data.dailyReminders, todayStr, completedIdx);
+  renderActionItems((data.weeklyNotes||{})[weekMondayStr], weekMondayStr);
 
   document.getElementById('sync-note').textContent =
     `Synced from GitHub · ${new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}`;
