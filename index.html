@@ -1,6 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>
+  // GitHub Pages doesn't allow custom Cache-Control headers, so any cached
+  // copy of this page (browser or CDN) can go stale after we push updates.
+  // Force every load to be a genuinely fresh network fetch by navigating to
+  // a URL with a unique query string — impossible for any cache to already
+  // have an entry for. Runs before anything else loads.
+  if (!location.search.includes('v=')) {
+    location.replace(location.pathname + '?v=' + Date.now());
+  }
+</script>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Team Griffin</title>
