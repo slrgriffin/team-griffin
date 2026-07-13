@@ -181,6 +181,16 @@
     "2026-07-06": [
       {
         "text": "ANNA — Review intake info at https://sanandreasregional.org/services/intake/",
+        "completed": true
+      }
+    ],
+    "2026-07-13": [
+      {
+        "text": "ANNA — Relax and recharge",
+        "completed": false
+      },
+      {
+        "text": "ANNA — Think on kids & family: what can we do to help the kids be happy and successful, and what do you need to feel happy and satisfied rather than stressed and overwhelmed?",
         "completed": false
       }
     ]
