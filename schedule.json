@@ -166,14 +166,63 @@
     },
     "2026-07-28": {
       "n": [
+        "Robotics Camp · 9:00 am–3:00 pm @ Grace Church",
         "Therapy · 9:00 am @ Via Oso",
         "Roller League · 4:00–4:45 pm @ Silver Creek",
         "Little Giants · 7:00–7:45 pm @ Milpitas"
       ],
       "a": [
+        "Robotics Camp · 9:00 am–3:00 pm @ Grace Church",
         "Dentist · 8:00–9:00 am @ Blossom Hill",
         "Roller League · 4:00–4:45 pm @ Silver Creek",
         "Little Giants · 7:00–7:45 pm @ Milpitas"
+      ],
+      "f": []
+    },
+    "2026-07-27": {
+      "n": [
+        "Robotics Camp · 9:00 am–3:00 pm @ Grace Church",
+        "Parcor Flip · 4:00–5:15 pm @ SI"
+      ],
+      "a": [
+        "Robotics Camp · 9:00 am–3:00 pm @ Grace Church",
+        "Roller Shooting · 5:15–6:00 pm @ Silver Creek"
+      ],
+      "f": []
+    },
+    "2026-07-29": {
+      "n": [
+        "Robotics Camp · 9:00 am–3:00 pm @ Grace Church",
+        "Parcor · 5:30–6:45 pm @ SJ"
+      ],
+      "a": [
+        "Robotics Camp · 9:00 am–3:00 pm @ Grace Church",
+        "Parcor · 5:30–6:45 pm @ SJ"
+      ],
+      "f": []
+    },
+    "2026-07-30": {
+      "n": [
+        "Robotics Camp · 9:00 am–3:00 pm @ Grace Church",
+        "Parcor · 5:30–6:45 pm @ SJ"
+      ],
+      "a": [
+        "Robotics Camp · 9:00 am–3:00 pm @ Grace Church",
+        "TKD Advanced · 4:00–4:45 pm @ Santa Teresa",
+        "Parcor · 5:30–6:45 pm @ SJ"
+      ],
+      "f": []
+    },
+    "2026-07-31": {
+      "n": [
+        "Robotics Camp · 9:00 am–3:00 pm @ Grace Church",
+        "TKD Black Belt · 6:00–6:45 pm @ Santa Teresa",
+        "TKD XMA · 6:45–7:30 pm @ Santa Teresa"
+      ],
+      "a": [
+        "Robotics Camp · 9:00 am–3:00 pm @ Grace Church",
+        "TKD Advanced · 4:00–4:45 pm @ Santa Teresa",
+        "TKD XMA · 6:45–7:30 pm @ Santa Teresa"
       ],
       "f": []
     }
