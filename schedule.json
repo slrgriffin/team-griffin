@@ -260,5 +260,139 @@
       "reading": true,
       "exercises": true
     }
+  },
+  "activityOptions": {
+    "Monday": [
+      {
+        "child": "Nollen",
+        "name": "TKD Black Belt",
+        "start": "18:00",
+        "end": "18:45",
+        "location": "Santa Teresa"
+      },
+      {
+        "child": "Austin",
+        "name": "Roller Shooting",
+        "start": "17:15",
+        "end": "18:00",
+        "location": "Silver Creek"
+      }
+    ],
+    "Tuesday": [
+      {
+        "child": "Nollen",
+        "name": "Roller League",
+        "start": "16:00",
+        "end": "16:45",
+        "location": "Silver Creek"
+      },
+      {
+        "child": "Nollen",
+        "name": "Little Giants",
+        "start": "19:00",
+        "end": "19:45",
+        "location": "Milpitas"
+      },
+      {
+        "child": "Austin",
+        "name": "Roller League",
+        "start": "16:00",
+        "end": "16:45",
+        "location": "Silver Creek"
+      },
+      {
+        "child": "Austin",
+        "name": "Little Giants",
+        "start": "19:00",
+        "end": "19:45",
+        "location": "Milpitas"
+      }
+    ],
+    "Wednesday": [
+      {
+        "child": "Nollen",
+        "name": "Parcor",
+        "start": "17:30",
+        "end": "18:45",
+        "location": "SJ"
+      },
+      {
+        "child": "Austin",
+        "name": "Parcor",
+        "start": "17:30",
+        "end": "18:45",
+        "location": "SJ"
+      }
+    ],
+    "Thursday": [
+      {
+        "child": "Nollen",
+        "name": "Parcor",
+        "start": "17:30",
+        "end": "18:45",
+        "location": "SJ"
+      },
+      {
+        "child": "Austin",
+        "name": "TKD Advanced",
+        "start": "16:00",
+        "end": "16:45",
+        "location": "Santa Teresa"
+      },
+      {
+        "child": "Austin",
+        "name": "Parcor",
+        "start": "17:30",
+        "end": "18:45",
+        "location": "SJ"
+      }
+    ],
+    "Friday": [
+      {
+        "child": "Nollen",
+        "name": "TKD Black Belt",
+        "start": "18:00",
+        "end": "18:45",
+        "location": "Santa Teresa"
+      },
+      {
+        "child": "Nollen",
+        "name": "TKD XMA",
+        "start": "18:45",
+        "end": "19:30",
+        "location": "Santa Teresa"
+      },
+      {
+        "child": "Austin",
+        "name": "TKD Advanced",
+        "start": "16:00",
+        "end": "16:45",
+        "location": "Santa Teresa"
+      },
+      {
+        "child": "Austin",
+        "name": "TKD XMA",
+        "start": "18:45",
+        "end": "19:30",
+        "location": "Santa Teresa"
+      }
+    ],
+    "Saturday": [
+      {
+        "child": "Nollen",
+        "name": "Roller Game",
+        "start": "10:00",
+        "end": "10:45",
+        "location": "Silver Creek"
+      },
+      {
+        "child": "Austin",
+        "name": "Roller Game",
+        "start": "10:00",
+        "end": "10:45",
+        "location": "Silver Creek"
+      }
+    ],
+    "Sunday": []
   }
 }
