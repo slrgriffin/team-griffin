@@ -163,6 +163,28 @@
     padding:.35rem .8rem;border-radius:99px;cursor:pointer;font-family:inherit;font-weight:600;
   }
   .refresh-btn:hover{background:rgba(0,0,0,.03);}
+
+  .tabs{display:flex;gap:.5rem;padding:1rem 1.25rem 0;}
+  .tab-btn{
+    flex:1;background:var(--card);border:1px solid var(--line);border-radius:8px;
+    padding:.55rem;font-family:inherit;font-weight:600;font-size:.85rem;color:var(--ink-soft);
+    cursor:pointer;transition:.15s;
+  }
+  .tab-btn.active{background:var(--pine);color:#fff;border-color:var(--pine);}
+
+  .opt-row{
+    display:flex;align-items:center;gap:.55rem;padding:.5rem .2rem;font-size:.85rem;
+    border-bottom:1px solid var(--line);
+  }
+  .opt-row:last-child{border-bottom:none;}
+  .opt-row.opt-dim{opacity:.5;}
+  .opt-text{flex:1;color:var(--ink-soft);}
+  .opt-badge{
+    font-size:.65rem;font-weight:700;padding:.15rem .45rem;border-radius:99px;flex-shrink:0;
+    white-space:nowrap;
+  }
+  .opt-pick{background:rgba(76,122,82,.15);color:var(--good);}
+  .opt-conflict{background:rgba(184,73,47,.13);color:#B8492F;}
 </style>
 </head>
 <body>
@@ -177,9 +199,15 @@
     </div>
   </header>
 
+  <div class="tabs">
+    <button class="tab-btn active" id="tab-btn-week">📅 This Week</button>
+    <button class="tab-btn" id="tab-btn-activities">⚙️ Activities</button>
+  </div>
+
   <main id="main">
     <div class="state-msg" id="loading">Loading schedule…</div>
   </main>
+  <div id="activities-panel" style="display:none;padding:0 1.25rem;"></div>
 
   <footer>
     <div id="sync-note">—</div>
@@ -381,6 +409,7 @@ function render(data){
   `;
 
   renderActionItems((data.weeklyNotes||{})[weekMondayStr], weekMondayStr);
+  renderActivitiesTab(data);
 
   document.getElementById('sync-note').textContent =
     `Synced from GitHub · ${new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}`;
@@ -390,6 +419,93 @@ function renderError(msg){
   document.getElementById('main').innerHTML = `<div class="state-msg">⚠️ ${msg}</div>`;
   document.getElementById('week-range').textContent = 'Unable to load';
 }
+
+// ── Activity options & optimizer ──────────────────────────────────
+// Classic activity-selection algorithm: sort by end time, greedily keep
+// each option that doesn't overlap the last one kept. This is proven to
+// maximize the number of non-conflicting activities that can be kept —
+// it's the same approach used for interval scheduling generally.
+function timeToMinutes(t){ const [h,m]=t.split(':').map(Number); return h*60+m; }
+
+function formatTime12(t){
+  const [h,m]=t.split(':').map(Number);
+  const ampm = h>=12 ? 'pm':'am';
+  const hh = ((h+11)%12)+1;
+  return `${hh}:${String(m).padStart(2,'0')} ${ampm}`;
+}
+
+function optimizePicks(list){
+  const withIdx = list.map((a,i)=>({...a, i}));
+  withIdx.sort((a,b)=>timeToMinutes(a.end)-timeToMinutes(b.end));
+  const picked = new Set();
+  let lastEnd = -1;
+  for(const a of withIdx){
+    const s = timeToMinutes(a.start);
+    if(s >= lastEnd){ picked.add(a.i); lastEnd = timeToMinutes(a.end); }
+  }
+  return picked;
+}
+
+function hasAnyConflict(list, i){
+  const a = list[i];
+  const aS = timeToMinutes(a.start), aE = timeToMinutes(a.end);
+  return list.some((b,j)=>{
+    if(j===i) return false;
+    const bS = timeToMinutes(b.start), bE = timeToMinutes(b.end);
+    return aS < bE && bS < aE;
+  });
+}
+
+function renderChildOptions(label, tagClass, list){
+  if(!list.length) return '';
+  const picked = optimizePicks(list);
+  return list.map((a,i) => {
+    const isPicked = picked.has(i);
+    const conflict = !isPicked && hasAnyConflict(list, i);
+    const badge = isPicked
+      ? '<span class="opt-badge opt-pick">✓ optimal pick</span>'
+      : (conflict ? '<span class="opt-badge opt-conflict">⚠ conflict</span>' : '');
+    return `<div class="opt-row${isPicked?'':' opt-dim'}">
+      <span class="person-tag ${tagClass}">${label}</span>
+      <span class="opt-text">${a.name} · ${formatTime12(a.start)}–${formatTime12(a.end)} @ ${a.location}</span>
+      ${badge}
+    </div>`;
+  }).join('');
+}
+
+function renderActivitiesTab(data){
+  const days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  const opts = data.activityOptions || {};
+  let html = '<div class="section-label">⚙️ Activity Options &amp; Optimizer</div>' +
+    '<div class="hint" style="margin:0 0 1rem">Every logged option per day, reoptimized automatically. ' +
+    'Tell Claude about a new class, a dropped one, or a time change — this recalculates next load, no manual re-run needed.</div>';
+
+  days.forEach(day => {
+    const acts = opts[day] || [];
+    const nollen = acts.filter(a=>a.child==='Nollen');
+    const austin = acts.filter(a=>a.child==='Austin');
+    const bodyRows = renderChildOptions('N','tag-n',nollen) + renderChildOptions('A','tag-a',austin);
+    html += `<div class="day-card">
+      <div class="day-head"><div class="day-name">${day}</div></div>
+      <div class="day-body">${bodyRows || '<div class="free-day">No options logged</div>'}</div>
+    </div>`;
+  });
+
+  document.getElementById('activities-panel').innerHTML = html;
+}
+
+document.getElementById('tab-btn-week').addEventListener('click', () => {
+  document.getElementById('tab-btn-week').classList.add('active');
+  document.getElementById('tab-btn-activities').classList.remove('active');
+  document.getElementById('main').style.display = '';
+  document.getElementById('activities-panel').style.display = 'none';
+});
+document.getElementById('tab-btn-activities').addEventListener('click', () => {
+  document.getElementById('tab-btn-activities').classList.add('active');
+  document.getElementById('tab-btn-week').classList.remove('active');
+  document.getElementById('main').style.display = 'none';
+  document.getElementById('activities-panel').style.display = '';
+});
 
 async function load(){
   document.getElementById('main').innerHTML = '<div class="state-msg" id="loading">Loading schedule…</div>';
