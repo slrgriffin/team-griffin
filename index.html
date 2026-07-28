@@ -434,14 +434,24 @@ function formatTime12(t){
   return `${hh}:${String(m).padStart(2,'0')} ${ampm}`;
 }
 
+// Activities already actually chosen (matching the real weekly pattern) are
+// locked in first — the optimizer shouldn't suggest swapping out a decision
+// that's already been made. Remaining time is then filled greedily with
+// whatever additional non-conflicting alternatives fit, by earliest end time.
 function optimizePicks(list){
   const withIdx = list.map((a,i)=>({...a, i}));
-  withIdx.sort((a,b)=>timeToMinutes(a.end)-timeToMinutes(b.end));
-  const picked = new Set();
-  let lastEnd = -1;
-  for(const a of withIdx){
-    const s = timeToMinutes(a.start);
-    if(s >= lastEnd){ picked.add(a.i); lastEnd = timeToMinutes(a.end); }
+  const overlaps = (a,b) => timeToMinutes(a.start) < timeToMinutes(b.end) && timeToMinutes(b.start) < timeToMinutes(a.end);
+
+  const preferred = withIdx.filter(a=>a.preferred);
+  const alts = withIdx.filter(a=>!a.preferred).sort((a,b)=>timeToMinutes(a.end)-timeToMinutes(b.end));
+
+  const picked = new Set(preferred.map(a=>a.i));
+  const lockedIn = [...preferred];
+  for(const alt of alts){
+    if(!lockedIn.some(p => overlaps(alt,p))){
+      picked.add(alt.i);
+      lockedIn.push(alt);
+    }
   }
   return picked;
 }
@@ -462,9 +472,10 @@ function renderChildOptions(label, tagClass, list){
   return list.map((a,i) => {
     const isPicked = picked.has(i);
     const conflict = !isPicked && hasAnyConflict(list, i);
-    const badge = isPicked
-      ? '<span class="opt-badge opt-pick">✓ optimal pick</span>'
-      : (conflict ? '<span class="opt-badge opt-conflict">⚠ conflict</span>' : '');
+    let badge = '';
+    if(isPicked && a.preferred) badge = '<span class="opt-badge opt-pick">✓ current pick</span>';
+    else if(isPicked) badge = '<span class="opt-badge opt-pick">✓ fits too</span>';
+    else if(conflict) badge = '<span class="opt-badge opt-conflict">⚠ conflict</span>';
     return `<div class="opt-row${isPicked?'':' opt-dim'}">
       <span class="person-tag ${tagClass}">${label}</span>
       <span class="opt-text">${a.name} · ${formatTime12(a.start)}–${formatTime12(a.end)} @ ${a.location}</span>
