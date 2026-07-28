@@ -11,12 +11,10 @@
     },
     "Tuesday": {
       "n": [
-        "Roller League · 4:00–4:45 pm @ Silver Creek",
-        "Little Giants · 7:00–7:45 pm @ Milpitas"
+        "Roller League · 4:00–4:45 pm @ Silver Creek"
       ],
       "a": [
-        "Roller League · 4:00–4:45 pm @ Silver Creek",
-        "Little Giants · 7:00–7:45 pm @ Milpitas"
+        "Roller League · 4:00–4:45 pm @ Silver Creek"
       ],
       "f": []
     },
@@ -266,8 +264,23 @@
       {
         "child": "Nollen",
         "name": "TKD Black Belt",
-        "start": "18:00",
-        "end": "18:45",
+        "start": "16:45",
+        "end": "17:30",
+        "location": "Santa Teresa",
+        "preferred": true
+      },
+      {
+        "child": "Nollen",
+        "name": "Roller Goalie",
+        "start": "16:15",
+        "end": "17:00",
+        "location": "Silver Creek"
+      },
+      {
+        "child": "Austin",
+        "name": "TKD Advanced",
+        "start": "18:15",
+        "end": "19:00",
         "location": "Santa Teresa"
       },
       {
@@ -275,7 +288,8 @@
         "name": "Roller Shooting",
         "start": "17:15",
         "end": "18:00",
-        "location": "Silver Creek"
+        "location": "Silver Creek",
+        "preferred": true
       }
     ],
     "Tuesday": [
@@ -284,53 +298,16 @@
         "name": "Roller League",
         "start": "16:00",
         "end": "16:45",
-        "location": "Silver Creek"
-      },
-      {
-        "child": "Nollen",
-        "name": "Little Giants",
-        "start": "19:00",
-        "end": "19:45",
-        "location": "Milpitas"
+        "location": "Silver Creek",
+        "preferred": true
       },
       {
         "child": "Austin",
         "name": "Roller League",
         "start": "16:00",
         "end": "16:45",
-        "location": "Silver Creek"
-      },
-      {
-        "child": "Austin",
-        "name": "Little Giants",
-        "start": "19:00",
-        "end": "19:45",
-        "location": "Milpitas"
-      }
-    ],
-    "Wednesday": [
-      {
-        "child": "Nollen",
-        "name": "Parcor",
-        "start": "17:30",
-        "end": "18:45",
-        "location": "SJ"
-      },
-      {
-        "child": "Austin",
-        "name": "Parcor",
-        "start": "17:30",
-        "end": "18:45",
-        "location": "SJ"
-      }
-    ],
-    "Thursday": [
-      {
-        "child": "Nollen",
-        "name": "Parcor",
-        "start": "17:30",
-        "end": "18:45",
-        "location": "SJ"
+        "location": "Silver Creek",
+        "preferred": true
       },
       {
         "child": "Austin",
@@ -340,14 +317,19 @@
         "location": "Santa Teresa"
       },
       {
+        "child": "Nollen",
+        "name": "Parcor",
+        "start": "17:30",
+        "end": "18:45",
+        "location": "SJ"
+      },
+      {
         "child": "Austin",
         "name": "Parcor",
         "start": "17:30",
         "end": "18:45",
         "location": "SJ"
-      }
-    ],
-    "Friday": [
+      },
       {
         "child": "Nollen",
         "name": "TKD Black Belt",
@@ -356,25 +338,131 @@
         "location": "Santa Teresa"
       },
       {
+        "child": "Austin",
+        "name": "TKD Advanced Evening",
+        "start": "19:30",
+        "end": "20:15",
+        "location": "Santa Teresa"
+      }
+    ],
+    "Wednesday": [
+      {
+        "child": "Austin",
+        "name": "Roller Systems",
+        "start": "16:15",
+        "end": "17:00",
+        "location": "Silver Creek"
+      },
+      {
         "child": "Nollen",
-        "name": "TKD XMA",
-        "start": "18:45",
-        "end": "19:30",
+        "name": "TKD Black Belt",
+        "start": "16:45",
+        "end": "17:30",
         "location": "Santa Teresa"
       },
+      {
+        "child": "Nollen",
+        "name": "Parcor",
+        "start": "17:30",
+        "end": "18:45",
+        "location": "SJ",
+        "preferred": true
+      },
+      {
+        "child": "Austin",
+        "name": "Parcor",
+        "start": "17:30",
+        "end": "18:45",
+        "location": "SJ",
+        "preferred": true
+      },
+      {
+        "child": "Austin",
+        "name": "TKD Advanced",
+        "start": "18:15",
+        "end": "19:00",
+        "location": "Santa Teresa"
+      }
+    ],
+    "Thursday": [
       {
         "child": "Austin",
         "name": "TKD Advanced",
         "start": "16:00",
         "end": "16:45",
+        "location": "Santa Teresa",
+        "preferred": true
+      },
+      {
+        "child": "Austin",
+        "name": "Roller Mayhem",
+        "start": "16:00",
+        "end": "16:45",
+        "location": "Silver Creek"
+      },
+      {
+        "child": "Nollen",
+        "name": "Parcor",
+        "start": "17:30",
+        "end": "18:45",
+        "location": "SJ",
+        "preferred": true
+      },
+      {
+        "child": "Austin",
+        "name": "Parcor",
+        "start": "17:30",
+        "end": "18:45",
+        "location": "SJ",
+        "preferred": true
+      },
+      {
+        "child": "Nollen",
+        "name": "TKD Black Belt",
+        "start": "18:00",
+        "end": "18:45",
         "location": "Santa Teresa"
+      },
+      {
+        "child": "Austin",
+        "name": "TKD Advanced Evening",
+        "start": "19:30",
+        "end": "20:15",
+        "location": "Santa Teresa"
+      }
+    ],
+    "Friday": [
+      {
+        "child": "Austin",
+        "name": "TKD Advanced",
+        "start": "16:00",
+        "end": "16:45",
+        "location": "Santa Teresa",
+        "preferred": true
+      },
+      {
+        "child": "Nollen",
+        "name": "TKD Black Belt",
+        "start": "18:00",
+        "end": "18:45",
+        "location": "Santa Teresa",
+        "preferred": true
+      },
+      {
+        "child": "Nollen",
+        "name": "TKD XMA",
+        "start": "18:45",
+        "end": "19:30",
+        "location": "Santa Teresa",
+        "preferred": true
       },
       {
         "child": "Austin",
         "name": "TKD XMA",
         "start": "18:45",
         "end": "19:30",
-        "location": "Santa Teresa"
+        "location": "Santa Teresa",
+        "preferred": true
       }
     ],
     "Saturday": [
@@ -383,14 +471,58 @@
         "name": "Roller Game",
         "start": "10:00",
         "end": "10:45",
-        "location": "Silver Creek"
+        "location": "Silver Creek",
+        "preferred": true
       },
       {
         "child": "Austin",
         "name": "Roller Game",
         "start": "10:00",
         "end": "10:45",
-        "location": "Silver Creek"
+        "location": "Silver Creek",
+        "preferred": true
+      },
+      {
+        "child": "Austin",
+        "name": "TKD Advanced",
+        "start": "10:15",
+        "end": "11:00",
+        "location": "Santa Teresa"
+      },
+      {
+        "child": "Nollen",
+        "name": "TKD Sparring",
+        "start": "11:00",
+        "end": "11:30",
+        "location": "Santa Teresa"
+      },
+      {
+        "child": "Austin",
+        "name": "TKD Sparring",
+        "start": "11:00",
+        "end": "11:30",
+        "location": "Santa Teresa"
+      },
+      {
+        "child": "Nollen",
+        "name": "TKD Black Belt",
+        "start": "11:30",
+        "end": "12:15",
+        "location": "Santa Teresa"
+      },
+      {
+        "child": "Nollen",
+        "name": "Parcor",
+        "start": "11:30",
+        "end": "12:45",
+        "location": "SJ"
+      },
+      {
+        "child": "Austin",
+        "name": "Parcor",
+        "start": "11:30",
+        "end": "12:45",
+        "location": "SJ"
       }
     ],
     "Sunday": []
