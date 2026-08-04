@@ -10,9 +10,7 @@
       "f": []
     },
     "Tuesday": {
-      "n": [
-        "Roller League · 4:00–4:45 pm @ Silver Creek"
-      ],
+      "n": [],
       "a": [
         "Roller League · 4:00–4:45 pm @ Silver Creek"
       ],
@@ -49,9 +47,7 @@
       "f": []
     },
     "Saturday": {
-      "n": [
-        "Roller Game · 10:00–10:45 am @ Silver Creek"
-      ],
+      "n": [],
       "a": [
         "Roller Game · 10:00–10:45 am @ Silver Creek"
       ],
@@ -165,15 +161,12 @@
     "2026-07-28": {
       "n": [
         "Robotics Camp · 9:00 am–3:00 pm @ Grace Church",
-        "Therapy · 9:00 am @ Via Oso",
-        "Roller League · 4:00–4:45 pm @ Silver Creek",
-        "Little Giants · 7:00–7:45 pm @ Milpitas"
+        "Therapy · 9:00 am @ Via Oso"
       ],
       "a": [
         "Robotics Camp · 9:00 am–3:00 pm @ Grace Church",
         "Dentist · 8:00–9:00 am @ Blossom Hill",
-        "Roller League · 4:00–4:45 pm @ Silver Creek",
-        "Little Giants · 7:00–7:45 pm @ Milpitas"
+        "Roller League · 4:00–4:45 pm @ Silver Creek"
       ],
       "f": []
     },
@@ -226,8 +219,7 @@
     },
     "2026-08-04": {
       "n": [
-        "Annual Checkup · Dr. Tsui · 3:15 pm",
-        "Roller League · 4:00–4:45 pm @ Silver Creek"
+        "Annual Checkup · Dr. Tsui · 3:15 pm"
       ],
       "a": [
         "Roller League · 4:00–4:45 pm @ Silver Creek"
@@ -286,13 +278,6 @@
         "preferred": true
       },
       {
-        "child": "Nollen",
-        "name": "Roller Goalie",
-        "start": "16:15",
-        "end": "17:00",
-        "location": "Silver Creek"
-      },
-      {
         "child": "Austin",
         "name": "TKD Advanced",
         "start": "18:15",
@@ -309,14 +294,6 @@
       }
     ],
     "Tuesday": [
-      {
-        "child": "Nollen",
-        "name": "Roller League",
-        "start": "16:00",
-        "end": "16:45",
-        "location": "Silver Creek",
-        "preferred": true
-      },
       {
         "child": "Austin",
         "name": "Roller League",
@@ -482,14 +459,6 @@
       }
     ],
     "Saturday": [
-      {
-        "child": "Nollen",
-        "name": "Roller Game",
-        "start": "10:00",
-        "end": "10:45",
-        "location": "Silver Creek",
-        "preferred": true
-      },
       {
         "child": "Austin",
         "name": "Roller Game",
