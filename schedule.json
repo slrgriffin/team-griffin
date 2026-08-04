@@ -273,7 +273,8 @@
       "reading": true
     },
     "2026-08-04": {
-      "reading": true
+      "reading": true,
+      "exercises": true
     }
   },
   "activityOptions": {
