@@ -19,20 +19,20 @@
     },
     "Wednesday": {
       "n": [
-        "Parcor · 5:30–6:45 pm @ SJ"
+        "Parcor · 5:30–7:00 pm @ SJ"
       ],
       "a": [
-        "Parcor · 5:30–6:45 pm @ SJ"
+        "Parcor · 5:30–7:00 pm @ SJ"
       ],
       "f": []
     },
     "Thursday": {
       "n": [
-        "Parcor · 5:30–6:45 pm @ SJ"
+        "Parcor · 5:30–7:00 pm @ SJ"
       ],
       "a": [
         "TKD Advanced · 4:00–4:45 pm @ Santa Teresa",
-        "Parcor · 5:30–6:45 pm @ SJ"
+        "Parcor · 5:30–7:00 pm @ SJ"
       ],
       "f": []
     },
@@ -186,23 +186,23 @@
     "2026-07-29": {
       "n": [
         "Robotics Camp · 9:00 am–3:00 pm @ Grace Church",
-        "Parcor · 5:30–6:45 pm @ SJ"
+        "Parcor · 5:30–7:00 pm @ SJ"
       ],
       "a": [
         "Robotics Camp · 9:00 am–3:00 pm @ Grace Church",
-        "Parcor · 5:30–6:45 pm @ SJ"
+        "Parcor · 5:30–7:00 pm @ SJ"
       ],
       "f": []
     },
     "2026-07-30": {
       "n": [
         "Robotics Camp · 9:00 am–3:00 pm @ Grace Church",
-        "Parcor · 5:30–6:45 pm @ SJ"
+        "Parcor · 5:30–7:00 pm @ SJ"
       ],
       "a": [
         "Robotics Camp · 9:00 am–3:00 pm @ Grace Church",
         "TKD Advanced · 4:00–4:45 pm @ Santa Teresa",
-        "Parcor · 5:30–6:45 pm @ SJ"
+        "Parcor · 5:30–7:00 pm @ SJ"
       ],
       "f": []
     },
@@ -313,14 +313,14 @@
         "child": "Nollen",
         "name": "Parcor",
         "start": "17:30",
-        "end": "18:45",
+        "end": "19:00",
         "location": "SJ"
       },
       {
         "child": "Austin",
         "name": "Parcor",
         "start": "17:30",
-        "end": "18:45",
+        "end": "19:00",
         "location": "SJ"
       },
       {
@@ -373,7 +373,7 @@
         "child": "Nollen",
         "name": "Parcor",
         "start": "17:30",
-        "end": "18:45",
+        "end": "19:00",
         "location": "SJ",
         "preferred": true
       },
@@ -381,7 +381,7 @@
         "child": "Austin",
         "name": "Parcor",
         "start": "17:30",
-        "end": "18:45",
+        "end": "19:00",
         "location": "SJ",
         "preferred": true
       },
@@ -413,7 +413,7 @@
         "child": "Nollen",
         "name": "Parcor",
         "start": "17:30",
-        "end": "18:45",
+        "end": "19:00",
         "location": "SJ",
         "preferred": true
       },
@@ -421,7 +421,7 @@
         "child": "Austin",
         "name": "Parcor",
         "start": "17:30",
-        "end": "18:45",
+        "end": "19:00",
         "location": "SJ",
         "preferred": true
       },
@@ -472,6 +472,20 @@
         "end": "19:30",
         "location": "Santa Teresa",
         "preferred": true
+      },
+      {
+        "child": "Nollen",
+        "name": "Parcor",
+        "start": "17:30",
+        "end": "19:00",
+        "location": "SJ"
+      },
+      {
+        "child": "Austin",
+        "name": "Parcor",
+        "start": "17:30",
+        "end": "19:00",
+        "location": "SJ"
       }
     ],
     "Saturday": [
