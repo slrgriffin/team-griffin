@@ -12,7 +12,8 @@
     "Tuesday": {
       "n": [],
       "a": [
-        "Roller League · 4:00–4:45 pm @ Silver Creek"
+        "8U Practice · 4:15–5:00 pm @ Silver Creek",
+        "Travel Practice · 5:00–6:00 pm @ Silver Creek"
       ],
       "f": []
     },
@@ -166,7 +167,8 @@
       "a": [
         "Robotics Camp · 9:00 am–3:00 pm @ Grace Church",
         "Dentist · 8:00–9:00 am @ Blossom Hill",
-        "Roller League · 4:00–4:45 pm @ Silver Creek"
+        "8U Practice · 4:15–5:00 pm @ Silver Creek",
+        "Travel Practice · 5:00–6:00 pm @ Silver Creek"
       ],
       "f": []
     },
@@ -222,7 +224,8 @@
         "Annual Checkup · Dr. Tsui · 3:15 pm"
       ],
       "a": [
-        "Roller League · 4:00–4:45 pm @ Silver Creek"
+        "8U Practice · 4:15–5:00 pm @ Silver Creek",
+        "Travel Practice · 5:00–6:00 pm @ Silver Creek"
       ],
       "f": []
     }
@@ -296,14 +299,6 @@
     "Tuesday": [
       {
         "child": "Austin",
-        "name": "Roller League",
-        "start": "16:00",
-        "end": "16:45",
-        "location": "Silver Creek",
-        "preferred": true
-      },
-      {
-        "child": "Austin",
         "name": "TKD Advanced",
         "start": "16:00",
         "end": "16:45",
@@ -336,6 +331,22 @@
         "start": "19:30",
         "end": "20:15",
         "location": "Santa Teresa"
+      },
+      {
+        "child": "Austin",
+        "name": "8U Practice",
+        "start": "16:15",
+        "end": "17:00",
+        "location": "Silver Creek",
+        "preferred": true
+      },
+      {
+        "child": "Austin",
+        "name": "Travel Practice",
+        "start": "17:00",
+        "end": "18:00",
+        "location": "Silver Creek",
+        "preferred": true
       }
     ],
     "Wednesday": [
