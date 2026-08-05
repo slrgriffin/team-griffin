@@ -172,19 +172,41 @@
   }
   .tab-btn.active{background:var(--pine);color:#fff;border-color:var(--pine);}
 
-  .opt-row{
-    display:flex;align-items:center;gap:.55rem;padding:.5rem .2rem;font-size:.85rem;
-    border-bottom:1px solid var(--line);
+  .tt-legend{font-size:.72rem;color:var(--ink-soft);margin:0 0 1rem;line-height:1.5;}
+  .tt-swatch{display:inline-block;width:.7rem;height:.7rem;border-radius:2px;margin:0 .2rem -.05rem 0;}
+
+  .timetable{
+    border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card);
+    margin-bottom:1.5rem;
   }
-  .opt-row:last-child{border-bottom:none;}
-  .opt-row.opt-dim{opacity:.5;}
-  .opt-text{flex:1;color:var(--ink-soft);}
-  .opt-badge{
-    font-size:.65rem;font-weight:700;padding:.15rem .45rem;border-radius:99px;flex-shrink:0;
-    white-space:nowrap;
+  .tt-header{display:flex;background:var(--paper-deep);border-bottom:1px solid var(--line);}
+  .tt-time-col-h{width:44px;flex-shrink:0;}
+  .tt-day-col-h{
+    flex:1;text-align:center;font-size:.68rem;font-weight:700;letter-spacing:.02em;
+    text-transform:uppercase;color:var(--pine-deep);padding:.5rem .15rem;border-left:1px solid var(--line);
   }
-  .opt-pick{background:rgba(76,122,82,.15);color:var(--good);}
-  .opt-conflict{background:rgba(184,73,47,.13);color:#B8492F;}
+  .tt-body{display:flex;position:relative;}
+  .tt-time-col{width:44px;flex-shrink:0;position:relative;border-right:1px solid var(--line);}
+  .tt-hour-label{
+    position:absolute;left:0;right:0;transform:translateY(-50%);
+    font-size:.6rem;color:var(--ink-soft);text-align:right;padding-right:.35rem;white-space:nowrap;
+  }
+  .tt-day-col{
+    flex:1;position:relative;border-left:1px solid var(--line);
+    background-image:repeating-linear-gradient(to bottom, var(--line) 0, var(--line) 1px, transparent 1px, transparent 90px);
+  }
+  .tt-activity{
+    position:absolute;border-radius:4px;padding:.15rem .3rem;overflow:hidden;
+    font-size:.6rem;line-height:1.15;box-sizing:border-box;border:1px solid;
+  }
+  .tt-activity.tt-n.tt-picked{background:rgba(193,101,47,.20);border-color:var(--nollen);}
+  .tt-activity.tt-a.tt-picked{background:rgba(59,110,143,.20);border-color:var(--austin);}
+  .tt-activity.tt-conflict{
+    background:repeating-linear-gradient(135deg,rgba(184,73,47,.10),rgba(184,73,47,.10) 4px,rgba(184,73,47,.20) 4px,rgba(184,73,47,.20) 8px);
+    border:1px dashed #B8492F;
+  }
+  .tt-act-name{font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .tt-act-time{color:var(--ink-soft);white-space:nowrap;overflow:hidden;font-size:.56rem;}
 </style>
 </head>
 <body>
@@ -466,43 +488,91 @@ function hasAnyConflict(list, i){
   });
 }
 
-function renderChildOptions(label, tagClass, list){
-  if(!list.length) return '';
-  const picked = optimizePicks(list);
-  return list.map((a,i) => {
-    const isPicked = picked.has(i);
-    const conflict = !isPicked && hasAnyConflict(list, i);
-    let badge = '';
-    if(isPicked && a.preferred) badge = '<span class="opt-badge opt-pick">✓ current pick</span>';
-    else if(isPicked) badge = '<span class="opt-badge opt-pick">✓ fits too</span>';
-    else if(conflict) badge = '<span class="opt-badge opt-conflict">⚠ conflict</span>';
-    return `<div class="opt-row${isPicked?'':' opt-dim'}">
-      <span class="person-tag ${tagClass}">${label}</span>
-      <span class="opt-text">${a.name} · ${formatTime12(a.start)}–${formatTime12(a.end)} @ ${a.location}</span>
-      ${badge}
+const PX_PER_MIN = 1.5;
+
+// Assigns overlapping activities to side-by-side lanes within one child's half
+// of a day column (same technique day-view calendars use for conflicting events).
+function assignLanes(activities){
+  const withMin = activities.map((a,i)=>({...a, i, sMin:timeToMinutes(a.start), eMin:timeToMinutes(a.end)}))
+    .sort((a,b)=>a.sMin-b.sMin);
+  const laneEnds = [];
+  withMin.forEach(act => {
+    let lane = laneEnds.findIndex(end => end <= act.sMin);
+    if(lane === -1){ lane = laneEnds.length; laneEnds.push(act.eMin); }
+    else laneEnds[lane] = act.eMin;
+    act.lane = lane;
+  });
+  return { items: withMin, laneCount: Math.max(1, laneEnds.length) };
+}
+
+function layoutChild(activities, rangeStartMin, rangeEndMin, leftPct, widthPct){
+  if(!activities.length) return '';
+  const picked = optimizePicks(activities);
+  const { items, laneCount } = assignLanes(activities);
+  return items.map(act => {
+    const cStart = Math.max(rangeStartMin, act.sMin), cEnd = Math.min(rangeEndMin, act.eMin);
+    if(cEnd <= cStart) return '';
+    const top = (cStart - rangeStartMin) * PX_PER_MIN;
+    const height = Math.max(14, (cEnd - cStart) * PX_PER_MIN);
+    const laneW = widthPct / laneCount;
+    const left = leftPct + act.lane * laneW;
+    const isPicked = picked.has(act.i);
+    const cls = isPicked ? 'tt-picked' : 'tt-conflict';
+    const childCls = act.child==='Nollen' ? 'tt-n' : 'tt-a';
+    const tip = `${act.child}: ${act.name} · ${formatTime12(act.start)}–${formatTime12(act.end)} @ ${act.location}`;
+    return `<div class="tt-activity ${cls} ${childCls}" style="top:${top}px;height:${height}px;left:${left}%;width:${laneW-1}%" title="${tip}">
+      <div class="tt-act-name">${act.name}</div>
+      <div class="tt-act-time">${formatTime12(act.start)}–${formatTime12(act.end)}</div>
     </div>`;
   }).join('');
 }
 
-function renderActivitiesTab(data){
-  const days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-  const opts = data.activityOptions || {};
-  let html = '<div class="section-label">⚙️ Activity Options &amp; Optimizer</div>' +
-    '<div class="hint" style="margin:0 0 1rem">Every logged option per day, reoptimized automatically. ' +
-    'Tell Claude about a new class, a dropped one, or a time change — this recalculates next load, no manual re-run needed.</div>';
+function buildTimetable(title, days, rangeStart, rangeEnd, data){
+  const startMin = timeToMinutes(rangeStart), endMin = timeToMinutes(rangeEnd);
+  const totalMin = endMin - startMin;
+  const height = totalMin * PX_PER_MIN;
 
-  days.forEach(day => {
+  let labels = '';
+  for(let m = 0; m <= totalMin; m += 60){
+    const t = startMin + m;
+    const hh = String(Math.floor(t/60)).padStart(2,'0'), mm = String(t%60).padStart(2,'0');
+    labels += `<div class="tt-hour-label" style="top:${m*PX_PER_MIN}px">${formatTime12(hh+':'+mm)}</div>`;
+  }
+
+  const opts = data.activityOptions || {};
+  const dayCols = days.map(day => {
     const acts = opts[day] || [];
     const nollen = acts.filter(a=>a.child==='Nollen');
     const austin = acts.filter(a=>a.child==='Austin');
-    const bodyRows = renderChildOptions('N','tag-n',nollen) + renderChildOptions('A','tag-a',austin);
-    html += `<div class="day-card">
-      <div class="day-head"><div class="day-name">${day}</div></div>
-      <div class="day-body">${bodyRows || '<div class="free-day">No options logged</div>'}</div>
-    </div>`;
-  });
+    const body = layoutChild(nollen, startMin, endMin, 1, 48) + layoutChild(austin, startMin, endMin, 51, 48);
+    return `<div class="tt-day-col" style="height:${height}px">${body}</div>`;
+  }).join('');
 
-  document.getElementById('activities-panel').innerHTML = html;
+  const headerCols = days.map(d => `<div class="tt-day-col-h">${d.slice(0,3)}</div>`).join('');
+
+  return `<div class="section-label">${title}</div>
+  <div class="timetable">
+    <div class="tt-header"><div class="tt-time-col-h"></div>${headerCols}</div>
+    <div class="tt-body">
+      <div class="tt-time-col" style="height:${height}px">${labels}</div>
+      ${dayCols}
+    </div>
+  </div>`;
+}
+
+function renderActivitiesTab(data){
+  const legend = `<div class="tt-legend">
+    <span class="tt-swatch" style="background:rgba(193,101,47,.5);border:1px solid var(--nollen)"></span>Nollen
+    &nbsp;&nbsp;<span class="tt-swatch" style="background:rgba(59,110,143,.5);border:1px solid var(--austin)"></span>Austin
+    &nbsp;&nbsp;<span class="tt-swatch" style="border:1px dashed #B8492F"></span>conflict (loses out to something else at that time)<br>
+    Tell Claude about a new class, a dropped one, or a time change — this recalculates next load, no manual re-run needed.
+  </div>`;
+
+  const weekday = buildTimetable('📅 Weekdays · 2:30–8:30 pm', ['Monday','Tuesday','Wednesday','Thursday','Friday'], '14:30', '20:30', data);
+  const weekend = buildTimetable('📅 Weekend · 8:00 am–2:00 pm', ['Saturday','Sunday'], '08:00', '14:00', data);
+
+  document.getElementById('activities-panel').innerHTML =
+    '<div class="section-label">⚙️ Activity Optimizer</div>' + legend + weekday + weekend;
 }
 
 document.getElementById('tab-btn-week').addEventListener('click', () => {
