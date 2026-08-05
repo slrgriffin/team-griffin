@@ -175,6 +175,20 @@
   .tt-legend{font-size:.72rem;color:var(--ink-soft);margin:0 0 1rem;line-height:1.5;}
   .tt-swatch{display:inline-block;width:.7rem;height:.7rem;border-radius:2px;margin:0 .2rem -.05rem 0;}
 
+  .tt-filters{padding:0 0 1rem;}
+  .tt-filter-group{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.5rem;}
+  .tt-filter-chip{
+    font-size:.72rem;font-weight:600;padding:.32rem .7rem;border-radius:99px;
+    border:1px solid var(--line);background:var(--card);color:var(--ink-soft);
+    cursor:pointer;font-family:inherit;
+  }
+  .tt-filter-chip.active{background:var(--pine);color:#fff;border-color:var(--pine);}
+  .tt-toggle{
+    display:flex;align-items:center;gap:.4rem;font-size:.78rem;font-weight:600;
+    color:var(--ink-soft);cursor:pointer;margin-top:.2rem;
+  }
+  .tt-toggle input{width:1rem;height:1rem;accent-color:var(--pine);}
+
   .timetable{
     border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card);
     margin-bottom:1.5rem;
@@ -489,6 +503,8 @@ function hasAnyConflict(list, i){
 }
 
 const PX_PER_MIN = 1.5;
+let currentData = null;
+let filterState = { people: new Set(['Nollen','Austin']), types: null, optimizedOnly: false };
 
 // Assigns overlapping activities to side-by-side lanes within one child's half
 // of a day column (same technique day-view calendars use for conflicting events).
@@ -505,10 +521,25 @@ function assignLanes(activities){
   return { items: withMin, laneCount: Math.max(1, laneEnds.length) };
 }
 
-function layoutChild(activities, rangeStartMin, rangeEndMin, leftPct, widthPct){
-  if(!activities.length) return '';
-  const picked = optimizePicks(activities);
-  const { items, laneCount } = assignLanes(activities);
+// Tags each activity with whether the optimizer picked it — computed on the
+// FULL list before any display filtering, so hiding a type/person never
+// changes what counts as an actual conflict.
+function tagPicked(list){
+  const picked = optimizePicks(list);
+  return list.map((a,i)=>({...a, _picked: picked.has(i)}));
+}
+
+function passesFilters(a){
+  if(!filterState.people.has(a.child)) return false;
+  if(filterState.types && !filterState.types.has(a.type||'Other')) return false;
+  if(filterState.optimizedOnly && !a._picked) return false;
+  return true;
+}
+
+function layoutChild(activitiesTagged, rangeStartMin, rangeEndMin, leftPct, widthPct){
+  const visible = activitiesTagged.filter(passesFilters);
+  if(!visible.length) return '';
+  const { items, laneCount } = assignLanes(visible);
   return items.map(act => {
     const cStart = Math.max(rangeStartMin, act.sMin), cEnd = Math.min(rangeEndMin, act.eMin);
     if(cEnd <= cStart) return '';
@@ -516,8 +547,7 @@ function layoutChild(activities, rangeStartMin, rangeEndMin, leftPct, widthPct){
     const height = Math.max(14, (cEnd - cStart) * PX_PER_MIN);
     const laneW = widthPct / laneCount;
     const left = leftPct + act.lane * laneW;
-    const isPicked = picked.has(act.i);
-    const cls = isPicked ? 'tt-picked' : 'tt-conflict';
+    const cls = act._picked ? 'tt-picked' : 'tt-conflict';
     const childCls = act.child==='Nollen' ? 'tt-n' : 'tt-a';
     const tip = `${act.child}: ${act.name} · ${formatTime12(act.start)}–${formatTime12(act.end)} @ ${act.location}`;
     return `<div class="tt-activity ${cls} ${childCls}" style="top:${top}px;height:${height}px;left:${left}%;width:${laneW-1}%" title="${tip}">
@@ -542,8 +572,8 @@ function buildTimetable(title, days, rangeStart, rangeEnd, data){
   const opts = data.activityOptions || {};
   const dayCols = days.map(day => {
     const acts = opts[day] || [];
-    const nollen = acts.filter(a=>a.child==='Nollen');
-    const austin = acts.filter(a=>a.child==='Austin');
+    const nollen = tagPicked(acts.filter(a=>a.child==='Nollen'));
+    const austin = tagPicked(acts.filter(a=>a.child==='Austin'));
     const body = layoutChild(nollen, startMin, endMin, 1, 48) + layoutChild(austin, startMin, endMin, 51, 48);
     return `<div class="tt-day-col" style="height:${height}px">${body}</div>`;
   }).join('');
@@ -560,7 +590,48 @@ function buildTimetable(title, days, rangeStart, rangeEnd, data){
   </div>`;
 }
 
+function getAllTypes(data){
+  const types = new Set();
+  Object.values(data.activityOptions||{}).forEach(acts => acts.forEach(a => types.add(a.type||'Other')));
+  return [...types].sort();
+}
+
+function renderFilterBar(data){
+  const types = getAllTypes(data);
+  if(filterState.types === null){ filterState.types = new Set(types); } // default: all types on
+
+  const peopleChips = ['Nollen','Austin'].map(p =>
+    `<button class="tt-filter-chip${filterState.people.has(p)?' active':''}" data-filter="people" data-val="${p}">${p}</button>`
+  ).join('');
+  const typeChips = types.map(t =>
+    `<button class="tt-filter-chip${filterState.types.has(t)?' active':''}" data-filter="types" data-val="${t}">${t}</button>`
+  ).join('');
+
+  return `<div class="tt-filters">
+    <div class="tt-filter-group">${peopleChips}</div>
+    <div class="tt-filter-group">${typeChips}</div>
+    <label class="tt-toggle"><input type="checkbox" id="filter-optimized" ${filterState.optimizedOnly?'checked':''}> Optimized schedule only (hide conflicts)</label>
+  </div>`;
+}
+
+document.getElementById('activities-panel').addEventListener('click', (e) => {
+  const chip = e.target.closest('.tt-filter-chip');
+  if(!chip) return;
+  const group = filterState[chip.dataset.filter];
+  const val = chip.dataset.val;
+  if(group.has(val)) group.delete(val); else group.add(val);
+  if(currentData) renderActivitiesTab(currentData);
+});
+document.getElementById('activities-panel').addEventListener('change', (e) => {
+  if(e.target.id === 'filter-optimized'){
+    filterState.optimizedOnly = e.target.checked;
+    if(currentData) renderActivitiesTab(currentData);
+  }
+});
+
 function renderActivitiesTab(data){
+  currentData = data;
+  const filterBar = renderFilterBar(data);
   const legend = `<div class="tt-legend">
     <span class="tt-swatch" style="background:rgba(193,101,47,.5);border:1px solid var(--nollen)"></span>Nollen
     &nbsp;&nbsp;<span class="tt-swatch" style="background:rgba(59,110,143,.5);border:1px solid var(--austin)"></span>Austin
@@ -572,7 +643,7 @@ function renderActivitiesTab(data){
   const weekend = buildTimetable('📅 Weekend · 8:00 am–2:00 pm', ['Saturday','Sunday'], '08:00', '14:00', data);
 
   document.getElementById('activities-panel').innerHTML =
-    '<div class="section-label">⚙️ Activity Optimizer</div>' + legend + weekday + weekend;
+    '<div class="section-label">⚙️ Activity Optimizer</div>' + filterBar + legend + weekday + weekend;
 }
 
 document.getElementById('tab-btn-week').addEventListener('click', () => {
