@@ -608,9 +608,11 @@ function renderFilterBar(data){
   ).join('');
 
   return `<div class="tt-filters">
+    <label class="tt-toggle" style="margin:0 0 .6rem">
+      <input type="checkbox" id="filter-optimized" ${filterState.optimizedOnly?'checked':''}> Optimized schedule only (hide conflicts)
+    </label>
     <div class="tt-filter-group">${peopleChips}</div>
     <div class="tt-filter-group">${typeChips}</div>
-    <label class="tt-toggle"><input type="checkbox" id="filter-optimized" ${filterState.optimizedOnly?'checked':''}> Optimized schedule only (hide conflicts)</label>
   </div>`;
 }
 
