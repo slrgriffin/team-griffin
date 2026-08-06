@@ -250,12 +250,28 @@
   },
   "dailyReminders": [
     {
-      "id": "exercises",
-      "label": "Remember to do exercises"
+      "id": "n-exercises",
+      "label": "Nollen: Exercises"
     },
     {
-      "id": "reading",
-      "label": "Remember to read for 20 minutes"
+      "id": "a-exercises",
+      "label": "Austin: Exercises"
+    },
+    {
+      "id": "n-reading",
+      "label": "Nollen: Reading"
+    },
+    {
+      "id": "a-reading",
+      "label": "Austin: Reading"
+    },
+    {
+      "id": "anna-exercises",
+      "label": "Anna: Exercise"
+    },
+    {
+      "id": "justin-exercises",
+      "label": "Justin: Exercise"
     }
   ],
   "taskCompletions": {
