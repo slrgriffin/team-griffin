@@ -281,7 +281,8 @@
     },
     "2026-08-04": {
       "reading": true,
-      "exercises": true
+      "exercises": true,
+      "n-exercises": true
     },
     "2026-08-03": {
       "exercises": true,
