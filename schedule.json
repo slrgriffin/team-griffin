@@ -50,7 +50,7 @@
     "Saturday": {
       "n": [],
       "a": [
-        "Roller Game · 10:00–10:45 am @ Silver Creek"
+        "Roller Game · 10:15 am–12:30 pm @ Silver Creek"
       ],
       "f": []
     },
@@ -545,8 +545,8 @@
       {
         "child": "Austin",
         "name": "Roller Game",
-        "start": "10:00",
-        "end": "10:45",
+        "start": "10:15",
+        "end": "12:30",
         "location": "Silver Creek",
         "preferred": true,
         "type": "Hockey"
