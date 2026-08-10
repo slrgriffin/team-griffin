@@ -5,14 +5,14 @@
         "TKD Black Belt · 6:00–6:45 pm @ Santa Teresa"
       ],
       "a": [
-        "Roller Shooting · 5:15–6:00 pm @ Silver Creek"
+        "Roller Shooting · 5:15–6:15 pm @ Silver Creek"
       ],
       "f": []
     },
     "Tuesday": {
       "n": [],
       "a": [
-        "8U Practice · 4:15–5:00 pm @ Silver Creek",
+        "8U Practice · 4:00–5:00 pm @ Silver Creek",
         "Travel Practice · 5:00–6:00 pm @ Silver Creek"
       ],
       "f": []
@@ -69,7 +69,7 @@
       "a": [
         "Dentist · 9:30 am @ Blossom Hill",
         "Topgolf · 12:30–2:30 pm",
-        "Roller Shooting · 5:15–6:00 pm @ Silver Creek"
+        "Roller Shooting · 5:15–6:15 pm @ Silver Creek"
       ],
       "f": [
         "Family Dinner · 7:00 pm"
@@ -167,7 +167,7 @@
       "a": [
         "Robotics Camp · 9:00 am–3:00 pm @ Grace Church",
         "Dentist · 8:00–9:00 am @ Blossom Hill",
-        "8U Practice · 4:15–5:00 pm @ Silver Creek",
+        "8U Practice · 4:00–5:00 pm @ Silver Creek",
         "Travel Practice · 5:00–6:00 pm @ Silver Creek"
       ],
       "f": []
@@ -179,7 +179,7 @@
       ],
       "a": [
         "Robotics Camp · 9:00 am–3:00 pm @ Grace Church",
-        "Roller Shooting · 5:15–6:00 pm @ Silver Creek"
+        "Roller Shooting · 5:15–6:15 pm @ Silver Creek"
       ],
       "f": []
     },
@@ -224,7 +224,7 @@
         "Annual Checkup · Dr. Tsui · 3:15 pm"
       ],
       "a": [
-        "8U Practice · 4:15–5:00 pm @ Silver Creek",
+        "8U Practice · 4:00–5:00 pm @ Silver Creek",
         "Travel Practice · 5:00–6:00 pm @ Silver Creek"
       ],
       "f": []
@@ -324,7 +324,7 @@
         "child": "Austin",
         "name": "Roller Shooting",
         "start": "17:15",
-        "end": "18:00",
+        "end": "18:15",
         "location": "Silver Creek",
         "preferred": true,
         "type": "Hockey"
@@ -374,7 +374,7 @@
       {
         "child": "Austin",
         "name": "8U Practice",
-        "start": "16:15",
+        "start": "16:00",
         "end": "17:00",
         "location": "Silver Creek",
         "preferred": true,
