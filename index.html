@@ -281,6 +281,30 @@
   </footer>
 </div>
 
+<div class="modal-overlay" id="activity-modal" style="display:none">
+  <div class="modal-box">
+    <h3>Edit Activity</h3>
+    <label class="modal-field">Name<input type="text" id="modal-name"></label>
+    <div class="modal-row">
+      <label class="modal-field">Child
+        <select id="modal-child"><option>Nollen</option><option>Austin</option></select>
+      </label>
+      <label class="modal-field">Type
+        <select id="modal-type"><option>TKD</option><option>Parcor</option><option>Hockey</option><option>Other</option></select>
+      </label>
+    </div>
+    <div class="modal-row">
+      <label class="modal-field">Start<input type="time" id="modal-start"></label>
+      <label class="modal-field">End<input type="time" id="modal-end"></label>
+    </div>
+    <div class="modal-actions">
+      <button id="modal-cancel">Cancel</button>
+      <button id="modal-save" class="primary">Save</button>
+    </div>
+    <div id="modal-status"></div>
+  </div>
+</div>
+
 <script>
 const RAW_JSON_URL = 'https://raw.githubusercontent.com/slrgriffin/team-griffin/main/schedule.json';
 const SEASON_START = '2026-06-15';
@@ -791,28 +815,5 @@ async function load(){
 document.getElementById('refresh-btn').addEventListener('click', load);
 load();
 </script>
-<div class="modal-overlay" id="activity-modal" style="display:none">
-  <div class="modal-box">
-    <h3>Edit Activity</h3>
-    <label class="modal-field">Name<input type="text" id="modal-name"></label>
-    <div class="modal-row">
-      <label class="modal-field">Child
-        <select id="modal-child"><option>Nollen</option><option>Austin</option></select>
-      </label>
-      <label class="modal-field">Type
-        <select id="modal-type"><option>TKD</option><option>Parcor</option><option>Hockey</option><option>Other</option></select>
-      </label>
-    </div>
-    <div class="modal-row">
-      <label class="modal-field">Start<input type="time" id="modal-start"></label>
-      <label class="modal-field">End<input type="time" id="modal-end"></label>
-    </div>
-    <div class="modal-actions">
-      <button id="modal-cancel">Cancel</button>
-      <button id="modal-save" class="primary">Save</button>
-    </div>
-    <div id="modal-status"></div>
-  </div>
-</div>
 </body>
 </html>
