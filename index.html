@@ -211,8 +211,38 @@
   }
   .tt-activity{
     position:absolute;border-radius:4px;padding:.15rem .3rem;overflow:hidden;
-    font-size:.6rem;line-height:1.15;box-sizing:border-box;border:1px solid;
+    font-size:.6rem;line-height:1.15;box-sizing:border-box;border:1px solid;cursor:pointer;
   }
+  .tt-activity:hover{filter:brightness(0.95);box-shadow:0 0 0 2px rgba(47,69,56,.3);}
+
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(35,51,39,.45);display:flex;
+    align-items:center;justify-content:center;z-index:1000;padding:1rem;
+  }
+  .modal-box{
+    background:var(--card);border-radius:12px;padding:1.4rem;max-width:340px;width:100%;
+    box-shadow:0 12px 40px rgba(0,0,0,.3);
+  }
+  .modal-box h3{margin:0 0 1rem;font-family:'Fraunces',serif;font-weight:600;color:var(--pine-deep);font-size:1.1rem;}
+  .modal-field{display:block;font-size:.72rem;font-weight:700;color:var(--ink-soft);
+    text-transform:uppercase;letter-spacing:.03em;margin-bottom:.9rem;}
+  .modal-field input, .modal-field select{
+    display:block;width:100%;margin-top:.35rem;padding:.5rem .55rem;border:1px solid var(--line);
+    border-radius:6px;font-family:'Inter',sans-serif;font-size:.9rem;box-sizing:border-box;color:var(--ink);
+    text-transform:none;font-weight:400;letter-spacing:normal;background:#fff;
+  }
+  .modal-row{display:flex;gap:.6rem;}
+  .modal-row .modal-field{flex:1;}
+  .modal-actions{display:flex;gap:.5rem;margin-top:.4rem;}
+  .modal-actions button{
+    flex:1;padding:.6rem;border-radius:8px;border:1px solid var(--line);font-family:inherit;
+    font-weight:600;cursor:pointer;font-size:.85rem;background:var(--card);color:var(--ink-soft);
+  }
+  .modal-actions button.primary{background:var(--pine);color:#fff;border-color:var(--pine);}
+  .modal-actions button:disabled{opacity:.5;cursor:default;}
+  #modal-status{font-size:.72rem;margin-top:.7rem;text-align:center;color:var(--ink-soft);min-height:1em;}
+  #modal-status.err{color:#B8492F;font-weight:600;}
+  #modal-status.ok{color:var(--good);font-weight:600;}
   .tt-activity.tt-n.tt-picked{background:rgba(193,101,47,.20);border-color:var(--nollen);}
   .tt-activity.tt-a.tt-picked{background:rgba(59,110,143,.20);border-color:var(--austin);}
   .tt-activity.tt-conflict{
@@ -550,7 +580,7 @@ function layoutChild(activitiesTagged, rangeStartMin, rangeEndMin, leftPct, widt
     const cls = act._picked ? 'tt-picked' : 'tt-conflict';
     const childCls = act.child==='Nollen' ? 'tt-n' : 'tt-a';
     const tip = `${act.child}: ${act.name} · ${formatTime12(act.start)}–${formatTime12(act.end)} @ ${act.location}`;
-    return `<div class="tt-activity ${cls} ${childCls}" style="top:${top}px;height:${height}px;left:${left}%;width:${laneW-1}%" title="${tip}">
+    return `<div class="tt-activity ${cls} ${childCls}" style="top:${top}px;height:${height}px;left:${left}%;width:${laneW-1}%" title="${tip}" data-day="${act._day}" data-index="${act._origIndex}">
       <div class="tt-act-name">${act.name}</div>
       <div class="tt-act-time">${formatTime12(act.start)}–${formatTime12(act.end)}</div>
     </div>`;
@@ -571,7 +601,7 @@ function buildTimetable(title, days, rangeStart, rangeEnd, data){
 
   const opts = data.activityOptions || {};
   const dayCols = days.map(day => {
-    const acts = opts[day] || [];
+    const acts = (opts[day] || []).map((a,i)=>({...a, _day:day, _origIndex:i}));
     const nollen = tagPicked(acts.filter(a=>a.child==='Nollen'));
     const austin = tagPicked(acts.filter(a=>a.child==='Austin'));
     const body = layoutChild(nollen, startMin, endMin, 1, 48) + layoutChild(austin, startMin, endMin, 51, 48);
@@ -618,17 +648,102 @@ function renderFilterBar(data){
 
 document.getElementById('activities-panel').addEventListener('click', (e) => {
   const chip = e.target.closest('.tt-filter-chip');
-  if(!chip) return;
-  const group = filterState[chip.dataset.filter];
-  const val = chip.dataset.val;
-  if(group.has(val)) group.delete(val); else group.add(val);
-  if(currentData) renderActivitiesTab(currentData);
+  if(chip){
+    const group = filterState[chip.dataset.filter];
+    const val = chip.dataset.val;
+    if(group.has(val)) group.delete(val); else group.add(val);
+    if(currentData) renderActivitiesTab(currentData);
+    return;
+  }
+  const block = e.target.closest('.tt-activity');
+  if(block) openActivityModal(block.dataset.day, Number(block.dataset.index));
 });
 document.getElementById('activities-panel').addEventListener('change', (e) => {
   if(e.target.id === 'filter-optimized'){
     filterState.optimizedOnly = e.target.checked;
     if(currentData) renderActivitiesTab(currentData);
   }
+});
+
+// ── Edit-activity modal ────────────────────────────────────────────
+let modalTarget = null; // { day, index }
+
+function openActivityModal(day, index){
+  const item = (currentData.activityOptions[day] || [])[index];
+  if(!item) return;
+  modalTarget = { day, index };
+  document.getElementById('modal-name').value = item.name;
+  document.getElementById('modal-child').value = item.child;
+  document.getElementById('modal-type').value = item.type || 'Other';
+  document.getElementById('modal-start').value = item.start;
+  document.getElementById('modal-end').value = item.end;
+  const statusEl = document.getElementById('modal-status');
+  statusEl.textContent = '';
+  statusEl.className = '';
+  document.getElementById('modal-save').disabled = false;
+  document.getElementById('activity-modal').style.display = 'flex';
+}
+
+function closeActivityModal(){
+  document.getElementById('activity-modal').style.display = 'none';
+  modalTarget = null;
+}
+
+document.getElementById('modal-cancel').addEventListener('click', closeActivityModal);
+document.getElementById('activity-modal').addEventListener('click', (e) => {
+  if(e.target.id === 'activity-modal') closeActivityModal(); // click outside the box
+});
+
+document.getElementById('modal-save').addEventListener('click', async () => {
+  if(!modalTarget) return;
+  const { day, index } = modalTarget;
+  const name = document.getElementById('modal-name').value.trim();
+  const child = document.getElementById('modal-child').value;
+  const type = document.getElementById('modal-type').value;
+  const start = document.getElementById('modal-start').value;
+  const end = document.getElementById('modal-end').value;
+  const statusEl = document.getElementById('modal-status');
+
+  if(!name || !start || !end){
+    statusEl.textContent = 'Name, start, and end are required.';
+    statusEl.className = 'err';
+    return;
+  }
+  if(timeToMinutes(end) <= timeToMinutes(start)){
+    statusEl.textContent = 'End time must be after start time.';
+    statusEl.className = 'err';
+    return;
+  }
+
+  document.getElementById('modal-save').disabled = true;
+  statusEl.textContent = 'Saving…';
+  statusEl.className = '';
+
+  const url = `${SCRIPT_URL}?mode=editActivity&day=${encodeURIComponent(day)}&index=${index}`
+    + `&name=${encodeURIComponent(name)}&child=${encodeURIComponent(child)}`
+    + `&type=${encodeURIComponent(type)}&start=${start}&end=${end}`;
+  fetch(url, { mode: 'no-cors' }).catch(()=>{});
+
+  confirmWrite(
+    null,
+    (d) => {
+      const item = (d.activityOptions[day] || [])[index];
+      return !!item && item.name===name && item.child===child && item.type===type && item.start===start && item.end===end;
+    },
+    () => {
+      statusEl.textContent = 'Saved ✓';
+      statusEl.className = 'ok';
+      setTimeout(() => {
+        closeActivityModal();
+        load(); // full refresh so both timetables reflect the change
+      }, 600);
+    },
+    () => {
+      statusEl.textContent = "Didn't confirm — check your connection and try again.";
+      statusEl.className = 'err';
+      document.getElementById('modal-save').disabled = false;
+    }
+  );
 });
 
 function renderActivitiesTab(data){
@@ -676,5 +791,28 @@ async function load(){
 document.getElementById('refresh-btn').addEventListener('click', load);
 load();
 </script>
+<div class="modal-overlay" id="activity-modal" style="display:none">
+  <div class="modal-box">
+    <h3>Edit Activity</h3>
+    <label class="modal-field">Name<input type="text" id="modal-name"></label>
+    <div class="modal-row">
+      <label class="modal-field">Child
+        <select id="modal-child"><option>Nollen</option><option>Austin</option></select>
+      </label>
+      <label class="modal-field">Type
+        <select id="modal-type"><option>TKD</option><option>Parcor</option><option>Hockey</option><option>Other</option></select>
+      </label>
+    </div>
+    <div class="modal-row">
+      <label class="modal-field">Start<input type="time" id="modal-start"></label>
+      <label class="modal-field">End<input type="time" id="modal-end"></label>
+    </div>
+    <div class="modal-actions">
+      <button id="modal-cancel">Cancel</button>
+      <button id="modal-save" class="primary">Save</button>
+    </div>
+    <div id="modal-status"></div>
+  </div>
+</div>
 </body>
 </html>
