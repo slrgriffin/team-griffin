@@ -231,6 +231,12 @@
     border-radius:6px;font-family:'Inter',sans-serif;font-size:.9rem;box-sizing:border-box;color:var(--ink);
     text-transform:none;font-weight:400;letter-spacing:normal;background:#fff;
   }
+  .modal-radios{display:flex;gap:.7rem;margin-top:.35rem;}
+  .modal-radios label{
+    display:flex;align-items:center;gap:.3rem;font-size:.82rem;font-weight:600;
+    text-transform:none;letter-spacing:normal;color:var(--ink);cursor:pointer;
+  }
+  .modal-radios input{width:auto;margin:0;accent-color:var(--pine);}
   .modal-row{display:flex;gap:.6rem;}
   .modal-row .modal-field{flex:1;}
   .modal-actions{display:flex;gap:.5rem;margin-top:.4rem;}
@@ -245,6 +251,7 @@
   #modal-status.ok{color:var(--good);font-weight:600;}
   .tt-activity.tt-n.tt-picked{background:rgba(193,101,47,.20);border-color:var(--nollen);}
   .tt-activity.tt-a.tt-picked{background:rgba(59,110,143,.20);border-color:var(--austin);}
+  .tt-activity.tt-both.tt-picked{background:rgba(138,106,47,.20);border-color:var(--family);}
   .tt-activity.tt-conflict{
     background:repeating-linear-gradient(135deg,rgba(184,73,47,.10),rgba(184,73,47,.10) 4px,rgba(184,73,47,.20) 4px,rgba(184,73,47,.20) 8px);
     border:1px dashed #B8492F;
@@ -287,7 +294,11 @@
     <label class="modal-field">Name<input type="text" id="modal-name"></label>
     <div class="modal-row">
       <label class="modal-field">Child
-        <select id="modal-child"><option>Nollen</option><option>Austin</option></select>
+        <div class="modal-radios">
+          <label><input type="radio" name="modal-child" value="Nollen"> Nollen</label>
+          <label><input type="radio" name="modal-child" value="Austin"> Austin</label>
+          <label><input type="radio" name="modal-child" value="Both"> Both</label>
+        </div>
       </label>
       <label class="modal-field">Type
         <select id="modal-type"><option>TKD</option><option>Parcor</option><option>Hockey</option><option>Other</option></select>
@@ -583,8 +594,13 @@ function tagPicked(list){
   return list.map((a,i)=>({...a, _picked: picked.has(i)}));
 }
 
+function personMatches(child){
+  if(child === 'Both') return filterState.people.has('Nollen') || filterState.people.has('Austin');
+  return filterState.people.has(child);
+}
+
 function passesFilters(a){
-  if(!filterState.people.has(a.child)) return false;
+  if(!personMatches(a.child)) return false;
   if(filterState.types && !filterState.types.has(a.type||'Other')) return false;
   if(filterState.optimizedOnly && !a._picked) return false;
   return true;
@@ -602,7 +618,7 @@ function layoutChild(activitiesTagged, rangeStartMin, rangeEndMin, leftPct, widt
     const laneW = widthPct / laneCount;
     const left = leftPct + act.lane * laneW;
     const cls = act._picked ? 'tt-picked' : 'tt-conflict';
-    const childCls = act.child==='Nollen' ? 'tt-n' : 'tt-a';
+    const childCls = act.child==='Nollen' ? 'tt-n' : act.child==='Austin' ? 'tt-a' : 'tt-both';
     const tip = `${act.child}: ${act.name} · ${formatTime12(act.start)}–${formatTime12(act.end)} @ ${act.location}`;
     return `<div class="tt-activity ${cls} ${childCls}" style="top:${top}px;height:${height}px;left:${left}%;width:${laneW-1}%" title="${tip}" data-day="${act._day}" data-index="${act._origIndex}">
       <div class="tt-act-name">${act.name}</div>
@@ -626,8 +642,8 @@ function buildTimetable(title, days, rangeStart, rangeEnd, data){
   const opts = data.activityOptions || {};
   const dayCols = days.map(day => {
     const acts = (opts[day] || []).map((a,i)=>({...a, _day:day, _origIndex:i}));
-    const nollen = tagPicked(acts.filter(a=>a.child==='Nollen'));
-    const austin = tagPicked(acts.filter(a=>a.child==='Austin'));
+    const nollen = tagPicked(acts.filter(a=>a.child==='Nollen' || a.child==='Both'));
+    const austin = tagPicked(acts.filter(a=>a.child==='Austin' || a.child==='Both'));
     const body = layoutChild(nollen, startMin, endMin, 1, 48) + layoutChild(austin, startMin, endMin, 51, 48);
     return `<div class="tt-day-col" style="height:${height}px">${body}</div>`;
   }).join('');
@@ -697,7 +713,7 @@ function openActivityModal(day, index){
   if(!item) return;
   modalTarget = { day, index };
   document.getElementById('modal-name').value = item.name;
-  document.getElementById('modal-child').value = item.child;
+  document.querySelectorAll('input[name="modal-child"]').forEach(r => r.checked = (r.value === item.child));
   document.getElementById('modal-type').value = item.type || 'Other';
   document.getElementById('modal-start').value = item.start;
   document.getElementById('modal-end').value = item.end;
@@ -722,14 +738,14 @@ document.getElementById('modal-save').addEventListener('click', async () => {
   if(!modalTarget) return;
   const { day, index } = modalTarget;
   const name = document.getElementById('modal-name').value.trim();
-  const child = document.getElementById('modal-child').value;
+  const child = document.querySelector('input[name="modal-child"]:checked')?.value;
   const type = document.getElementById('modal-type').value;
   const start = document.getElementById('modal-start').value;
   const end = document.getElementById('modal-end').value;
   const statusEl = document.getElementById('modal-status');
 
-  if(!name || !start || !end){
-    statusEl.textContent = 'Name, start, and end are required.';
+  if(!name || !child || !start || !end){
+    statusEl.textContent = 'Name, child, start, and end are all required.';
     statusEl.className = 'err';
     return;
   }
