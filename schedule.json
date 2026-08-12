@@ -326,6 +326,14 @@
         "location": "Silver Creek",
         "preferred": true,
         "type": "Hockey"
+      },
+      {
+        "child": "Nollen",
+        "name": "Afterschool Program",
+        "start": "14:35",
+        "end": "18:00",
+        "location": "School",
+        "type": "Afterschool"
       }
     ],
     "Tuesday": [
@@ -377,6 +385,14 @@
         "location": "Silver Creek",
         "preferred": true,
         "type": "Hockey"
+      },
+      {
+        "child": "Nollen",
+        "name": "Afterschool Program",
+        "start": "14:35",
+        "end": "18:00",
+        "location": "School",
+        "type": "Afterschool"
       }
     ],
     "Wednesday": [
@@ -421,6 +437,14 @@
         "end": "19:10",
         "location": "Santa Teresa",
         "type": "TKD"
+      },
+      {
+        "child": "Nollen",
+        "name": "Afterschool Program",
+        "start": "14:35",
+        "end": "18:00",
+        "location": "School",
+        "type": "Afterschool"
       }
     ],
     "Thursday": [
@@ -474,6 +498,14 @@
         "end": "20:20",
         "location": "Santa Teresa",
         "type": "TKD"
+      },
+      {
+        "child": "Nollen",
+        "name": "Afterschool Program",
+        "start": "14:35",
+        "end": "18:00",
+        "location": "School",
+        "type": "Afterschool"
       }
     ],
     "Friday": [
@@ -528,6 +560,14 @@
         "end": "19:00",
         "location": "SJ",
         "type": "Parcor"
+      },
+      {
+        "child": "Nollen",
+        "name": "Afterschool Program",
+        "start": "14:35",
+        "end": "18:00",
+        "location": "School",
+        "type": "Afterschool"
       }
     ],
     "Saturday": [
