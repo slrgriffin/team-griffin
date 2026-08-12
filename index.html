@@ -535,26 +535,68 @@ function formatTime12(t){
   return `${hh}:${String(m).padStart(2,'0')} ${ampm}`;
 }
 
-// Activities already actually chosen (matching the real weekly pattern) are
-// locked in first — the optimizer shouldn't suggest swapping out a decision
-// that's already been made. Remaining time is then filled greedily with
-// whatever additional non-conflicting alternatives fit, by earliest end time.
-function optimizePicks(list){
-  const withIdx = list.map((a,i)=>({...a, i}));
-  const overlaps = (a,b) => timeToMinutes(a.start) < timeToMinutes(b.end) && timeToMinutes(b.start) < timeToMinutes(a.end);
+// Whole-week optimizer: computed ONCE per child across all 7 days, so it
+// can enforce rules that span days — weekly caps, hard exclusions, and
+// entire excluded days — not just avoid conflicts within a single day.
+// Returns a Set of "day|origIndex" keys identifying every picked activity.
+const WEEK_DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 
-  const preferred = withIdx.filter(a=>a.preferred);
-  const alts = withIdx.filter(a=>!a.preferred).sort((a,b)=>timeToMinutes(a.end)-timeToMinutes(b.end));
+function optimizeWeek(child, activityOptionsByDay, rules){
+  rules = rules || {};
+  const excludedNames = new Set((rules.excluded && rules.excluded[child]) || []);
+  const excludedDays = new Set((rules.excludedDays && rules.excludedDays[child]) || []);
+  const caps = (rules.weeklyCaps && rules.weeklyCaps[child]) || {};
 
-  const picked = new Set(preferred.map(a=>a.i));
-  const lockedIn = [...preferred];
-  for(const alt of alts){
-    if(!lockedIn.some(p => overlaps(alt,p))){
-      picked.add(alt.i);
-      lockedIn.push(alt);
+  let all = [];
+  WEEK_DAYS.forEach(day => {
+    if(excludedDays.has(day)) return;
+    (activityOptionsByDay[day]||[]).forEach((a,i) => {
+      if(a.child !== child && a.child !== 'Both') return;
+      if(excludedNames.has(a.name)) return;
+      all.push({...a, day, origIndex:i});
+    });
+  });
+
+  const preferred = all.filter(a=>a.preferred);
+  const alts = all.filter(a=>!a.preferred);
+  const used = {};
+  preferred.forEach(a => { used[a.name] = (used[a.name]||0)+1; });
+
+  const coveredDays = new Set(preferred.map(a=>a.day));
+  let picks = [...preferred];
+
+  // Maximize day coverage: one primary pick per still-open day, cheapest (earliest-ending) first
+  const openDays = WEEK_DAYS.filter(d => !excludedDays.has(d) && !coveredDays.has(d));
+  openDays.forEach(day => {
+    const dayAlts = alts.filter(a=>a.day===day).sort((a,b)=>timeToMinutes(a.end)-timeToMinutes(b.end));
+    for(const cand of dayAlts){
+      const cap = caps[cand.name];
+      if(cap != null && (used[cand.name]||0) >= cap) continue;
+      picks.push(cand);
+      used[cand.name] = (used[cand.name]||0)+1;
+      coveredDays.add(day);
+      break;
     }
-  }
-  return picked;
+  });
+
+  // Fill remaining non-conflicting time on every non-excluded day (rule 7)
+  WEEK_DAYS.forEach(day => {
+    if(excludedDays.has(day)) return;
+    const dayPicks = picks.filter(p=>p.day===day);
+    const dayAlts = alts.filter(a=>a.day===day).sort((a,b)=>timeToMinutes(a.end)-timeToMinutes(b.end));
+    dayAlts.forEach(cand => {
+      if(picks.some(p=>p.day===cand.day && p.origIndex===cand.origIndex)) return;
+      const cap = caps[cand.name];
+      if(cap != null && (used[cand.name]||0) >= cap) return;
+      const conflict = dayPicks.some(p => timeToMinutes(cand.start) < timeToMinutes(p.end) && timeToMinutes(p.start) < timeToMinutes(cand.end));
+      if(conflict) return;
+      picks.push(cand);
+      dayPicks.push(cand);
+      used[cand.name] = (used[cand.name]||0)+1;
+    });
+  });
+
+  return new Set(picks.map(p => p.day + '|' + p.origIndex));
 }
 
 function hasAnyConflict(list, i){
@@ -586,12 +628,10 @@ function assignLanes(activities){
   return { items: withMin, laneCount: Math.max(1, laneEnds.length) };
 }
 
-// Tags each activity with whether the optimizer picked it — computed on the
-// FULL list before any display filtering, so hiding a type/person never
-// changes what counts as an actual conflict.
-function tagPicked(list){
-  const picked = optimizePicks(list);
-  return list.map((a,i)=>({...a, _picked: picked.has(i)}));
+// Tags each activity using the whole-week pick set (see optimizeWeek) so
+// hiding a type/person in the display never changes what counts as picked.
+function tagPicked(list, weekPicks, day){
+  return list.map((a) => ({...a, _picked: weekPicks.has(day + '|' + a._origIndex)}));
 }
 
 function personMatches(child){
@@ -640,10 +680,14 @@ function buildTimetable(title, days, rangeStart, rangeEnd, data){
   }
 
   const opts = data.activityOptions || {};
+  const rules = data.optimizerRules || {};
+  const nollenWeekPicks = optimizeWeek('Nollen', opts, rules);
+  const austinWeekPicks = optimizeWeek('Austin', opts, rules);
+
   const dayCols = days.map(day => {
     const acts = (opts[day] || []).map((a,i)=>({...a, _day:day, _origIndex:i}));
-    const nollen = tagPicked(acts.filter(a=>a.child==='Nollen' || a.child==='Both'));
-    const austin = tagPicked(acts.filter(a=>a.child==='Austin' || a.child==='Both'));
+    const nollen = tagPicked(acts.filter(a=>a.child==='Nollen' || a.child==='Both'), nollenWeekPicks, day);
+    const austin = tagPicked(acts.filter(a=>a.child==='Austin' || a.child==='Both'), austinWeekPicks, day);
     const body = layoutChild(nollen, startMin, endMin, 1, 48) + layoutChild(austin, startMin, endMin, 51, 48);
     return `<div class="tt-day-col" style="height:${height}px">${body}</div>`;
   }).join('');
