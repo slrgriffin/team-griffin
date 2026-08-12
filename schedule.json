@@ -5,16 +5,19 @@
         "TKD Black Belt · 4:50–5:40 pm @ Santa Teresa"
       ],
       "a": [
-        "Roller Shooting · 5:15–6:15 pm @ Silver Creek"
+        "Roller Shooting · 5:15–6:15 pm @ Silver Creek",
+        "TKD Advanced · 6:15–7:05 pm @ Santa Teresa"
       ],
       "f": []
     },
     "Tuesday": {
       "n": [
-        "Afterschool Program · 2:35–6:00 pm @ School"
+        "Afterschool Program · 2:35–6:00 pm @ School",
+        "TKD Black Belt · 6:00–6:50 pm @ Santa Teresa"
       ],
       "a": [
-        "Team Practice · 4:15–6:00 pm @ Silver Creek"
+        "Team Practice · 4:15–6:00 pm @ Silver Creek",
+        "TKD Advanced Evening · 7:30–8:20 pm @ Santa Teresa"
       ],
       "f": []
     },
@@ -24,7 +27,8 @@
         "Afterschool Program · 2:35–5:30 pm @ School"
       ],
       "a": [
-        "Parcor · 5:30–7:00 pm @ SJ"
+        "Parcor · 5:30–7:00 pm @ SJ",
+        "Roller Systems · 4:15–5:00 pm @ Silver Creek"
       ],
       "f": []
     },
@@ -35,22 +39,21 @@
       ],
       "a": [
         "TKD Advanced · 4:05–4:55 pm @ Santa Teresa",
-        "Parcor · 5:30–7:00 pm @ SJ"
+        "Parcor · 5:30–7:00 pm @ SJ",
+        "TKD Advanced Evening · 7:30–8:20 pm @ Santa Teresa"
       ],
       "f": []
     },
     "Friday": {
-      "n": [
-        "TKD Black Belt · 6:05–6:55 pm @ Santa Teresa"
-      ],
-      "a": [
-        "TKD Advanced · 4:00–4:50 pm @ Santa Teresa",
-        "TKD XMA · 6:45–7:35 pm @ Santa Teresa"
-      ],
+      "n": [],
+      "a": [],
       "f": []
     },
     "Saturday": {
-      "n": [],
+      "n": [
+        "TKD Sparring · 11:05–11:40 am @ Santa Teresa",
+        "TKD Black Belt · 11:40 am–12:30 pm @ Santa Teresa"
+      ],
       "a": [
         "Roller Game · 10:15 am–12:30 pm @ Silver Creek"
       ],
@@ -318,7 +321,8 @@
         "start": "18:15",
         "end": "19:05",
         "location": "Santa Teresa",
-        "type": "TKD"
+        "type": "TKD",
+        "preferred": true
       },
       {
         "child": "Austin",
@@ -369,7 +373,8 @@
         "start": "18:00",
         "end": "18:50",
         "location": "Santa Teresa",
-        "type": "TKD"
+        "type": "TKD",
+        "preferred": true
       },
       {
         "child": "Austin",
@@ -377,7 +382,8 @@
         "start": "19:30",
         "end": "20:20",
         "location": "Santa Teresa",
-        "type": "TKD"
+        "type": "TKD",
+        "preferred": true
       },
       {
         "child": "Austin",
@@ -405,7 +411,8 @@
         "start": "16:15",
         "end": "17:00",
         "location": "Silver Creek",
-        "type": "Hockey"
+        "type": "Hockey",
+        "preferred": true
       },
       {
         "child": "Nollen",
@@ -501,7 +508,8 @@
         "start": "19:30",
         "end": "20:20",
         "location": "Santa Teresa",
-        "type": "TKD"
+        "type": "TKD",
+        "preferred": true
       },
       {
         "child": "Nollen",
@@ -520,7 +528,7 @@
         "start": "16:00",
         "end": "16:50",
         "location": "Santa Teresa",
-        "preferred": true,
+        "preferred": false,
         "type": "TKD"
       },
       {
@@ -529,7 +537,7 @@
         "start": "18:05",
         "end": "18:55",
         "location": "Santa Teresa",
-        "preferred": true,
+        "preferred": false,
         "type": "TKD"
       },
       {
@@ -547,7 +555,7 @@
         "start": "18:45",
         "end": "19:35",
         "location": "Santa Teresa",
-        "preferred": true,
+        "preferred": false,
         "type": "TKD"
       },
       {
@@ -592,7 +600,8 @@
         "start": "11:05",
         "end": "11:40",
         "location": "Santa Teresa",
-        "type": "TKD"
+        "type": "TKD",
+        "preferred": true
       },
       {
         "child": "Austin",
@@ -608,7 +617,8 @@
         "start": "11:40",
         "end": "12:30",
         "location": "Santa Teresa",
-        "type": "TKD"
+        "type": "TKD",
+        "preferred": true
       },
       {
         "child": "Nollen",
