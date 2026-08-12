@@ -30,7 +30,8 @@
     },
     "Thursday": {
       "n": [
-        "Parcor · 5:30–7:00 pm @ SJ"
+        "Parcor · 5:30–7:00 pm @ SJ",
+        "Afterschool Program · 2:35–5:30 pm @ School"
       ],
       "a": [
         "TKD Advanced · 4:05–4:55 pm @ Santa Teresa",
@@ -40,8 +41,7 @@
     },
     "Friday": {
       "n": [
-        "TKD Black Belt · 6:05–6:55 pm @ Santa Teresa",
-        "Afterschool Program · 2:35–6:00 pm @ School"
+        "TKD Black Belt · 6:05–6:55 pm @ Santa Teresa"
       ],
       "a": [
         "TKD Advanced · 4:00–4:50 pm @ Santa Teresa",
@@ -508,9 +508,10 @@
         "child": "Nollen",
         "name": "Afterschool Program",
         "start": "14:35",
-        "end": "18:00",
+        "end": "17:30",
         "location": "School",
-        "type": "Afterschool"
+        "type": "Afterschool",
+        "preferred": true
       }
     ],
     "Friday": [
@@ -565,15 +566,6 @@
         "end": "19:00",
         "location": "SJ",
         "type": "Parcor"
-      },
-      {
-        "child": "Nollen",
-        "name": "Afterschool Program",
-        "start": "14:35",
-        "end": "18:00",
-        "location": "School",
-        "type": "Afterschool",
-        "preferred": true
       }
     ],
     "Saturday": [
