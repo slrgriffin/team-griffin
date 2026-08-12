@@ -659,5 +659,36 @@
       }
     ],
     "Sunday": []
+  },
+  "optimizerRules": {
+    "weeklyCaps": {
+      "Nollen": {
+        "Parcor": 2
+      },
+      "Austin": {
+        "Parcor": 2
+      }
+    },
+    "excluded": {
+      "Nollen": [
+        "TKD XMA"
+      ]
+    },
+    "excludedDays": {
+      "Nollen": [
+        "Friday"
+      ],
+      "Austin": [
+        "Friday"
+      ]
+    },
+    "bonusGoals": [
+      {
+        "child": "Nollen",
+        "name": "TKD Black Belt",
+        "minCount": 2,
+        "excludeDay": "Friday"
+      }
+    ]
   }
 }
