@@ -159,6 +159,9 @@
   .school-item.completed .school-item-title{text-decoration:line-through;}
   .school-item-meta{font-size:.74rem;color:var(--ink-soft);margin-top:.15rem;}
   .school-item-notes{font-size:.76rem;color:var(--ink-soft);margin-top:.25rem;line-height:1.4;}
+  .school-item-docref{font-size:.76rem;margin-top:.3rem;}
+  .school-item-docref a{color:var(--school);text-decoration:none;font-weight:600;}
+  .school-item-docref a:hover{text-decoration:underline;}
   .school-empty{font-size:.82rem;color:var(--ink-soft);font-style:italic;padding:.3rem 0 .8rem;}
 
   .comm-item{
@@ -174,6 +177,30 @@
     text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:.6rem;margin-top:.6rem;
   }
   .comm-log-link:hover{background:rgba(0,0,0,.03);}
+
+  .doc-card{
+    background:var(--card);border:1px solid var(--line);border-radius:10px;
+    padding:.75rem .9rem;margin-bottom:.65rem;
+  }
+  .doc-card-head{display:flex;align-items:baseline;gap:.5rem;flex-wrap:wrap;}
+  .doc-card-title{font-size:.92rem;font-weight:700;color:var(--ink);}
+  .doc-card-date{font-size:.72rem;color:var(--ink-soft);margin-left:auto;white-space:nowrap;}
+  .doc-card-summary{font-size:.83rem;color:var(--ink-soft);margin-top:.35rem;line-height:1.5;}
+  .doc-card-footer{display:flex;align-items:center;gap:.5rem;margin-top:.55rem;flex-wrap:wrap;}
+  .doc-tag{
+    font-size:.66rem;font-weight:700;letter-spacing:.02em;text-transform:uppercase;
+    background:rgba(0,0,0,.05);color:var(--ink-soft);padding:.15rem .45rem;border-radius:5px;
+  }
+  .doc-card-link{
+    margin-left:auto;font-size:.78rem;font-weight:600;color:var(--pine);text-decoration:none;
+  }
+  .doc-card-link:hover{text-decoration:underline;}
+  .doc-filter-bar{display:flex;gap:.4rem;margin-bottom:1rem;flex-wrap:wrap;}
+  .doc-filter-btn{
+    font-family:inherit;font-size:.76rem;font-weight:600;padding:.35rem .7rem;border-radius:20px;
+    border:1px solid var(--line);background:var(--card);color:var(--ink-soft);cursor:pointer;
+  }
+  .doc-filter-btn.active{background:var(--school);color:#fff;border-color:var(--school);}
 
   .checklist-box{
     background:var(--card);border:1px solid var(--line);border-radius:10px;padding:.4rem .5rem;
@@ -319,6 +346,7 @@
     <button class="tab-btn active" id="tab-btn-week">📅 This Week</button>
     <button class="tab-btn" id="tab-btn-activities">⚙️ Activities</button>
     <button class="tab-btn" id="tab-btn-school">🎓 School</button>
+    <button class="tab-btn" id="tab-btn-documents">📄 Documents</button>
   </div>
 
   <main id="main">
@@ -326,6 +354,7 @@
   </main>
   <div id="activities-panel" style="display:none;padding:0 1.25rem;"></div>
   <div id="school-panel" style="display:none;padding:0 1.25rem;"></div>
+  <div id="documents-panel" style="display:none;padding:0 1.25rem;"></div>
 
   <footer>
     <div id="sync-note">—</div>
@@ -393,6 +422,7 @@
 
 <script>
 const RAW_JSON_URL = 'https://raw.githubusercontent.com/slrgriffin/team-griffin/main/schedule.json';
+const DOCS_JSON_URL = 'https://raw.githubusercontent.com/slrgriffin/team-griffin/main/documents.json';
 const SEASON_START = '2026-06-15';
 const SEASON_END   = '2026-08-14';
 const DAY_MS = 86400000;
@@ -556,7 +586,7 @@ document.getElementById('main').addEventListener('click', (e) => {
   }
 });
 
-function render(data){
+function render(data, docsData){
   document.getElementById('loading')?.remove?.();
 
   const sunday = new Date(weekMonday); sunday.setDate(weekMonday.getDate()+6);
@@ -589,7 +619,8 @@ function render(data){
 
   renderActionItems((data.weeklyNotes||{})[weekMondayStr], weekMondayStr);
   renderActivitiesTab(data);
-  renderSchoolTab(data);
+  renderSchoolTab(data, docsData);
+  renderDocumentsTab(docsData);
 
   document.getElementById('sync-note').textContent =
     `Synced from GitHub · ${new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}`;
@@ -738,9 +769,9 @@ function layoutChild(activitiesTagged, rangeStartMin, rangeEndMin, leftPct, widt
     const left = leftPct + act.lane * laneW;
     const cls = act._picked ? 'tt-picked' : 'tt-conflict';
     const childCls = act.child==='Nollen' ? 'tt-n' : act.child==='Austin' ? 'tt-a' : 'tt-both';
-    const tip = `${act.child}: ${act.name} · ${formatTime12(act.start)}–${formatTime12(act.end)} @ ${act.location}`;
+    const tip = `${act.child}: ${act.name} · ${formatTime12(act.start)}–${formatTime12(act.end)} @ ${act.location}` + (act.docRef ? ` · 📄 ${act.docRef.summaryShort}` : '');
     return `<div class="tt-activity ${cls} ${childCls}" style="top:${top}px;height:${height}px;left:${left}%;width:${laneW-1}%" title="${tip}" data-day="${act._day}" data-index="${act._origIndex}">
-      <div class="tt-act-name">${act.name}</div>
+      <div class="tt-act-name">${act.name}${act.docRef ? ' 📄' : ''}</div>
       <div class="tt-act-time">${formatTime12(act.start)}–${formatTime12(act.end)}</div>
     </div>`;
   }).join('');
@@ -941,11 +972,12 @@ function renderSchoolItem(it){
       <div class="school-item-title">${it.title}</div>
       <div class="school-item-meta">${it.child} &nbsp;·&nbsp; ${fmtSchoolDate(it.date)}${isOverdue?' · Overdue':''}</div>
       ${it.notes ? `<div class="school-item-notes">${it.notes}</div>` : ''}
+      ${it.docRef ? `<div class="school-item-docref"><a href="${it.docRef.driveUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()">📄 ${it.docRef.summaryShort}</a></div>` : ''}
     </div>
   </div>`;
 }
 
-function renderSchoolTab(data){
+function renderSchoolTab(data, docsData){
   const items = [...(data.schoolItems || [])].sort((a,b) => a.date.localeCompare(b.date));
   const overdue = items.filter(it => !it.completed && it.date < todayStr);
   const upcoming = items.filter(it => !it.completed && it.date >= todayStr);
@@ -957,20 +989,16 @@ function renderSchoolTab(data){
   itemsHtml += upcoming.length ? upcoming.map(renderSchoolItem).join('') : `<div class="school-empty">Nothing on the horizon.</div>`;
   if(completed.length) itemsHtml += `<div class="school-group-label">Recently Completed</div>` + completed.map(renderSchoolItem).join('');
 
-  const comms = (data.communicationsLog && data.communicationsLog.recent) || [];
-  const commsHtml = comms.length
-    ? [...comms].reverse().slice(0,8).map(c => `<div class="comm-item">
+  const docs = [...((docsData && docsData.documents) || [])].sort((a,b) => b.uploadedDate.localeCompare(a.uploadedDate));
+  const commsHtml = docs.length
+    ? docs.slice(0,5).map(c => `<div class="comm-item">
         <div class="comm-item-head">
-          <span class="comm-item-subject">${c.subject}</span>
-          <span class="comm-item-date">${c.child ? c.child+' · ' : ''}${fmtSchoolDate(c.date)}</span>
+          <span class="comm-item-subject">${c.title}</span>
+          <span class="comm-item-date">${c.child ? c.child+' · ' : ''}${fmtSchoolDate(c.uploadedDate)}</span>
         </div>
-        <div class="comm-item-summary">${c.summary}</div>
+        <div class="comm-item-summary">${c.summaryShort}</div>
       </div>`).join('')
     : `<div class="school-empty">No communications logged yet — tell Claude about one and it'll show up here.</div>`;
-  const docUrl = data.communicationsLog && data.communicationsLog.docUrl;
-  const docLinkHtml = docUrl
-    ? `<a class="comm-log-link" href="${docUrl}" target="_blank" rel="noopener">Open full communications log →</a>`
-    : '';
 
   document.getElementById('school-panel').innerHTML = `
     <div class="section-label">🎓 Assignments, Projects &amp; Events</div>
@@ -978,12 +1006,13 @@ function renderSchoolTab(data){
     ${itemsHtml}
     <div class="section-label">📨 Communications</div>
     ${commsHtml}
-    ${docLinkHtml}
+    <a class="comm-log-link" id="comm-view-all-link" href="#">Open full Documents archive →</a>
   `;
 }
 
 document.getElementById('school-panel').addEventListener('click', (e) => {
   if(e.target.id === 'school-add-btn'){ openSchoolModal(null); return; }
+  if(e.target.id === 'comm-view-all-link'){ e.preventDefault(); setActiveTab('documents'); return; }
   const item = e.target.closest('.school-item');
   if(item) openSchoolModal(item.dataset.schoolId);
 });
@@ -1092,8 +1121,50 @@ document.getElementById('school-modal-delete').addEventListener('click', async (
   );
 });
 
+// ── Documents tab: full archive from documents.json ────────────────────
+let docFilterChild = 'All';
+let latestDocsData = null;
+
+function renderDocumentsTab(docsData){
+  latestDocsData = docsData;
+  const all = [...((docsData && docsData.documents) || [])].sort((a,b) => b.uploadedDate.localeCompare(a.uploadedDate));
+  const filtered = docFilterChild === 'All' ? all : all.filter(d => d.child === docFilterChild || d.child === 'Both');
+
+  const filterBar = `<div class="doc-filter-bar">
+    ${['All','Nollen','Austin'].map(c => `<button class="doc-filter-btn${docFilterChild===c?' active':''}" data-doc-filter="${c}">${c}</button>`).join('')}
+  </div>`;
+
+  const cardsHtml = filtered.length
+    ? filtered.map(d => `<div class="doc-card">
+        <div class="doc-card-head">
+          <span class="doc-card-title">${d.title}</span>
+          <span class="doc-card-date">${d.child} · ${fmtSchoolDate(d.uploadedDate)}</span>
+        </div>
+        <div class="doc-card-summary">${d.summaryLong}</div>
+        <div class="doc-card-footer">
+          ${(d.tags||[]).map(t => `<span class="doc-tag">${t}</span>`).join('')}
+          ${d.driveUrl ? `<a class="doc-card-link" href="${d.driveUrl}" target="_blank" rel="noopener">Open original ↗</a>` : ''}
+        </div>
+      </div>`).join('')
+    : `<div class="school-empty">No documents logged yet — use the "add to School Comms" skill to log one.</div>`;
+
+  document.getElementById('documents-panel').innerHTML = `
+    <div class="section-label">📄 Documents</div>
+    ${filterBar}
+    ${cardsHtml}
+  `;
+}
+
+document.getElementById('documents-panel').addEventListener('click', (e) => {
+  const btn = e.target.closest('.doc-filter-btn');
+  if(!btn) return;
+  docFilterChild = btn.dataset.docFilter;
+  renderDocumentsTab(latestDocsData);
+});
+
 function setActiveTab(name){
-  const tabs = {week: 'main', activities: 'activities-panel', school: 'school-panel'};
+
+  const tabs = {week: 'main', activities: 'activities-panel', school: 'school-panel', documents: 'documents-panel'};
   Object.entries(tabs).forEach(([k, elId]) => {
     document.getElementById('tab-btn-' + k).classList.toggle('active', k === name);
     document.getElementById(elId).style.display = (k === name) ? '' : 'none';
@@ -1102,6 +1173,7 @@ function setActiveTab(name){
 document.getElementById('tab-btn-week').addEventListener('click', () => setActiveTab('week'));
 document.getElementById('tab-btn-activities').addEventListener('click', () => setActiveTab('activities'));
 document.getElementById('tab-btn-school').addEventListener('click', () => setActiveTab('school'));
+document.getElementById('tab-btn-documents').addEventListener('click', () => setActiveTab('documents'));
 
 async function load(){
   document.getElementById('main').innerHTML = '<div class="state-msg" id="loading">Loading schedule…</div>';
@@ -1109,7 +1181,14 @@ async function load(){
     const res = await fetch(RAW_JSON_URL + '?t=' + Date.now());
     if(!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
-    render(data);
+
+    let docsData = { documents: [] };
+    try{
+      const docsRes = await fetch(DOCS_JSON_URL + '?t=' + Date.now());
+      if(docsRes.ok) docsData = await docsRes.json();
+    }catch(docsErr){ /* documents.json is supplementary — don't block the newsletter on it */ }
+
+    render(data, docsData);
   }catch(err){
     renderError(`Could not load schedule.json (${err.message}).`);
   }
