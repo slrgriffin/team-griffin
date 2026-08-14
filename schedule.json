@@ -725,15 +725,6 @@
         "summaryShort": "Ms. Marcias needs 6-8 grandparent volunteers for a class interview project on Thursday, Aug 27, 8:30-10am. Students will interview a grandparent and make a short video about their story. Translation support is available, so language isn't a barrier. Let the teacher know if a grandparent can attend.",
         "driveUrl": "https://docs.google.com/document/d/1QDVdENp8AoDYEbV6cihu8BYxgt84Wb57ZTjFn8E0cn8/edit"
       }
-    },
-    {
-      "id": "sch-idempotenttest01",
-      "title": "Idempotent Test",
-      "child": "Austin",
-      "type": "Event",
-      "date": "2026-08-22",
-      "notes": "",
-      "completed": false
     }
   ],
   "communicationsLog": {
