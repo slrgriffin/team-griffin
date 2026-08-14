@@ -3,11 +3,11 @@
   "documents": [
     {
       "id": "doc-20260814-sofos",
-      "title": "Sofos After School Program 2026-2027 — Welcome & Schedule Info",
+      "title": "Sofos After School Program 2026-2027 \u2014 Welcome & Schedule Info",
       "uploadedDate": "2026-08-14",
       "driveUrl": "https://docs.google.com/document/d/1Y0B6fvIP58huiXLMl6JfK2r2P4LYuwHbHzdidBsG2qk/edit",
-      "summaryLong": "Brian Yee, director of the Sofos After School program at Carolyn Clark, confirmed the program starts Monday, August 17, 2026 in Room C106 right after dismissal, running 2:35-6:00PM each school day (check-in, two recess breaks, a 3:15-4:30 homework/work block, and iPad/craft time from 5:00-5:40). Minimum days add a movie after the work block; Fridays usually add a game/activity since there's typically no homework. Families on the 3-day/4-day plan need to email Brian back with which days Nollen will attend. No food is provided, so pack extra for after school. Monthly tuition posts to the online account (https://campsself.active.com/mathenrichment0) on the 1st or 2nd school day and auto-charges any card on file — Brian recommends saving a card. Pickup is at Room C106 any time before 6:00PM; bring photo ID during the first week, and notify staff in advance if someone not on the list will be picking up. Contacts: Brian Yee (408-679-8196), JM Malit (408-712-1307).",
-      "summaryShort": "Sofos After School for Nollen starts Mon, Aug 17, 2026 in Room C106, running 2:35-6:00PM daily. If he's on a 3-day/4-day plan, reply to Brian Yee (408-679-8196) with which days he'll attend. Monthly tuition auto-charges any card on file around the 1st-2nd school day via the online account — worth saving a card. Pack extra food (none provided) and bring photo ID for pickup during the first week.",
+      "summaryLong": "Brian Yee, director of the Sofos After School program at Carolyn Clark, confirmed the program starts Monday, August 17, 2026 in Room C106 right after dismissal, running 2:35-6:00PM each school day (check-in, two recess breaks, a 3:15-4:30 homework/work block, and iPad/craft time from 5:00-5:40). Minimum days add a movie after the work block; Fridays usually add a game/activity since there's typically no homework. Families on the 3-day/4-day plan need to email Brian back with which days Nollen will attend. No food is provided, so pack extra for after school. Monthly tuition posts to the online account (https://campsself.active.com/mathenrichment0) on the 1st or 2nd school day and auto-charges any card on file \u2014 Brian recommends saving a card. Pickup is at Room C106 any time before 6:00PM; bring photo ID during the first week, and notify staff in advance if someone not on the list will be picking up. Contacts: Brian Yee (408-679-8196), JM Malit (408-712-1307).",
+      "summaryShort": "Sofos After School for Nollen starts Mon, Aug 17, 2026 in Room C106, running 2:35-6:00PM daily. If he's on a 3-day/4-day plan, reply to Brian Yee (408-679-8196) with which days he'll attend. Monthly tuition auto-charges any card on file around the 1st-2nd school day via the online account \u2014 worth saving a card. Pack extra food (none provided) and bring photo ID for pickup during the first week.",
       "child": "Nollen",
       "tags": [
         "afterschool",
@@ -17,7 +17,7 @@
     },
     {
       "id": "doc-20260814-marcias-welcome",
-      "title": "Ms. Marcias — Welcome Letter (Nollen's Teacher, 2026–2027)",
+      "title": "Ms. Marcias \u2014 Welcome Letter (Nollen's Teacher, 2026\u20132027)",
       "uploadedDate": "2026-08-14",
       "driveUrl": "https://docs.google.com/document/d/1xJ_NVK0wAP44kCg2YXfB2TFafP-oBWo6EJHtxSBF6mM/edit",
       "summaryLong": "Bernadette Marcias, Nollen's teacher for 2026-2027 at Carolyn Clark Elementary, introduced herself as a 27-year educator (23rd year at Carolyn Clark) who also serves as the school's Administrative Designee. She stressed that attendance during the first 10 days is critical since class placements are provisional and could be reshuffled based on enrollment. A detailed class syllabus will come home next week to review together as a family. She's hosting a Meet & Greet on August 14 (today) from 1:30-2:30pm in Room C215, and can be reached at bmarcias@eesd.org or via the school office voicemail at 408-223-4560. She also encouraged families to join the Carolyn Clark PTA (goal: 100% participation) at https://jointotem.com/ca/san-jose/carolyn-clark-pta.",
@@ -32,7 +32,7 @@
     },
     {
       "id": "doc-20260814-generations-conversation",
-      "title": "Generations in Conversation — Grandparent Interview Project",
+      "title": "Generations in Conversation \u2014 Grandparent Interview Project",
       "uploadedDate": "2026-08-14",
       "driveUrl": "https://docs.google.com/document/d/1QDVdENp8AoDYEbV6cihu8BYxgt84Wb57ZTjFn8E0cn8/edit",
       "summaryLong": "Ms. Marcias is relaunching a class project called Generations in Conversation, where small student groups interview a visiting grandparent about their life and experiences, then create a short video montage celebrating their guest. She's asking for 6-8 grandparents to volunteer for a visit on Thursday, August 27, from 8:30-10:00am, and notes translation support will be arranged so grandparents can share their story in whichever language they're most comfortable with. Snacks will be provided for the guests. Families with an available and willing grandparent should let the teacher know.",
@@ -43,6 +43,18 @@
         "volunteer-request",
         "event",
         "classroom"
+      ]
+    },
+    {
+      "id": "doc-verifytest01",
+      "title": "Verify Test Doc",
+      "uploadedDate": "2026-08-14",
+      "driveUrl": "https://drive.google.com/test",
+      "summaryLong": "A temporary test document for verifying docRef linking.",
+      "summaryShort": "Temporary test document.",
+      "child": "Nollen",
+      "tags": [
+        "test"
       ]
     }
   ]
