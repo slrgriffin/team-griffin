@@ -340,7 +340,8 @@
     },
     "2026-08-13": {
       "a-exercises": true,
-      "a-reading": true
+      "a-reading": true,
+      "n-exercises": true
     }
   },
   "activityOptions": {
