@@ -30,6 +30,8 @@
     --nollen:#C1652F;
     --austin:#3B6E8F;
     --family:#8A6A2F;
+    --school:#6B4C8A;
+    --overdue:#B8492F;
     --line:#C9BB9E;
     --card:#FBF8F1;
     --good:#4C7A52;
@@ -129,8 +131,49 @@
   .tag-n{background:var(--nollen);}
   .tag-a{background:var(--austin);}
   .tag-f{background:var(--family);}
+  .tag-s{background:var(--school);}
   .person-items{font-size:.85rem;color:var(--ink-soft);line-height:1.5;}
   .free-day{font-size:.85rem;color:var(--ink-soft);font-style:italic;}
+
+  .school-add-btn{
+    display:block;width:100%;background:var(--pine);color:#fff;border:none;border-radius:8px;
+    padding:.65rem;font-family:inherit;font-weight:700;font-size:.85rem;cursor:pointer;margin-bottom:1rem;
+  }
+  .school-group-label{
+    font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--ink-soft);margin:1rem 0 .5rem;
+  }
+  .school-group-label.overdue{color:var(--overdue);}
+  .school-item{
+    display:flex;align-items:flex-start;gap:.6rem;background:var(--card);border:1px solid var(--line);
+    border-radius:10px;padding:.65rem .8rem;margin-bottom:.5rem;cursor:pointer;
+  }
+  .school-item.overdue{border-color:var(--overdue);}
+  .school-item.completed{opacity:.5;}
+  .school-item-badge{
+    flex-shrink:0;font-size:.62rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;
+    padding:.2rem .4rem;border-radius:5px;color:#fff;margin-top:.1rem;white-space:nowrap;
+  }
+  .school-item-body{flex:1;min-width:0;}
+  .school-item-title{font-size:.87rem;font-weight:600;color:var(--ink);}
+  .school-item.completed .school-item-title{text-decoration:line-through;}
+  .school-item-meta{font-size:.74rem;color:var(--ink-soft);margin-top:.15rem;}
+  .school-item-notes{font-size:.76rem;color:var(--ink-soft);margin-top:.25rem;line-height:1.4;}
+  .school-empty{font-size:.82rem;color:var(--ink-soft);font-style:italic;padding:.3rem 0 .8rem;}
+
+  .comm-item{
+    background:var(--card);border:1px solid var(--line);border-radius:10px;
+    padding:.65rem .8rem;margin-bottom:.5rem;
+  }
+  .comm-item-head{display:flex;align-items:baseline;gap:.5rem;flex-wrap:wrap;}
+  .comm-item-subject{font-size:.87rem;font-weight:600;color:var(--ink);}
+  .comm-item-date{font-size:.72rem;color:var(--ink-soft);margin-left:auto;white-space:nowrap;}
+  .comm-item-summary{font-size:.8rem;color:var(--ink-soft);margin-top:.3rem;line-height:1.45;}
+  .comm-log-link{
+    display:block;text-align:center;font-size:.82rem;font-weight:600;color:var(--pine);
+    text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:.6rem;margin-top:.6rem;
+  }
+  .comm-log-link:hover{background:rgba(0,0,0,.03);}
 
   .checklist-box{
     background:var(--card);border:1px solid var(--line);border-radius:10px;padding:.4rem .5rem;
@@ -275,12 +318,14 @@
   <div class="tabs">
     <button class="tab-btn active" id="tab-btn-week">📅 This Week</button>
     <button class="tab-btn" id="tab-btn-activities">⚙️ Activities</button>
+    <button class="tab-btn" id="tab-btn-school">🎓 School</button>
   </div>
 
   <main id="main">
     <div class="state-msg" id="loading">Loading schedule…</div>
   </main>
   <div id="activities-panel" style="display:none;padding:0 1.25rem;"></div>
+  <div id="school-panel" style="display:none;padding:0 1.25rem;"></div>
 
   <footer>
     <div id="sync-note">—</div>
@@ -313,6 +358,36 @@
       <button id="modal-save" class="primary">Save</button>
     </div>
     <div id="modal-status"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="school-modal" style="display:none">
+  <div class="modal-box">
+    <h3 id="school-modal-title">Add School Item</h3>
+    <label class="modal-field">Title<input type="text" id="school-modal-title-input" placeholder="e.g. Book report due"></label>
+    <div class="modal-row">
+      <label class="modal-field">Child
+        <div class="modal-radios">
+          <label><input type="radio" name="school-modal-child" value="Nollen"> Nollen</label>
+          <label><input type="radio" name="school-modal-child" value="Austin"> Austin</label>
+          <label><input type="radio" name="school-modal-child" value="Both"> Both</label>
+        </div>
+      </label>
+      <label class="modal-field">Type
+        <select id="school-modal-type"><option>Assignment</option><option>Project</option><option>Event</option></select>
+      </label>
+    </div>
+    <label class="modal-field">Date<input type="date" id="school-modal-date"></label>
+    <label class="modal-field">Notes<input type="text" id="school-modal-notes" placeholder="optional"></label>
+    <label class="modal-field" style="display:flex;align-items:center;gap:.5rem;">
+      <input type="checkbox" id="school-modal-completed" style="width:auto;margin:0;accent-color:var(--pine);"> Completed
+    </label>
+    <div class="modal-actions">
+      <button id="school-modal-delete" style="flex:0 0 auto;color:var(--overdue);border-color:var(--overdue);">Delete</button>
+      <button id="school-modal-cancel">Cancel</button>
+      <button id="school-modal-save" class="primary">Save</button>
+    </div>
+    <div id="school-modal-status"></div>
   </div>
 </div>
 
@@ -361,10 +436,13 @@ function renderDayCard(date, data){
     bodyHtml = `<div class="vac-banner">${override.vac}</div>`;
   } else {
     const day = override || (data.weeklyPattern || {})[dn] || {n:[],a:[],f:[]};
+    const schoolToday = (data.schoolItems || []).filter(it => it.date === dStr && !it.completed);
+    const schoolLabels = schoolToday.map(it => `${it.type === 'Event' ? '' : (it.type + ' due: ')}${it.title}${it.child === 'Both' ? '' : ' ('+it.child+')'}`);
     const rows = [
       renderPersonRow('tag-n','Nollen', day.n),
       renderPersonRow('tag-a','Austin', day.a),
       renderPersonRow('tag-f','Family', day.f),
+      renderPersonRow('tag-s','School', schoolLabels),
     ].join('');
     bodyHtml = rows
       ? `<div class="day-body">${rows}</div>`
@@ -511,6 +589,7 @@ function render(data){
 
   renderActionItems((data.weeklyNotes||{})[weekMondayStr], weekMondayStr);
   renderActivitiesTab(data);
+  renderSchoolTab(data);
 
   document.getElementById('sync-note').textContent =
     `Synced from GitHub · ${new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}`;
@@ -847,18 +926,182 @@ function renderActivitiesTab(data){
     '<div class="section-label">⚙️ Activity Optimizer</div>' + filterBar + legend + weekday + weekend;
 }
 
-document.getElementById('tab-btn-week').addEventListener('click', () => {
-  document.getElementById('tab-btn-week').classList.add('active');
-  document.getElementById('tab-btn-activities').classList.remove('active');
-  document.getElementById('main').style.display = '';
-  document.getElementById('activities-panel').style.display = 'none';
+// ── School tab: Assignments/Projects/Events + Communications ──────────
+function fmtSchoolDate(dStr){
+  const d = parseISO(dStr);
+  return d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+}
+
+function renderSchoolItem(it){
+  const isOverdue = !it.completed && it.date < todayStr;
+  const typeColors = {Assignment:'var(--nollen)', Project:'var(--austin)', Event:'var(--school)'};
+  return `<div class="school-item${isOverdue?' overdue':''}${it.completed?' completed':''}" data-school-id="${it.id}">
+    <span class="school-item-badge" style="background:${typeColors[it.type]||'var(--family)'}">${it.type}</span>
+    <div class="school-item-body">
+      <div class="school-item-title">${it.title}</div>
+      <div class="school-item-meta">${it.child} &nbsp;·&nbsp; ${fmtSchoolDate(it.date)}${isOverdue?' · Overdue':''}</div>
+      ${it.notes ? `<div class="school-item-notes">${it.notes}</div>` : ''}
+    </div>
+  </div>`;
+}
+
+function renderSchoolTab(data){
+  const items = [...(data.schoolItems || [])].sort((a,b) => a.date.localeCompare(b.date));
+  const overdue = items.filter(it => !it.completed && it.date < todayStr);
+  const upcoming = items.filter(it => !it.completed && it.date >= todayStr);
+  const completed = items.filter(it => it.completed).reverse().slice(0, 10);
+
+  let itemsHtml = '';
+  if(overdue.length) itemsHtml += `<div class="school-group-label overdue">⚠️ Overdue</div>` + overdue.map(renderSchoolItem).join('');
+  itemsHtml += `<div class="school-group-label">Upcoming</div>`;
+  itemsHtml += upcoming.length ? upcoming.map(renderSchoolItem).join('') : `<div class="school-empty">Nothing on the horizon.</div>`;
+  if(completed.length) itemsHtml += `<div class="school-group-label">Recently Completed</div>` + completed.map(renderSchoolItem).join('');
+
+  const comms = (data.communicationsLog && data.communicationsLog.recent) || [];
+  const commsHtml = comms.length
+    ? [...comms].reverse().slice(0,8).map(c => `<div class="comm-item">
+        <div class="comm-item-head">
+          <span class="comm-item-subject">${c.subject}</span>
+          <span class="comm-item-date">${c.child ? c.child+' · ' : ''}${fmtSchoolDate(c.date)}</span>
+        </div>
+        <div class="comm-item-summary">${c.summary}</div>
+      </div>`).join('')
+    : `<div class="school-empty">No communications logged yet — tell Claude about one and it'll show up here.</div>`;
+  const docUrl = data.communicationsLog && data.communicationsLog.docUrl;
+  const docLinkHtml = docUrl
+    ? `<a class="comm-log-link" href="${docUrl}" target="_blank" rel="noopener">Open full communications log →</a>`
+    : '';
+
+  document.getElementById('school-panel').innerHTML = `
+    <div class="section-label">🎓 Assignments, Projects &amp; Events</div>
+    <button class="school-add-btn" id="school-add-btn">+ Add School Item</button>
+    ${itemsHtml}
+    <div class="section-label">📨 Communications</div>
+    ${commsHtml}
+    ${docLinkHtml}
+  `;
+}
+
+document.getElementById('school-panel').addEventListener('click', (e) => {
+  if(e.target.id === 'school-add-btn'){ openSchoolModal(null); return; }
+  const item = e.target.closest('.school-item');
+  if(item) openSchoolModal(item.dataset.schoolId);
 });
-document.getElementById('tab-btn-activities').addEventListener('click', () => {
-  document.getElementById('tab-btn-activities').classList.add('active');
-  document.getElementById('tab-btn-week').classList.remove('active');
-  document.getElementById('main').style.display = 'none';
-  document.getElementById('activities-panel').style.display = '';
+
+// ── School item modal ──────────────────────────────────────────────
+let schoolModalTarget = null; // id, or null for "new"
+
+function openSchoolModal(id){
+  schoolModalTarget = id;
+  const isNew = !id;
+  const item = isNew ? null : (currentData.schoolItems || []).find(x => x.id === id);
+  document.getElementById('school-modal-title').textContent = isNew ? 'Add School Item' : 'Edit School Item';
+  document.getElementById('school-modal-title-input').value = item ? item.title : '';
+  document.querySelectorAll('input[name="school-modal-child"]').forEach(r => r.checked = item ? (r.value === item.child) : false);
+  document.getElementById('school-modal-type').value = item ? item.type : 'Assignment';
+  document.getElementById('school-modal-date').value = item ? item.date : todayStr;
+  document.getElementById('school-modal-notes').value = item ? (item.notes||'') : '';
+  document.getElementById('school-modal-completed').checked = item ? !!item.completed : false;
+  document.getElementById('school-modal-delete').style.display = isNew ? 'none' : '';
+  const statusEl = document.getElementById('school-modal-status');
+  statusEl.textContent = ''; statusEl.className = '';
+  document.getElementById('school-modal-save').disabled = false;
+  document.getElementById('school-modal').style.display = 'flex';
+}
+
+function closeSchoolModal(){
+  document.getElementById('school-modal').style.display = 'none';
+  schoolModalTarget = null;
+}
+
+document.getElementById('school-modal-cancel').addEventListener('click', closeSchoolModal);
+document.getElementById('school-modal').addEventListener('click', (e) => {
+  if(e.target.id === 'school-modal') closeSchoolModal();
 });
+
+document.getElementById('school-modal-save').addEventListener('click', async () => {
+  const isNew = !schoolModalTarget;
+  const id = schoolModalTarget || ('sch-' + Date.now().toString(36) + Math.random().toString(36).slice(2,6));
+  const title = document.getElementById('school-modal-title-input').value.trim();
+  const child = document.querySelector('input[name="school-modal-child"]:checked')?.value;
+  const type = document.getElementById('school-modal-type').value;
+  const date = document.getElementById('school-modal-date').value;
+  const notes = document.getElementById('school-modal-notes').value.trim();
+  const completed = document.getElementById('school-modal-completed').checked;
+  const statusEl = document.getElementById('school-modal-status');
+
+  if(!title || !child || !date){
+    statusEl.textContent = 'Title, child, and date are all required.';
+    statusEl.className = 'err';
+    return;
+  }
+
+  document.getElementById('school-modal-save').disabled = true;
+  statusEl.textContent = 'Saving…';
+  statusEl.className = '';
+
+  const mode = isNew ? 'addSchoolItem' : 'editSchoolItem';
+  const url = `${SCRIPT_URL}?mode=${mode}&id=${encodeURIComponent(id)}`
+    + `&title=${encodeURIComponent(title)}&child=${encodeURIComponent(child)}`
+    + `&type=${encodeURIComponent(type)}&date=${date}&notes=${encodeURIComponent(notes)}&completed=${completed}`;
+  fetch(url, { mode: 'no-cors' }).catch(()=>{});
+
+  confirmWrite(
+    null,
+    (d) => {
+      const it = (d.schoolItems||[]).find(x => x.id === id);
+      return !!it && it.title===title && it.child===child && it.type===type && it.date===date && !!it.completed===completed;
+    },
+    () => {
+      statusEl.textContent = 'Saved ✓';
+      statusEl.className = 'ok';
+      setTimeout(() => { closeSchoolModal(); load(); }, 600);
+    },
+    () => {
+      statusEl.textContent = "Didn't confirm — check your connection and try again.";
+      statusEl.className = 'err';
+      document.getElementById('school-modal-save').disabled = false;
+    }
+  );
+});
+
+document.getElementById('school-modal-delete').addEventListener('click', async () => {
+  if(!schoolModalTarget) return;
+  const id = schoolModalTarget;
+  const statusEl = document.getElementById('school-modal-status');
+  document.getElementById('school-modal-save').disabled = true;
+  statusEl.textContent = 'Deleting…';
+  statusEl.className = '';
+
+  const url = `${SCRIPT_URL}?mode=deleteSchoolItem&id=${encodeURIComponent(id)}`;
+  fetch(url, { mode: 'no-cors' }).catch(()=>{});
+
+  confirmWrite(
+    null,
+    (d) => !(d.schoolItems||[]).some(x => x.id === id),
+    () => {
+      statusEl.textContent = 'Deleted ✓';
+      statusEl.className = 'ok';
+      setTimeout(() => { closeSchoolModal(); load(); }, 600);
+    },
+    () => {
+      statusEl.textContent = "Didn't confirm — check your connection and try again.";
+      statusEl.className = 'err';
+      document.getElementById('school-modal-save').disabled = false;
+    }
+  );
+});
+
+function setActiveTab(name){
+  const tabs = {week: 'main', activities: 'activities-panel', school: 'school-panel'};
+  Object.entries(tabs).forEach(([k, elId]) => {
+    document.getElementById('tab-btn-' + k).classList.toggle('active', k === name);
+    document.getElementById(elId).style.display = (k === name) ? '' : 'none';
+  });
+}
+document.getElementById('tab-btn-week').addEventListener('click', () => setActiveTab('week'));
+document.getElementById('tab-btn-activities').addEventListener('click', () => setActiveTab('activities'));
+document.getElementById('tab-btn-school').addEventListener('click', () => setActiveTab('school'));
 
 async function load(){
   document.getElementById('main').innerHTML = '<div class="state-msg" id="loading">Loading schedule…</div>';
