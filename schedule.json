@@ -705,7 +705,17 @@
       }
     ]
   },
-  "schoolItems": [],
+  "schoolItems": [
+    {
+      "id": "sch-verifytest01",
+      "title": "Verify Test Item",
+      "child": "Nollen",
+      "type": "Assignment",
+      "date": "2026-08-20",
+      "notes": "temp verification item",
+      "completed": false
+    }
+  ],
   "communicationsLog": {
     "docId": "",
     "docUrl": "https://drive.google.com/drive/folders/1Wz7NQgzuoPEy8-LLRiwnrUrPfj4XrVm7",
