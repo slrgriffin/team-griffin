@@ -332,7 +332,18 @@ function addSchoolItem(params) {
       if (params.docId) {
         newItem.docRef = { id: params.docId, summaryShort: params.docSummary || '', driveUrl: params.docUrl || '' };
       }
-      data.schoolItems.push(newItem);
+      // Idempotent by id: a retried "add" (e.g. after a client-side timeout on an
+      // earlier attempt that actually succeeded) updates the existing item in
+      // place instead of pushing a duplicate.
+      var existingIndex = -1;
+      for (var i = 0; i < data.schoolItems.length; i++) {
+        if (data.schoolItems[i].id === id) { existingIndex = i; break; }
+      }
+      if (existingIndex >= 0) {
+        data.schoolItems[existingIndex] = newItem;
+      } else {
+        data.schoolItems.push(newItem);
+      }
     }, 'Add school item: ' + title);
     return jsonOutput({ success: ok });
   } catch (err) {
