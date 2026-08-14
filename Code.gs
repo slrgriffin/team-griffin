@@ -28,6 +28,7 @@ var PAGE_URL = 'https://slrgriffin.github.io/team-griffin/';
 
 function doGet(e) {
   var params = e.parameter || {};
+  if (params.mode === 'ping') return jsonOutput({ ok: true, deployedAt: new Date().toISOString() });
   if (params.mode === 'toggleTask') return toggleTask(params);
   if (params.mode === 'completeAction') return completeAction(params);
   if (params.mode === 'editActivity') return editActivity(params);
