@@ -320,7 +320,7 @@ function addSchoolItem(params) {
   try {
     var ok = ghUpdate(function (data) {
       data.schoolItems = data.schoolItems || [];
-      data.schoolItems.push({
+      var newItem = {
         id: id,
         title: title,
         child: child,
@@ -328,7 +328,11 @@ function addSchoolItem(params) {
         date: date,
         notes: params.notes || '',
         completed: params.completed === 'true'
-      });
+      };
+      if (params.docId) {
+        newItem.docRef = { id: params.docId, summaryShort: params.docSummary || '', driveUrl: params.docUrl || '' };
+      }
+      data.schoolItems.push(newItem);
     }, 'Add school item: ' + title);
     return jsonOutput({ success: ok });
   } catch (err) {
@@ -353,6 +357,13 @@ function editSchoolItem(params) {
           if (params.date) data.schoolItems[i].date = params.date;
           if (params.notes !== undefined) data.schoolItems[i].notes = params.notes;
           if (params.completed !== undefined) data.schoolItems[i].completed = params.completed === 'true';
+          if (params.docId !== undefined) {
+            if (params.docId) {
+              data.schoolItems[i].docRef = { id: params.docId, summaryShort: params.docSummary || '', driveUrl: params.docUrl || '' };
+            } else {
+              delete data.schoolItems[i].docRef;
+            }
+          }
           break;
         }
       }
