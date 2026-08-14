@@ -408,6 +408,9 @@
     </div>
     <label class="modal-field">Date<input type="date" id="school-modal-date"></label>
     <label class="modal-field">Notes<input type="text" id="school-modal-notes" placeholder="optional"></label>
+    <label class="modal-field">Linked Document
+      <select id="school-modal-docref"><option value="">— None —</option></select>
+    </label>
     <label class="modal-field" style="display:flex;align-items:center;gap:.5rem;">
       <input type="checkbox" id="school-modal-completed" style="width:auto;margin:0;accent-color:var(--pine);"> Completed
     </label>
@@ -1031,6 +1034,13 @@ function openSchoolModal(id){
   document.getElementById('school-modal-date').value = item ? item.date : todayStr;
   document.getElementById('school-modal-notes').value = item ? (item.notes||'') : '';
   document.getElementById('school-modal-completed').checked = item ? !!item.completed : false;
+
+  const docs = [...((latestDocsData && latestDocsData.documents) || [])].sort((a,b) => b.uploadedDate.localeCompare(a.uploadedDate));
+  const docSel = document.getElementById('school-modal-docref');
+  docSel.innerHTML = '<option value="">— None —</option>' +
+    docs.map(d => `<option value="${d.id}">${d.title} (${fmtSchoolDate(d.uploadedDate)})</option>`).join('');
+  docSel.value = (item && item.docRef) ? item.docRef.id : '';
+
   document.getElementById('school-modal-delete').style.display = isNew ? 'none' : '';
   const statusEl = document.getElementById('school-modal-status');
   statusEl.textContent = ''; statusEl.className = '';
@@ -1057,6 +1067,8 @@ document.getElementById('school-modal-save').addEventListener('click', async () 
   const date = document.getElementById('school-modal-date').value;
   const notes = document.getElementById('school-modal-notes').value.trim();
   const completed = document.getElementById('school-modal-completed').checked;
+  const docId = document.getElementById('school-modal-docref').value;
+  const selectedDoc = docId ? ((latestDocsData && latestDocsData.documents) || []).find(d => d.id === docId) : null;
   const statusEl = document.getElementById('school-modal-status');
 
   if(!title || !child || !date){
@@ -1070,16 +1082,23 @@ document.getElementById('school-modal-save').addEventListener('click', async () 
   statusEl.className = '';
 
   const mode = isNew ? 'addSchoolItem' : 'editSchoolItem';
-  const url = `${SCRIPT_URL}?mode=${mode}&id=${encodeURIComponent(id)}`
+  let url = `${SCRIPT_URL}?mode=${mode}&id=${encodeURIComponent(id)}`
     + `&title=${encodeURIComponent(title)}&child=${encodeURIComponent(child)}`
-    + `&type=${encodeURIComponent(type)}&date=${date}&notes=${encodeURIComponent(notes)}&completed=${completed}`;
+    + `&type=${encodeURIComponent(type)}&date=${date}&notes=${encodeURIComponent(notes)}&completed=${completed}`
+    + `&docId=${encodeURIComponent(docId)}`;
+  if(selectedDoc){
+    url += `&docSummary=${encodeURIComponent(selectedDoc.summaryShort)}&docUrl=${encodeURIComponent(selectedDoc.driveUrl)}`;
+  }
   fetch(url, { mode: 'no-cors' }).catch(()=>{});
 
   confirmWrite(
     null,
     (d) => {
       const it = (d.schoolItems||[]).find(x => x.id === id);
-      return !!it && it.title===title && it.child===child && it.type===type && it.date===date && !!it.completed===completed;
+      if(!it || it.title!==title || it.child!==child || it.type!==type || it.date!==date || !!it.completed!==completed) return false;
+      const wantDoc = selectedDoc ? selectedDoc.id : null;
+      const gotDoc = it.docRef ? it.docRef.id : null;
+      return wantDoc === gotDoc;
     },
     () => {
       statusEl.textContent = 'Saved ✓';
