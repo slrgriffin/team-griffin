@@ -720,15 +720,6 @@
       "date": "2026-08-27",
       "notes": "",
       "completed": false
-    },
-    {
-      "id": "sch-mstbx93gbim6",
-      "title": "Generations Project",
-      "child": "Nollen",
-      "type": "Project",
-      "date": "2026-08-27",
-      "notes": "",
-      "completed": false
     }
   ],
   "communicationsLog": {
