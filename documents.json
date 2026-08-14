@@ -44,18 +44,6 @@
         "event",
         "classroom"
       ]
-    },
-    {
-      "id": "doc-verifytest01",
-      "title": "Verify Test Doc",
-      "uploadedDate": "2026-08-14",
-      "driveUrl": "https://drive.google.com/test",
-      "summaryLong": "A temporary test document for verifying docRef linking.",
-      "summaryShort": "Temporary test document.",
-      "child": "Nollen",
-      "tags": [
-        "test"
-      ]
     }
   ]
 }
