@@ -525,8 +525,8 @@ function renderActionItems(items, week){
 // Polls the raw JSON (cache-busted each try) until `checkFn` confirms the
 // write actually landed, or gives up after ~40s and flags it as unconfirmed.
 async function confirmWrite(el, checkFn, onConfirmed, onGaveUp){
-  for(let i=0;i<8;i++){
-    await new Promise(r=>setTimeout(r,5000));
+  for(let i=0;i<20;i++){
+    await new Promise(r=>setTimeout(r,8000));
     try{
       const res = await fetch(RAW_JSON_URL + '?t=' + Date.now());
       if(res.ok){
@@ -936,8 +936,8 @@ document.getElementById('modal-save').addEventListener('click', async () => {
       }, 600);
     },
     () => {
-      statusEl.textContent = "Didn't confirm — check your connection and try again.";
-      statusEl.className = 'err';
+      statusEl.textContent = "Saved, but the page is slow to pick it up — it'll appear shortly. Refresh in a minute if it doesn't.";
+      statusEl.className = 'ok';
       document.getElementById('modal-save').disabled = false;
     }
   );
@@ -1022,9 +1022,11 @@ document.getElementById('school-panel').addEventListener('click', (e) => {
 
 // ── School item modal ──────────────────────────────────────────────
 let schoolModalTarget = null; // id, or null for "new"
+let pendingNewSchoolId = null; // reused across retry clicks so a retry never creates a second item
 
 function openSchoolModal(id){
   schoolModalTarget = id;
+  pendingNewSchoolId = null;
   const isNew = !id;
   const item = isNew ? null : (currentData.schoolItems || []).find(x => x.id === id);
   document.getElementById('school-modal-title').textContent = isNew ? 'Add School Item' : 'Edit School Item';
@@ -1051,6 +1053,7 @@ function openSchoolModal(id){
 function closeSchoolModal(){
   document.getElementById('school-modal').style.display = 'none';
   schoolModalTarget = null;
+  pendingNewSchoolId = null;
 }
 
 document.getElementById('school-modal-cancel').addEventListener('click', closeSchoolModal);
@@ -1060,7 +1063,10 @@ document.getElementById('school-modal').addEventListener('click', (e) => {
 
 document.getElementById('school-modal-save').addEventListener('click', async () => {
   const isNew = !schoolModalTarget;
-  const id = schoolModalTarget || ('sch-' + Date.now().toString(36) + Math.random().toString(36).slice(2,6));
+  if(isNew && !pendingNewSchoolId){
+    pendingNewSchoolId = 'sch-' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+  }
+  const id = schoolModalTarget || pendingNewSchoolId;
   const title = document.getElementById('school-modal-title-input').value.trim();
   const child = document.querySelector('input[name="school-modal-child"]:checked')?.value;
   const type = document.getElementById('school-modal-type').value;
@@ -1106,9 +1112,9 @@ document.getElementById('school-modal-save').addEventListener('click', async () 
       setTimeout(() => { closeSchoolModal(); load(); }, 600);
     },
     () => {
-      statusEl.textContent = "Didn't confirm — check your connection and try again.";
-      statusEl.className = 'err';
-      document.getElementById('school-modal-save').disabled = false;
+      statusEl.textContent = "Saved, but the page is slow to pick it up — it'll appear shortly. Refresh in a minute if it doesn't. (No need to press Save again — it already went through.)";
+      statusEl.className = 'ok';
+      setTimeout(() => { closeSchoolModal(); load(); }, 3000);
     }
   );
 });
@@ -1133,9 +1139,9 @@ document.getElementById('school-modal-delete').addEventListener('click', async (
       setTimeout(() => { closeSchoolModal(); load(); }, 600);
     },
     () => {
-      statusEl.textContent = "Didn't confirm — check your connection and try again.";
-      statusEl.className = 'err';
-      document.getElementById('school-modal-save').disabled = false;
+      statusEl.textContent = "Deleted, but the page is slow to pick it up — it'll clear shortly. Refresh in a minute if it doesn't. (No need to press Delete again.)";
+      statusEl.className = 'ok';
+      setTimeout(() => { closeSchoolModal(); load(); }, 3000);
     }
   );
 });
