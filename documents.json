@@ -1,4 +1,19 @@
 {
   "_schema": "Each entry: { id, title, uploadedDate (YYYY-MM-DD), driveUrl, summaryLong, summaryShort (<=4 sentences), child ('Nollen'|'Austin'|'Both'), tags: [string] }. This file is the full-content source of truth for the Documents tab. Activities (schoolItems / activityOptions) may carry a denormalized docRef: { id, summaryShort, driveUrl } pointing back here, so activity cards render without a second fetch. Written by the 'add-to-school-comms' skill.",
-  "documents": []
+  "documents": [
+    {
+      "id": "doc-20260814-sofos",
+      "title": "Sofos After School Program 2026-2027 \u2014 Welcome & Schedule Info",
+      "uploadedDate": "2026-08-14",
+      "driveUrl": "https://docs.google.com/document/d/1Y0B6fvIP58huiXLMl6JfK2r2P4LYuwHbHzdidBsG2qk/edit",
+      "summaryLong": "Brian Yee, director of the Sofos After School program at Carolyn Clark, confirmed the program starts Monday, August 17, 2026 in Room C106 right after dismissal, running 2:35-6:00PM each school day (check-in, two recess breaks, a 3:15-4:30 homework/work block, and iPad/craft time from 5:00-5:40). Minimum days add a movie after the work block; Fridays usually add a game/activity since there's typically no homework. Families on the 3-day/4-day plan need to email Brian back with which days Nollen will attend. No food is provided, so pack extra for after school. Monthly tuition posts to the online account (https://campsself.active.com/mathenrichment0) on the 1st or 2nd school day and auto-charges any card on file \u2014 Brian recommends saving a card. Pickup is at Room C106 any time before 6:00PM; bring photo ID during the first week, and notify staff in advance if someone not on the list will be picking up. Contacts: Brian Yee (408-679-8196), JM Malit (408-712-1307).",
+      "summaryShort": "Sofos After School for Nollen starts Mon, Aug 17, 2026 in Room C106, running 2:35-6:00PM daily. If he's on a 3-day/4-day plan, reply to Brian Yee (408-679-8196) with which days he'll attend. Monthly tuition auto-charges any card on file around the 1st-2nd school day via the online account \u2014 worth saving a card. Pack extra food (none provided) and bring photo ID for pickup during the first week.",
+      "child": "Nollen",
+      "tags": [
+        "afterschool",
+        "schedule",
+        "payment"
+      ]
+    }
+  ]
 }
