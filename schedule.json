@@ -708,12 +708,12 @@
   "schoolItems": [
     {
       "id": "sch-verifytest01",
-      "title": "Verify Test Item",
+      "title": "Verify Test Item EDITED",
       "child": "Nollen",
       "type": "Assignment",
       "date": "2026-08-20",
       "notes": "temp verification item",
-      "completed": false
+      "completed": true
     }
   ],
   "communicationsLog": {
