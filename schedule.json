@@ -711,7 +711,17 @@
       }
     ]
   },
-  "schoolItems": [],
+  "schoolItems": [
+    {
+      "id": "sch-mstbr2brwada",
+      "title": "Generations Project",
+      "child": "Nollen",
+      "type": "Project",
+      "date": "2026-08-27",
+      "notes": "",
+      "completed": false
+    }
+  ],
   "communicationsLog": {
     "docId": "",
     "docUrl": "https://drive.google.com/drive/folders/1Wz7NQgzuoPEy8-LLRiwnrUrPfj4XrVm7",
