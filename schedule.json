@@ -728,12 +728,7 @@
       "type": "Assignment",
       "date": "2026-08-21",
       "notes": "",
-      "completed": false,
-      "docRef": {
-        "id": "doc-verifytest01",
-        "summaryShort": "Temporary test document.",
-        "driveUrl": "https://drive.google.com/test"
-      }
+      "completed": false
     }
   ],
   "communicationsLog": {
