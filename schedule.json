@@ -720,6 +720,20 @@
       "date": "2026-08-27",
       "notes": "",
       "completed": false
+    },
+    {
+      "id": "sch-docreftest01",
+      "title": "DocRef Test",
+      "child": "Nollen",
+      "type": "Assignment",
+      "date": "2026-08-21",
+      "notes": "",
+      "completed": false,
+      "docRef": {
+        "id": "doc-verifytest01",
+        "summaryShort": "Temporary test document.",
+        "driveUrl": "https://drive.google.com/test"
+      }
     }
   ],
   "communicationsLog": {
