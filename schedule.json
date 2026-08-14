@@ -704,5 +704,11 @@
         "excludeDay": "Friday"
       }
     ]
+  },
+  "schoolItems": [],
+  "communicationsLog": {
+    "docId": "",
+    "docUrl": "",
+    "recent": []
   }
 }
