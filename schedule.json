@@ -47,7 +47,7 @@
     },
     "Friday": {
       "n": [
-        "TKD Black Belt · 6:05–6:55 pm @ Santa Teresa"
+        "TKD Black Belt · 6:05–6:40 pm @ Santa Teresa"
       ],
       "a": [
         "TKD XMA · 6:45–7:35 pm @ Santa Teresa",
@@ -605,7 +605,7 @@
         "child": "Nollen",
         "name": "TKD Black Belt",
         "start": "18:05",
-        "end": "18:55",
+        "end": "18:40",
         "location": "Santa Teresa",
         "preferred": true,
         "type": "TKD"
