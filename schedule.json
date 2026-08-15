@@ -5,8 +5,8 @@
         "TKD Black Belt · 4:50–5:40 pm @ Santa Teresa"
       ],
       "a": [
-        "Roller Shooting · 5:15–6:15 pm @ Silver Creek",
-        "TKD Advanced · 6:15–7:05 pm @ Santa Teresa"
+        "TKD Advanced · 6:15–7:05 pm @ Santa Teresa",
+        "Basic Shooting and Passing · 5:15–6:15 pm @ Silver Creek"
       ],
       "f": []
     },
@@ -16,8 +16,9 @@
         "TKD Black Belt · 6:00–6:50 pm @ Santa Teresa"
       ],
       "a": [
-        "Team Practice · 4:15–6:00 pm @ Silver Creek",
-        "TKD Advanced Evening · 7:30–8:20 pm @ Santa Teresa"
+        "TKD Advanced Evening · 7:30–8:20 pm @ Santa Teresa",
+        "Basic Skating · 4:15–5:00 pm @ Silver Creek",
+        "Advanced Shooting and Passing · 5:00–6:00 pm @ Silver Creek"
       ],
       "f": []
     },
@@ -27,8 +28,7 @@
         "Afterschool Program · 2:35–5:30 pm @ School"
       ],
       "a": [
-        "Parcor · 5:30–7:00 pm @ SJ",
-        "Roller Systems · 4:15–5:00 pm @ Silver Creek"
+        "Parcor · 5:30–7:00 pm @ SJ"
       ],
       "f": []
     },
@@ -55,7 +55,7 @@
         "TKD Black Belt · 11:40 am–12:30 pm @ Santa Teresa"
       ],
       "a": [
-        "Roller Game · 10:15 am–12:30 pm @ Silver Creek"
+        "Game · 10:00 am–12:30 pm @ Silver Creek (times may vary)"
       ],
       "f": []
     },
@@ -372,21 +372,21 @@
         "preferred": true
       },
       {
-        "child": "Austin",
-        "name": "Roller Shooting",
-        "start": "17:15",
-        "end": "18:15",
-        "location": "Silver Creek",
-        "preferred": true,
-        "type": "Hockey"
-      },
-      {
         "child": "Nollen",
         "name": "Afterschool Program",
         "start": "14:35",
         "end": "18:00",
         "location": "School",
         "type": "Afterschool"
+      },
+      {
+        "child": "Austin",
+        "name": "Basic Shooting and Passing",
+        "start": "17:15",
+        "end": "18:15",
+        "location": "Silver Creek",
+        "type": "Hockey",
+        "preferred": true
       }
     ],
     "Tuesday": [
@@ -433,15 +433,6 @@
         "preferred": true
       },
       {
-        "child": "Austin",
-        "name": "Team Practice",
-        "start": "16:15",
-        "end": "18:00",
-        "location": "Silver Creek",
-        "preferred": true,
-        "type": "Hockey"
-      },
-      {
         "child": "Nollen",
         "name": "Afterschool Program",
         "start": "14:35",
@@ -449,18 +440,27 @@
         "location": "School",
         "type": "Afterschool",
         "preferred": true
-      }
-    ],
-    "Wednesday": [
+      },
       {
         "child": "Austin",
-        "name": "Roller Systems",
+        "name": "Basic Skating",
         "start": "16:15",
         "end": "17:00",
         "location": "Silver Creek",
         "type": "Hockey",
         "preferred": true
       },
+      {
+        "child": "Austin",
+        "name": "Advanced Shooting and Passing",
+        "start": "17:00",
+        "end": "18:00",
+        "location": "Silver Creek",
+        "type": "Hockey",
+        "preferred": true
+      }
+    ],
+    "Wednesday": [
       {
         "child": "Nollen",
         "name": "TKD Black Belt",
@@ -503,6 +503,14 @@
         "location": "School",
         "type": "Afterschool",
         "preferred": true
+      },
+      {
+        "child": "Austin",
+        "name": "Travel - Conditioning and Practice",
+        "start": "16:15",
+        "end": "18:15",
+        "location": "Silver Creek",
+        "type": "Hockey"
       }
     ],
     "Thursday": [
@@ -514,14 +522,6 @@
         "location": "Santa Teresa",
         "preferred": true,
         "type": "TKD"
-      },
-      {
-        "child": "Austin",
-        "name": "Roller Mayhem",
-        "start": "16:00",
-        "end": "16:45",
-        "location": "Silver Creek",
-        "type": "Hockey"
       },
       {
         "child": "Nollen",
@@ -566,6 +566,14 @@
         "location": "School",
         "type": "Afterschool",
         "preferred": true
+      },
+      {
+        "child": "Austin",
+        "name": "Advanced Skating",
+        "start": "16:15",
+        "end": "17:15",
+        "location": "Silver Creek",
+        "type": "Hockey"
       }
     ],
     "Friday": [
@@ -620,18 +628,17 @@
         "end": "19:00",
         "location": "SJ",
         "type": "Parcor"
+      },
+      {
+        "child": "Austin",
+        "name": "8U House",
+        "start": "17:00",
+        "end": "18:00",
+        "location": "Silver Creek",
+        "type": "Hockey"
       }
     ],
     "Saturday": [
-      {
-        "child": "Austin",
-        "name": "Roller Game",
-        "start": "10:15",
-        "end": "12:30",
-        "location": "Silver Creek",
-        "preferred": true,
-        "type": "Hockey"
-      },
       {
         "child": "Austin",
         "name": "TKD Advanced",
@@ -682,9 +689,27 @@
         "end": "12:45",
         "location": "SJ",
         "type": "Parcor"
+      },
+      {
+        "child": "Austin",
+        "name": "Game",
+        "start": "10:00",
+        "end": "12:30",
+        "location": "Silver Creek",
+        "type": "Hockey",
+        "preferred": true
       }
     ],
-    "Sunday": []
+    "Sunday": [
+      {
+        "child": "Austin",
+        "name": "Travel Game (8U)",
+        "start": "08:00",
+        "end": "10:00",
+        "location": "Silver Creek",
+        "type": "Hockey"
+      }
+    ]
   },
   "optimizerRules": {
     "weeklyCaps": {
