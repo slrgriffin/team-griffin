@@ -28,7 +28,8 @@
         "Afterschool Program · 2:35–5:30 pm @ School"
       ],
       "a": [
-        "Parcor · 5:30–7:00 pm @ SJ"
+        "Travel - Conditioning and Practice · 4:15–6:15 pm @ Silver Creek",
+        "TKD Advanced · 6:20–7:10 pm @ Santa Teresa"
       ],
       "f": []
     },
@@ -46,7 +47,11 @@
     },
     "Friday": {
       "n": [],
-      "a": [],
+      "a": [
+        "TKD Advanced · 4:00–4:50 pm @ Santa Teresa",
+        "8U House · 5:00–6:00 pm @ Silver Creek",
+        "TKD XMA · 6:45–7:35 pm @ Santa Teresa"
+      ],
       "f": []
     },
     "Saturday": {
@@ -492,7 +497,7 @@
         "start": "17:30",
         "end": "19:00",
         "location": "SJ",
-        "preferred": true,
+        "preferred": false,
         "type": "Parcor"
       },
       {
@@ -518,7 +523,8 @@
         "start": "16:15",
         "end": "18:15",
         "location": "Silver Creek",
-        "type": "Hockey"
+        "type": "Hockey",
+        "preferred": true
       }
     ],
     "Thursday": [
@@ -609,16 +615,7 @@
         "start": "18:45",
         "end": "19:35",
         "location": "Santa Teresa",
-        "preferred": false,
-        "type": "TKD"
-      },
-      {
-        "child": "Austin",
-        "name": "TKD XMA",
-        "start": "18:45",
-        "end": "19:35",
-        "location": "Santa Teresa",
-        "preferred": false,
+        "preferred": true,
         "type": "TKD"
       },
       {
@@ -737,9 +734,7 @@
       "Nollen": [
         "Friday"
       ],
-      "Austin": [
-        "Friday"
-      ]
+      "Austin": []
     },
     "bonusGoals": [
       {
