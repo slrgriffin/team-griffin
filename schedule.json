@@ -387,6 +387,14 @@
         "location": "Silver Creek",
         "type": "Hockey",
         "preferred": true
+      },
+      {
+        "child": "None",
+        "name": "Goalie Session",
+        "start": "16:15",
+        "end": "17:15",
+        "location": "Silver Creek",
+        "type": "Hockey"
       }
     ],
     "Tuesday": [
