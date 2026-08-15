@@ -30,8 +30,6 @@
     --nollen:#C1652F;
     --austin:#3B6E8F;
     --family:#8A6A2F;
-    --school:#6B4C8A;
-    --overdue:#B8492F;
     --line:#C9BB9E;
     --card:#FBF8F1;
     --good:#4C7A52;
@@ -131,76 +129,8 @@
   .tag-n{background:var(--nollen);}
   .tag-a{background:var(--austin);}
   .tag-f{background:var(--family);}
-  .tag-s{background:var(--school);}
   .person-items{font-size:.85rem;color:var(--ink-soft);line-height:1.5;}
   .free-day{font-size:.85rem;color:var(--ink-soft);font-style:italic;}
-
-  .school-add-btn{
-    display:block;width:100%;background:var(--pine);color:#fff;border:none;border-radius:8px;
-    padding:.65rem;font-family:inherit;font-weight:700;font-size:.85rem;cursor:pointer;margin-bottom:1rem;
-  }
-  .school-group-label{
-    font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
-    color:var(--ink-soft);margin:1rem 0 .5rem;
-  }
-  .school-group-label.overdue{color:var(--overdue);}
-  .school-item{
-    display:flex;align-items:flex-start;gap:.6rem;background:var(--card);border:1px solid var(--line);
-    border-radius:10px;padding:.65rem .8rem;margin-bottom:.5rem;cursor:pointer;
-  }
-  .school-item.overdue{border-color:var(--overdue);}
-  .school-item.completed{opacity:.5;}
-  .school-item-badge{
-    flex-shrink:0;font-size:.62rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;
-    padding:.2rem .4rem;border-radius:5px;color:#fff;margin-top:.1rem;white-space:nowrap;
-  }
-  .school-item-body{flex:1;min-width:0;}
-  .school-item-title{font-size:.87rem;font-weight:600;color:var(--ink);}
-  .school-item.completed .school-item-title{text-decoration:line-through;}
-  .school-item-meta{font-size:.74rem;color:var(--ink-soft);margin-top:.15rem;}
-  .school-item-notes{font-size:.76rem;color:var(--ink-soft);margin-top:.25rem;line-height:1.4;}
-  .school-item-docref{font-size:.76rem;margin-top:.3rem;}
-  .school-item-docref a{color:var(--school);text-decoration:none;font-weight:600;}
-  .school-item-docref a:hover{text-decoration:underline;}
-  .school-empty{font-size:.82rem;color:var(--ink-soft);font-style:italic;padding:.3rem 0 .8rem;}
-
-  .comm-item{
-    background:var(--card);border:1px solid var(--line);border-radius:10px;
-    padding:.65rem .8rem;margin-bottom:.5rem;
-  }
-  .comm-item-head{display:flex;align-items:baseline;gap:.5rem;flex-wrap:wrap;}
-  .comm-item-subject{font-size:.87rem;font-weight:600;color:var(--ink);}
-  .comm-item-date{font-size:.72rem;color:var(--ink-soft);margin-left:auto;white-space:nowrap;}
-  .comm-item-summary{font-size:.8rem;color:var(--ink-soft);margin-top:.3rem;line-height:1.45;}
-  .comm-log-link{
-    display:block;text-align:center;font-size:.82rem;font-weight:600;color:var(--pine);
-    text-decoration:none;border:1px solid var(--line);border-radius:8px;padding:.6rem;margin-top:.6rem;
-  }
-  .comm-log-link:hover{background:rgba(0,0,0,.03);}
-
-  .doc-card{
-    background:var(--card);border:1px solid var(--line);border-radius:10px;
-    padding:.75rem .9rem;margin-bottom:.65rem;
-  }
-  .doc-card-head{display:flex;align-items:baseline;gap:.5rem;flex-wrap:wrap;}
-  .doc-card-title{font-size:.92rem;font-weight:700;color:var(--ink);}
-  .doc-card-date{font-size:.72rem;color:var(--ink-soft);margin-left:auto;white-space:nowrap;}
-  .doc-card-summary{font-size:.83rem;color:var(--ink-soft);margin-top:.35rem;line-height:1.5;}
-  .doc-card-footer{display:flex;align-items:center;gap:.5rem;margin-top:.55rem;flex-wrap:wrap;}
-  .doc-tag{
-    font-size:.66rem;font-weight:700;letter-spacing:.02em;text-transform:uppercase;
-    background:rgba(0,0,0,.05);color:var(--ink-soft);padding:.15rem .45rem;border-radius:5px;
-  }
-  .doc-card-link{
-    margin-left:auto;font-size:.78rem;font-weight:600;color:var(--pine);text-decoration:none;
-  }
-  .doc-card-link:hover{text-decoration:underline;}
-  .doc-filter-bar{display:flex;gap:.4rem;margin-bottom:1rem;flex-wrap:wrap;}
-  .doc-filter-btn{
-    font-family:inherit;font-size:.76rem;font-weight:600;padding:.35rem .7rem;border-radius:20px;
-    border:1px solid var(--line);background:var(--card);color:var(--ink-soft);cursor:pointer;
-  }
-  .doc-filter-btn.active{background:var(--school);color:#fff;border-color:var(--school);}
 
   .checklist-box{
     background:var(--card);border:1px solid var(--line);border-radius:10px;padding:.4rem .5rem;
@@ -322,6 +252,8 @@
   .tt-activity.tt-n.tt-picked{background:rgba(193,101,47,.20);border-color:var(--nollen);}
   .tt-activity.tt-a.tt-picked{background:rgba(59,110,143,.20);border-color:var(--austin);}
   .tt-activity.tt-both.tt-picked{background:rgba(138,106,47,.20);border-color:var(--family);}
+  .tt-activity.tt-none{background:rgba(91,86,76,.13);border:1px dashed var(--ink-soft);}
+  .tt-activity.tt-none .tt-act-name{color:var(--ink-soft);font-style:italic;}
   .tt-activity.tt-conflict{
     background:repeating-linear-gradient(135deg,rgba(184,73,47,.10),rgba(184,73,47,.10) 4px,rgba(184,73,47,.20) 4px,rgba(184,73,47,.20) 8px);
     border:1px dashed #B8492F;
@@ -345,16 +277,12 @@
   <div class="tabs">
     <button class="tab-btn active" id="tab-btn-week">📅 This Week</button>
     <button class="tab-btn" id="tab-btn-activities">⚙️ Activities</button>
-    <button class="tab-btn" id="tab-btn-school">🎓 School</button>
-    <button class="tab-btn" id="tab-btn-documents">📄 Documents</button>
   </div>
 
   <main id="main">
     <div class="state-msg" id="loading">Loading schedule…</div>
   </main>
   <div id="activities-panel" style="display:none;padding:0 1.25rem;"></div>
-  <div id="school-panel" style="display:none;padding:0 1.25rem;"></div>
-  <div id="documents-panel" style="display:none;padding:0 1.25rem;"></div>
 
   <footer>
     <div id="sync-note">—</div>
@@ -372,6 +300,7 @@
           <label><input type="radio" name="modal-child" value="Nollen"> Nollen</label>
           <label><input type="radio" name="modal-child" value="Austin"> Austin</label>
           <label><input type="radio" name="modal-child" value="Both"> Both</label>
+          <label><input type="radio" name="modal-child" value="None"> None</label>
         </div>
       </label>
       <label class="modal-field">Type
@@ -390,42 +319,8 @@
   </div>
 </div>
 
-<div class="modal-overlay" id="school-modal" style="display:none">
-  <div class="modal-box">
-    <h3 id="school-modal-title">Add School Item</h3>
-    <label class="modal-field">Title<input type="text" id="school-modal-title-input" placeholder="e.g. Book report due"></label>
-    <div class="modal-row">
-      <label class="modal-field">Child
-        <div class="modal-radios">
-          <label><input type="radio" name="school-modal-child" value="Nollen"> Nollen</label>
-          <label><input type="radio" name="school-modal-child" value="Austin"> Austin</label>
-          <label><input type="radio" name="school-modal-child" value="Both"> Both</label>
-        </div>
-      </label>
-      <label class="modal-field">Type
-        <select id="school-modal-type"><option>Assignment</option><option>Project</option><option>Event</option></select>
-      </label>
-    </div>
-    <label class="modal-field">Date<input type="date" id="school-modal-date"></label>
-    <label class="modal-field">Notes<input type="text" id="school-modal-notes" placeholder="optional"></label>
-    <label class="modal-field">Linked Document
-      <select id="school-modal-docref"><option value="">— None —</option></select>
-    </label>
-    <label class="modal-field" style="display:flex;align-items:center;gap:.5rem;">
-      <input type="checkbox" id="school-modal-completed" style="width:auto;margin:0;accent-color:var(--pine);"> Completed
-    </label>
-    <div class="modal-actions">
-      <button id="school-modal-delete" style="flex:0 0 auto;color:var(--overdue);border-color:var(--overdue);">Delete</button>
-      <button id="school-modal-cancel">Cancel</button>
-      <button id="school-modal-save" class="primary">Save</button>
-    </div>
-    <div id="school-modal-status"></div>
-  </div>
-</div>
-
 <script>
 const RAW_JSON_URL = 'https://raw.githubusercontent.com/slrgriffin/team-griffin/main/schedule.json';
-const DOCS_JSON_URL = 'https://raw.githubusercontent.com/slrgriffin/team-griffin/main/documents.json';
 const SEASON_START = '2026-06-15';
 const SEASON_END   = '2026-08-14';
 const DAY_MS = 86400000;
@@ -469,13 +364,10 @@ function renderDayCard(date, data){
     bodyHtml = `<div class="vac-banner">${override.vac}</div>`;
   } else {
     const day = override || (data.weeklyPattern || {})[dn] || {n:[],a:[],f:[]};
-    const schoolToday = (data.schoolItems || []).filter(it => it.date === dStr && !it.completed);
-    const schoolLabels = schoolToday.map(it => `${it.type === 'Event' ? '' : (it.type + ' due: ')}${it.title}${it.child === 'Both' ? '' : ' ('+it.child+')'}`);
     const rows = [
       renderPersonRow('tag-n','Nollen', day.n),
       renderPersonRow('tag-a','Austin', day.a),
       renderPersonRow('tag-f','Family', day.f),
-      renderPersonRow('tag-s','School', schoolLabels),
     ].join('');
     bodyHtml = rows
       ? `<div class="day-body">${rows}</div>`
@@ -525,8 +417,8 @@ function renderActionItems(items, week){
 // Polls the raw JSON (cache-busted each try) until `checkFn` confirms the
 // write actually landed, or gives up after ~40s and flags it as unconfirmed.
 async function confirmWrite(el, checkFn, onConfirmed, onGaveUp){
-  for(let i=0;i<20;i++){
-    await new Promise(r=>setTimeout(r,8000));
+  for(let i=0;i<8;i++){
+    await new Promise(r=>setTimeout(r,5000));
     try{
       const res = await fetch(RAW_JSON_URL + '?t=' + Date.now());
       if(res.ok){
@@ -589,7 +481,7 @@ document.getElementById('main').addEventListener('click', (e) => {
   }
 });
 
-function render(data, docsData){
+function render(data){
   document.getElementById('loading')?.remove?.();
 
   const sunday = new Date(weekMonday); sunday.setDate(weekMonday.getDate()+6);
@@ -622,8 +514,6 @@ function render(data, docsData){
 
   renderActionItems((data.weeklyNotes||{})[weekMondayStr], weekMondayStr);
   renderActivitiesTab(data);
-  renderSchoolTab(data, docsData);
-  renderDocumentsTab(docsData);
 
   document.getElementById('sync-note').textContent =
     `Synced from GitHub · ${new Date().toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})}`;
@@ -749,6 +639,7 @@ function tagPicked(list, weekPicks, day){
 
 function personMatches(child){
   if(child === 'Both') return filterState.people.has('Nollen') || filterState.people.has('Austin');
+  if(child === 'None') return true;
   return filterState.people.has(child);
 }
 
@@ -772,9 +663,35 @@ function layoutChild(activitiesTagged, rangeStartMin, rangeEndMin, leftPct, widt
     const left = leftPct + act.lane * laneW;
     const cls = act._picked ? 'tt-picked' : 'tt-conflict';
     const childCls = act.child==='Nollen' ? 'tt-n' : act.child==='Austin' ? 'tt-a' : 'tt-both';
-    const tip = `${act.child}: ${act.name} · ${formatTime12(act.start)}–${formatTime12(act.end)} @ ${act.location}` + (act.docRef ? ` · 📄 ${act.docRef.summaryShort}` : '');
+    const tip = `${act.child}: ${act.name} · ${formatTime12(act.start)}–${formatTime12(act.end)} @ ${act.location}`;
     return `<div class="tt-activity ${cls} ${childCls}" style="top:${top}px;height:${height}px;left:${left}%;width:${laneW-1}%" title="${tip}" data-day="${act._day}" data-index="${act._origIndex}">
-      <div class="tt-act-name">${act.name}${act.docRef ? ' 📄' : ''}</div>
+      <div class="tt-act-name">${act.name}</div>
+      <div class="tt-act-time">${formatTime12(act.start)}–${formatTime12(act.end)}</div>
+    </div>`;
+  }).join('');
+}
+
+// Unassigned (no-child) activities aren't part of anyone's optimized schedule,
+// so they skip the picked/conflict distinction entirely — just a neutral
+// reference block, still respecting the type filter but not the optimized-only one.
+function passesTypeFilter(a){
+  return filterState.types ? filterState.types.has(a.type||'Other') : true;
+}
+
+function layoutUnassigned(activities, rangeStartMin, rangeEndMin, leftPct, widthPct){
+  const visible = activities.filter(passesTypeFilter);
+  if(!visible.length) return '';
+  const { items, laneCount } = assignLanes(visible);
+  return items.map(act => {
+    const cStart = Math.max(rangeStartMin, act.sMin), cEnd = Math.min(rangeEndMin, act.eMin);
+    if(cEnd <= cStart) return '';
+    const top = (cStart - rangeStartMin) * PX_PER_MIN;
+    const height = Math.max(14, (cEnd - cStart) * PX_PER_MIN);
+    const laneW = widthPct / laneCount;
+    const left = leftPct + act.lane * laneW;
+    const tip = `${act.name} · ${formatTime12(act.start)}–${formatTime12(act.end)} @ ${act.location} (no specific child)`;
+    return `<div class="tt-activity tt-none" style="top:${top}px;height:${height}px;left:${left}%;width:${laneW-1}%" title="${tip}" data-day="${act._day}" data-index="${act._origIndex}">
+      <div class="tt-act-name">${act.name}</div>
       <div class="tt-act-time">${formatTime12(act.start)}–${formatTime12(act.end)}</div>
     </div>`;
   }).join('');
@@ -801,7 +718,14 @@ function buildTimetable(title, days, rangeStart, rangeEnd, data){
     const acts = (opts[day] || []).map((a,i)=>({...a, _day:day, _origIndex:i}));
     const nollen = tagPicked(acts.filter(a=>a.child==='Nollen' || a.child==='Both'), nollenWeekPicks, day);
     const austin = tagPicked(acts.filter(a=>a.child==='Austin' || a.child==='Both'), austinWeekPicks, day);
-    const body = layoutChild(nollen, startMin, endMin, 1, 48) + layoutChild(austin, startMin, endMin, 51, 48);
+    const unassigned = acts.filter(a=>a.child==='None' || !a.child);
+
+    const body = unassigned.length
+      ? layoutChild(nollen, startMin, endMin, 1, 31)
+        + layoutUnassigned(unassigned, startMin, endMin, 34, 32)
+        + layoutChild(austin, startMin, endMin, 68, 31)
+      : layoutChild(nollen, startMin, endMin, 1, 48) + layoutChild(austin, startMin, endMin, 51, 48);
+
     return `<div class="tt-day-col" style="height:${height}px">${body}</div>`;
   }).join('');
 
@@ -936,8 +860,8 @@ document.getElementById('modal-save').addEventListener('click', async () => {
       }, 600);
     },
     () => {
-      statusEl.textContent = "Saved, but the page is slow to pick it up — it'll appear shortly. Refresh in a minute if it doesn't.";
-      statusEl.className = 'ok';
+      statusEl.textContent = "Didn't confirm — check your connection and try again.";
+      statusEl.className = 'err';
       document.getElementById('modal-save').disabled = false;
     }
   );
@@ -960,245 +884,18 @@ function renderActivitiesTab(data){
     '<div class="section-label">⚙️ Activity Optimizer</div>' + filterBar + legend + weekday + weekend;
 }
 
-// ── School tab: Assignments/Projects/Events + Communications ──────────
-function fmtSchoolDate(dStr){
-  const d = parseISO(dStr);
-  return d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
-}
-
-function renderSchoolItem(it){
-  const isOverdue = !it.completed && it.date < todayStr;
-  const typeColors = {Assignment:'var(--nollen)', Project:'var(--austin)', Event:'var(--school)'};
-  return `<div class="school-item${isOverdue?' overdue':''}${it.completed?' completed':''}" data-school-id="${it.id}">
-    <span class="school-item-badge" style="background:${typeColors[it.type]||'var(--family)'}">${it.type}</span>
-    <div class="school-item-body">
-      <div class="school-item-title">${it.title}</div>
-      <div class="school-item-meta">${it.child} &nbsp;·&nbsp; ${fmtSchoolDate(it.date)}${isOverdue?' · Overdue':''}</div>
-      ${it.notes ? `<div class="school-item-notes">${it.notes}</div>` : ''}
-      ${it.docRef ? `<div class="school-item-docref"><a href="${it.docRef.driveUrl}" target="_blank" rel="noopener" onclick="event.stopPropagation()">📄 ${it.docRef.summaryShort}</a></div>` : ''}
-    </div>
-  </div>`;
-}
-
-function renderSchoolTab(data, docsData){
-  const items = [...(data.schoolItems || [])].sort((a,b) => a.date.localeCompare(b.date));
-  const overdue = items.filter(it => !it.completed && it.date < todayStr);
-  const upcoming = items.filter(it => !it.completed && it.date >= todayStr);
-  const completed = items.filter(it => it.completed).reverse().slice(0, 10);
-
-  let itemsHtml = '';
-  if(overdue.length) itemsHtml += `<div class="school-group-label overdue">⚠️ Overdue</div>` + overdue.map(renderSchoolItem).join('');
-  itemsHtml += `<div class="school-group-label">Upcoming</div>`;
-  itemsHtml += upcoming.length ? upcoming.map(renderSchoolItem).join('') : `<div class="school-empty">Nothing on the horizon.</div>`;
-  if(completed.length) itemsHtml += `<div class="school-group-label">Recently Completed</div>` + completed.map(renderSchoolItem).join('');
-
-  const docs = [...((docsData && docsData.documents) || [])].sort((a,b) => b.uploadedDate.localeCompare(a.uploadedDate));
-  const commsHtml = docs.length
-    ? docs.slice(0,5).map(c => `<div class="comm-item">
-        <div class="comm-item-head">
-          <span class="comm-item-subject">${c.title}</span>
-          <span class="comm-item-date">${c.child ? c.child+' · ' : ''}${fmtSchoolDate(c.uploadedDate)}</span>
-        </div>
-        <div class="comm-item-summary">${c.summaryShort}</div>
-      </div>`).join('')
-    : `<div class="school-empty">No communications logged yet — tell Claude about one and it'll show up here.</div>`;
-
-  document.getElementById('school-panel').innerHTML = `
-    <div class="section-label">🎓 Assignments, Projects &amp; Events</div>
-    <button class="school-add-btn" id="school-add-btn">+ Add School Item</button>
-    ${itemsHtml}
-    <div class="section-label">📨 Communications</div>
-    ${commsHtml}
-    <a class="comm-log-link" id="comm-view-all-link" href="#">Open full Documents archive →</a>
-  `;
-}
-
-document.getElementById('school-panel').addEventListener('click', (e) => {
-  if(e.target.id === 'school-add-btn'){ openSchoolModal(null); return; }
-  if(e.target.id === 'comm-view-all-link'){ e.preventDefault(); setActiveTab('documents'); return; }
-  const item = e.target.closest('.school-item');
-  if(item) openSchoolModal(item.dataset.schoolId);
+document.getElementById('tab-btn-week').addEventListener('click', () => {
+  document.getElementById('tab-btn-week').classList.add('active');
+  document.getElementById('tab-btn-activities').classList.remove('active');
+  document.getElementById('main').style.display = '';
+  document.getElementById('activities-panel').style.display = 'none';
 });
-
-// ── School item modal ──────────────────────────────────────────────
-let schoolModalTarget = null; // id, or null for "new"
-let pendingNewSchoolId = null; // reused across retry clicks so a retry never creates a second item
-
-function openSchoolModal(id){
-  schoolModalTarget = id;
-  pendingNewSchoolId = null;
-  const isNew = !id;
-  const item = isNew ? null : (currentData.schoolItems || []).find(x => x.id === id);
-  document.getElementById('school-modal-title').textContent = isNew ? 'Add School Item' : 'Edit School Item';
-  document.getElementById('school-modal-title-input').value = item ? item.title : '';
-  document.querySelectorAll('input[name="school-modal-child"]').forEach(r => r.checked = item ? (r.value === item.child) : false);
-  document.getElementById('school-modal-type').value = item ? item.type : 'Assignment';
-  document.getElementById('school-modal-date').value = item ? item.date : todayStr;
-  document.getElementById('school-modal-notes').value = item ? (item.notes||'') : '';
-  document.getElementById('school-modal-completed').checked = item ? !!item.completed : false;
-
-  const docs = [...((latestDocsData && latestDocsData.documents) || [])].sort((a,b) => b.uploadedDate.localeCompare(a.uploadedDate));
-  const docSel = document.getElementById('school-modal-docref');
-  docSel.innerHTML = '<option value="">— None —</option>' +
-    docs.map(d => `<option value="${d.id}">${d.title} (${fmtSchoolDate(d.uploadedDate)})</option>`).join('');
-  docSel.value = (item && item.docRef) ? item.docRef.id : '';
-
-  document.getElementById('school-modal-delete').style.display = isNew ? 'none' : '';
-  const statusEl = document.getElementById('school-modal-status');
-  statusEl.textContent = ''; statusEl.className = '';
-  document.getElementById('school-modal-save').disabled = false;
-  document.getElementById('school-modal').style.display = 'flex';
-}
-
-function closeSchoolModal(){
-  document.getElementById('school-modal').style.display = 'none';
-  schoolModalTarget = null;
-  pendingNewSchoolId = null;
-}
-
-document.getElementById('school-modal-cancel').addEventListener('click', closeSchoolModal);
-document.getElementById('school-modal').addEventListener('click', (e) => {
-  if(e.target.id === 'school-modal') closeSchoolModal();
+document.getElementById('tab-btn-activities').addEventListener('click', () => {
+  document.getElementById('tab-btn-activities').classList.add('active');
+  document.getElementById('tab-btn-week').classList.remove('active');
+  document.getElementById('main').style.display = 'none';
+  document.getElementById('activities-panel').style.display = '';
 });
-
-document.getElementById('school-modal-save').addEventListener('click', async () => {
-  const isNew = !schoolModalTarget;
-  if(isNew && !pendingNewSchoolId){
-    pendingNewSchoolId = 'sch-' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
-  }
-  const id = schoolModalTarget || pendingNewSchoolId;
-  const title = document.getElementById('school-modal-title-input').value.trim();
-  const child = document.querySelector('input[name="school-modal-child"]:checked')?.value;
-  const type = document.getElementById('school-modal-type').value;
-  const date = document.getElementById('school-modal-date').value;
-  const notes = document.getElementById('school-modal-notes').value.trim();
-  const completed = document.getElementById('school-modal-completed').checked;
-  const docId = document.getElementById('school-modal-docref').value;
-  const selectedDoc = docId ? ((latestDocsData && latestDocsData.documents) || []).find(d => d.id === docId) : null;
-  const statusEl = document.getElementById('school-modal-status');
-
-  if(!title || !child || !date){
-    statusEl.textContent = 'Title, child, and date are all required.';
-    statusEl.className = 'err';
-    return;
-  }
-
-  document.getElementById('school-modal-save').disabled = true;
-  statusEl.textContent = 'Saving…';
-  statusEl.className = '';
-
-  const mode = isNew ? 'addSchoolItem' : 'editSchoolItem';
-  let url = `${SCRIPT_URL}?mode=${mode}&id=${encodeURIComponent(id)}`
-    + `&title=${encodeURIComponent(title)}&child=${encodeURIComponent(child)}`
-    + `&type=${encodeURIComponent(type)}&date=${date}&notes=${encodeURIComponent(notes)}&completed=${completed}`
-    + `&docId=${encodeURIComponent(docId)}`;
-  if(selectedDoc){
-    url += `&docSummary=${encodeURIComponent(selectedDoc.summaryShort)}&docUrl=${encodeURIComponent(selectedDoc.driveUrl)}`;
-  }
-  fetch(url, { mode: 'no-cors' }).catch(()=>{});
-
-  confirmWrite(
-    null,
-    (d) => {
-      const it = (d.schoolItems||[]).find(x => x.id === id);
-      if(!it || it.title!==title || it.child!==child || it.type!==type || it.date!==date || !!it.completed!==completed) return false;
-      const wantDoc = selectedDoc ? selectedDoc.id : null;
-      const gotDoc = it.docRef ? it.docRef.id : null;
-      return wantDoc === gotDoc;
-    },
-    () => {
-      statusEl.textContent = 'Saved ✓';
-      statusEl.className = 'ok';
-      setTimeout(() => { closeSchoolModal(); load(); }, 600);
-    },
-    () => {
-      statusEl.textContent = "Saved, but the page is slow to pick it up — it'll appear shortly. Refresh in a minute if it doesn't. (No need to press Save again — it already went through.)";
-      statusEl.className = 'ok';
-      setTimeout(() => { closeSchoolModal(); load(); }, 3000);
-    }
-  );
-});
-
-document.getElementById('school-modal-delete').addEventListener('click', async () => {
-  if(!schoolModalTarget) return;
-  const id = schoolModalTarget;
-  const statusEl = document.getElementById('school-modal-status');
-  document.getElementById('school-modal-save').disabled = true;
-  statusEl.textContent = 'Deleting…';
-  statusEl.className = '';
-
-  const url = `${SCRIPT_URL}?mode=deleteSchoolItem&id=${encodeURIComponent(id)}`;
-  fetch(url, { mode: 'no-cors' }).catch(()=>{});
-
-  confirmWrite(
-    null,
-    (d) => !(d.schoolItems||[]).some(x => x.id === id),
-    () => {
-      statusEl.textContent = 'Deleted ✓';
-      statusEl.className = 'ok';
-      setTimeout(() => { closeSchoolModal(); load(); }, 600);
-    },
-    () => {
-      statusEl.textContent = "Deleted, but the page is slow to pick it up — it'll clear shortly. Refresh in a minute if it doesn't. (No need to press Delete again.)";
-      statusEl.className = 'ok';
-      setTimeout(() => { closeSchoolModal(); load(); }, 3000);
-    }
-  );
-});
-
-// ── Documents tab: full archive from documents.json ────────────────────
-let docFilterChild = 'All';
-let latestDocsData = null;
-
-function renderDocumentsTab(docsData){
-  latestDocsData = docsData;
-  const all = [...((docsData && docsData.documents) || [])].sort((a,b) => b.uploadedDate.localeCompare(a.uploadedDate));
-  const filtered = docFilterChild === 'All' ? all : all.filter(d => d.child === docFilterChild || d.child === 'Both');
-
-  const filterBar = `<div class="doc-filter-bar">
-    ${['All','Nollen','Austin'].map(c => `<button class="doc-filter-btn${docFilterChild===c?' active':''}" data-doc-filter="${c}">${c}</button>`).join('')}
-  </div>`;
-
-  const cardsHtml = filtered.length
-    ? filtered.map(d => `<div class="doc-card">
-        <div class="doc-card-head">
-          <span class="doc-card-title">${d.title}</span>
-          <span class="doc-card-date">${d.child} · ${fmtSchoolDate(d.uploadedDate)}</span>
-        </div>
-        <div class="doc-card-summary">${d.summaryLong}</div>
-        <div class="doc-card-footer">
-          ${(d.tags||[]).map(t => `<span class="doc-tag">${t}</span>`).join('')}
-          ${d.driveUrl ? `<a class="doc-card-link" href="${d.driveUrl}" target="_blank" rel="noopener">Open original ↗</a>` : ''}
-        </div>
-      </div>`).join('')
-    : `<div class="school-empty">No documents logged yet — use the "add to School Comms" skill to log one.</div>`;
-
-  document.getElementById('documents-panel').innerHTML = `
-    <div class="section-label">📄 Documents</div>
-    ${filterBar}
-    ${cardsHtml}
-  `;
-}
-
-document.getElementById('documents-panel').addEventListener('click', (e) => {
-  const btn = e.target.closest('.doc-filter-btn');
-  if(!btn) return;
-  docFilterChild = btn.dataset.docFilter;
-  renderDocumentsTab(latestDocsData);
-});
-
-function setActiveTab(name){
-
-  const tabs = {week: 'main', activities: 'activities-panel', school: 'school-panel', documents: 'documents-panel'};
-  Object.entries(tabs).forEach(([k, elId]) => {
-    document.getElementById('tab-btn-' + k).classList.toggle('active', k === name);
-    document.getElementById(elId).style.display = (k === name) ? '' : 'none';
-  });
-}
-document.getElementById('tab-btn-week').addEventListener('click', () => setActiveTab('week'));
-document.getElementById('tab-btn-activities').addEventListener('click', () => setActiveTab('activities'));
-document.getElementById('tab-btn-school').addEventListener('click', () => setActiveTab('school'));
-document.getElementById('tab-btn-documents').addEventListener('click', () => setActiveTab('documents'));
 
 async function load(){
   document.getElementById('main').innerHTML = '<div class="state-msg" id="loading">Loading schedule…</div>';
@@ -1206,14 +903,7 @@ async function load(){
     const res = await fetch(RAW_JSON_URL + '?t=' + Date.now());
     if(!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
-
-    let docsData = { documents: [] };
-    try{
-      const docsRes = await fetch(DOCS_JSON_URL + '?t=' + Date.now());
-      if(docsRes.ok) docsData = await docsRes.json();
-    }catch(docsErr){ /* documents.json is supplementary — don't block the newsletter on it */ }
-
-    render(data, docsData);
+    render(data);
   }catch(err){
     renderError(`Could not load schedule.json (${err.message}).`);
   }
