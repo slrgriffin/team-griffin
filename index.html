@@ -549,6 +549,11 @@ function optimizeWeek(child, activityOptionsByDay, rules){
   const excludedNames = new Set((rules.excluded && rules.excluded[child]) || []);
   const excludedDays = new Set((rules.excludedDays && rules.excludedDays[child]) || []);
   const caps = (rules.weeklyCaps && rules.weeklyCaps[child]) || {};
+  // Per-day exclusions: e.g. "no TKD Advanced on Fridays for Austin" without
+  // excluding the whole day or the activity on every other day.
+  const excludedOnDay = new Set(
+    ((rules.excludedOnDay && rules.excludedOnDay[child]) || []).map(x => x.day + '|' + x.name)
+  );
 
   let all = [];
   WEEK_DAYS.forEach(day => {
@@ -556,6 +561,7 @@ function optimizeWeek(child, activityOptionsByDay, rules){
     (activityOptionsByDay[day]||[]).forEach((a,i) => {
       if(a.child !== child && a.child !== 'Both') return;
       if(excludedNames.has(a.name)) return;
+      if(excludedOnDay.has(day + '|' + a.name)) return;
       all.push({...a, day, origIndex:i});
     });
   });
