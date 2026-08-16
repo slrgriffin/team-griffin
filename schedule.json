@@ -706,9 +706,17 @@
     "Sunday": [
       {
         "child": "Austin",
-        "name": "Travel Game (8U)",
+        "name": "Travel Practice (8U)",
         "start": "08:00",
         "end": "09:00",
+        "location": "Silver Creek",
+        "type": "Hockey"
+      },
+      {
+        "child": "Austin",
+        "name": "Travel Practice (10U)",
+        "start": "09:00",
+        "end": "10:00",
         "location": "Silver Creek",
         "type": "Hockey"
       }
