@@ -50,8 +50,7 @@
         "TKD Black Belt · 6:05–6:40 pm @ Santa Teresa"
       ],
       "a": [
-        "TKD XMA · 6:45–7:35 pm @ Santa Teresa",
-        "8U House · 5:00–6:00 pm @ Silver Creek"
+        "TKD XMA · 6:45–7:35 pm @ Santa Teresa"
       ],
       "f": []
     },
@@ -641,7 +640,8 @@
         "start": "17:00",
         "end": "18:00",
         "location": "Silver Creek",
-        "type": "Hockey"
+        "type": "Hockey",
+        "preferred": false
       }
     ],
     "Saturday": [
@@ -750,6 +750,28 @@
           "name": "TKD Advanced"
         }
       ]
+    },
+    "onlyTypeOnDay": {
+      "Nollen": [
+        {
+          "day": "Friday",
+          "type": "TKD"
+        }
+      ],
+      "Austin": [
+        {
+          "day": "Friday",
+          "type": "TKD"
+        }
+      ]
+    },
+    "typeDayCaps": {
+      "Nollen": {
+        "TKD": 3
+      },
+      "Austin": {
+        "TKD": 3
+      }
     }
   },
   "schoolItems": [
