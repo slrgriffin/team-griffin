@@ -662,19 +662,25 @@ function optimizeWeek(child, activityOptionsByDay, rules){
   const excludedNames = new Set((rules.excluded && rules.excluded[child]) || []);
   const excludedDays = new Set((rules.excludedDays && rules.excludedDays[child]) || []);
   const caps = (rules.weeklyCaps && rules.weeklyCaps[child]) || {};
+  const typeDayCaps = (rules.typeDayCaps && rules.typeDayCaps[child]) || {};
   // Per-day exclusions: e.g. "no TKD Advanced on Fridays for Austin" without
   // excluding the whole day or the activity on every other day.
   const excludedOnDay = new Set(
     ((rules.excludedOnDay && rules.excludedOnDay[child]) || []).map(x => x.day + '|' + x.name)
   );
+  // "Only type X on day Y" — e.g. Friday is TKD-only, so any non-TKD
+  // candidate that day is dropped regardless of its name.
+  const onlyTypeOnDay = (rules.onlyTypeOnDay && rules.onlyTypeOnDay[child]) || [];
 
   let all = [];
   WEEK_DAYS.forEach(day => {
     if(excludedDays.has(day)) return;
+    const onlyRule = onlyTypeOnDay.find(r => r.day === day);
     (activityOptionsByDay[day]||[]).forEach((a,i) => {
       if(a.child !== child && a.child !== 'Both') return;
       if(excludedNames.has(a.name)) return;
       if(excludedOnDay.has(day + '|' + a.name)) return;
+      if(onlyRule && a.type !== onlyRule.type) return;
       all.push({...a, day, origIndex:i});
     });
   });
@@ -682,7 +688,26 @@ function optimizeWeek(child, activityOptionsByDay, rules){
   const preferred = all.filter(a=>a.preferred);
   const alts = all.filter(a=>!a.preferred);
   const used = {};
-  preferred.forEach(a => { used[a.name] = (used[a.name]||0)+1; });
+  const typeDaysUsed = {}; // type -> Set of distinct days already picked for that type
+  preferred.forEach(a => {
+    used[a.name] = (used[a.name]||0)+1;
+    if(a.type){ (typeDaysUsed[a.type] = typeDaysUsed[a.type] || new Set()).add(a.day); }
+  });
+
+  // A candidate is only blocked by a type-day cap if picking it would add a
+  // NEW day to that type's day-set — a second session of the same type on a
+  // day already counted (e.g. Sparring + Black Belt both on Saturday) is free.
+  function typeDayCapOK(cand){
+    if(!cand.type) return true;
+    const cap = typeDayCaps[cand.type];
+    if(cap == null) return true;
+    const daysSet = typeDaysUsed[cand.type] || new Set();
+    return daysSet.has(cand.day) || daysSet.size < cap;
+  }
+  function markTypeDay(cand){
+    if(!cand.type) return;
+    (typeDaysUsed[cand.type] = typeDaysUsed[cand.type] || new Set()).add(cand.day);
+  }
 
   const coveredDays = new Set(preferred.map(a=>a.day));
   let picks = [...preferred];
@@ -694,8 +719,10 @@ function optimizeWeek(child, activityOptionsByDay, rules){
     for(const cand of dayAlts){
       const cap = caps[cand.name];
       if(cap != null && (used[cand.name]||0) >= cap) continue;
+      if(!typeDayCapOK(cand)) continue;
       picks.push(cand);
       used[cand.name] = (used[cand.name]||0)+1;
+      markTypeDay(cand);
       coveredDays.add(day);
       break;
     }
@@ -710,11 +737,13 @@ function optimizeWeek(child, activityOptionsByDay, rules){
       if(picks.some(p=>p.day===cand.day && p.origIndex===cand.origIndex)) return;
       const cap = caps[cand.name];
       if(cap != null && (used[cand.name]||0) >= cap) return;
+      if(!typeDayCapOK(cand)) return;
       const conflict = dayPicks.some(p => timeToMinutes(cand.start) < timeToMinutes(p.end) && timeToMinutes(p.start) < timeToMinutes(cand.end));
       if(conflict) return;
       picks.push(cand);
       dayPicks.push(cand);
       used[cand.name] = (used[cand.name]||0)+1;
+      markTypeDay(cand);
     });
   });
 
