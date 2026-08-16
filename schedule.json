@@ -18,8 +18,7 @@
       "a": [
         "TKD Advanced Evening · 7:30–8:20 pm @ Santa Teresa",
         "Basic Skating · 4:15–5:00 pm @ Silver Creek",
-        "Advanced Shooting and Passing · 5:00–6:00 pm @ Silver Creek",
-        "Parcor · 5:30–7:00 pm @ SJ"
+        "Advanced Shooting and Passing · 5:00–6:00 pm @ Silver Creek"
       ],
       "f": []
     },
@@ -427,7 +426,7 @@
         "end": "19:00",
         "location": "SJ",
         "type": "Parcor",
-        "preferred": true
+        "preferred": false
       },
       {
         "child": "Nollen",
