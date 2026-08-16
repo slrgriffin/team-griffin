@@ -28,9 +28,13 @@ var PAGE_URL = 'https://slrgriffin.github.io/team-griffin/';
 
 function doGet(e) {
   var params = e.parameter || {};
+  if (params.mode === 'ping') return jsonOutput({ ok: true, deployedAt: new Date().toISOString() });
   if (params.mode === 'toggleTask') return toggleTask(params);
   if (params.mode === 'completeAction') return completeAction(params);
   if (params.mode === 'editActivity') return editActivity(params);
+  if (params.mode === 'addSchoolItem') return addSchoolItem(params);
+  if (params.mode === 'editSchoolItem') return editSchoolItem(params);
+  if (params.mode === 'deleteSchoolItem') return deleteSchoolItem(params);
   return getMorningReminder();
 }
 
@@ -298,6 +302,101 @@ function completeAction(params) {
       if (index >= 0 && index < list.length) list[index].completed = true;
       data.weeklyNotes[week] = list;
     }, 'Mark action item ' + index + ' complete for week ' + week);
+    return jsonOutput({ success: ok });
+  } catch (err) {
+    return jsonOutput({ success: false, message: err.message });
+  }
+}
+
+// ── SCHOOL TAB: ASSIGNMENTS / PROJECTS / EVENTS ──────────────────────────
+// schoolItems is a flat array of { id, title, child, type, date, notes, completed }.
+// Unlike activityOptions (keyed by weekday + index), items here are addressed
+// by their own stable id, since the list grows/shrinks freely from the modal.
+function addSchoolItem(params) {
+  var id = params.id, title = params.title, child = params.child;
+  var type = params.type, date = params.date;
+  if (!id || !title || !child || !type || !date) {
+    return jsonOutput({ success: false, message: 'Missing id/title/child/type/date' });
+  }
+
+  try {
+    var ok = ghUpdate(function (data) {
+      data.schoolItems = data.schoolItems || [];
+      var newItem = {
+        id: id,
+        title: title,
+        child: child,
+        type: type,
+        date: date,
+        notes: params.notes || '',
+        completed: params.completed === 'true'
+      };
+      if (params.docId) {
+        newItem.docRef = { id: params.docId, summaryShort: params.docSummary || '', driveUrl: params.docUrl || '' };
+      }
+      // Idempotent by id: a retried "add" (e.g. after a client-side timeout on an
+      // earlier attempt that actually succeeded) updates the existing item in
+      // place instead of pushing a duplicate.
+      var existingIndex = -1;
+      for (var i = 0; i < data.schoolItems.length; i++) {
+        if (data.schoolItems[i].id === id) { existingIndex = i; break; }
+      }
+      if (existingIndex >= 0) {
+        data.schoolItems[existingIndex] = newItem;
+      } else {
+        data.schoolItems.push(newItem);
+      }
+    }, 'Add school item: ' + title);
+    return jsonOutput({ success: ok });
+  } catch (err) {
+    return jsonOutput({ success: false, message: err.message });
+  }
+}
+
+function editSchoolItem(params) {
+  var id = params.id;
+  if (!id) return jsonOutput({ success: false, message: 'Missing id' });
+
+  try {
+    var found = false;
+    var ok = ghUpdate(function (data) {
+      data.schoolItems = data.schoolItems || [];
+      for (var i = 0; i < data.schoolItems.length; i++) {
+        if (data.schoolItems[i].id === id) {
+          found = true;
+          if (params.title) data.schoolItems[i].title = params.title;
+          if (params.child) data.schoolItems[i].child = params.child;
+          if (params.type) data.schoolItems[i].type = params.type;
+          if (params.date) data.schoolItems[i].date = params.date;
+          if (params.notes !== undefined) data.schoolItems[i].notes = params.notes;
+          if (params.completed !== undefined) data.schoolItems[i].completed = params.completed === 'true';
+          if (params.docId !== undefined) {
+            if (params.docId) {
+              data.schoolItems[i].docRef = { id: params.docId, summaryShort: params.docSummary || '', driveUrl: params.docUrl || '' };
+            } else {
+              delete data.schoolItems[i].docRef;
+            }
+          }
+          break;
+        }
+      }
+      if (!found) throw new Error('School item not found: ' + id);
+    }, 'Edit school item ' + id);
+    return jsonOutput({ success: ok });
+  } catch (err) {
+    return jsonOutput({ success: false, message: err.message });
+  }
+}
+
+function deleteSchoolItem(params) {
+  var id = params.id;
+  if (!id) return jsonOutput({ success: false, message: 'Missing id' });
+
+  try {
+    var ok = ghUpdate(function (data) {
+      data.schoolItems = data.schoolItems || [];
+      data.schoolItems = data.schoolItems.filter(function (item) { return item.id !== id; });
+    }, 'Delete school item ' + id);
     return jsonOutput({ success: ok });
   } catch (err) {
     return jsonOutput({ success: false, message: err.message });
