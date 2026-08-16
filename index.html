@@ -671,6 +671,13 @@ function optimizeWeek(child, activityOptionsByDay, rules){
   // "Only type X on day Y" — e.g. Friday is TKD-only, so any non-TKD
   // candidate that day is dropped regardless of its name.
   const onlyTypeOnDay = (rules.onlyTypeOnDay && rules.onlyTypeOnDay[child]) || [];
+  // Days already guaranteed by an onlyTypeOnDay rule are exempt from that
+  // same type's day-cap — e.g. Friday's TKD doesn't eat into "2 other days
+  // of TKD," since Friday isn't really an "other" day, it's the given one.
+  const exemptDaysForType = {};
+  onlyTypeOnDay.forEach(r => {
+    (exemptDaysForType[r.type] = exemptDaysForType[r.type] || new Set()).add(r.day);
+  });
 
   let all = [];
   WEEK_DAYS.forEach(day => {
@@ -688,17 +695,21 @@ function optimizeWeek(child, activityOptionsByDay, rules){
   const preferred = all.filter(a=>a.preferred);
   const alts = all.filter(a=>!a.preferred);
   const used = {};
-  const typeDaysUsed = {}; // type -> Set of distinct days already picked for that type
+  const typeDaysUsed = {}; // type -> Set of distinct (non-exempt) days already picked for that type
   preferred.forEach(a => {
     used[a.name] = (used[a.name]||0)+1;
-    if(a.type){ (typeDaysUsed[a.type] = typeDaysUsed[a.type] || new Set()).add(a.day); }
+    if(a.type && !(exemptDaysForType[a.type] && exemptDaysForType[a.type].has(a.day))){
+      (typeDaysUsed[a.type] = typeDaysUsed[a.type] || new Set()).add(a.day);
+    }
   });
 
   // A candidate is only blocked by a type-day cap if picking it would add a
   // NEW day to that type's day-set — a second session of the same type on a
   // day already counted (e.g. Sparring + Black Belt both on Saturday) is free.
+  // Exempt days (already guaranteed elsewhere) never count against the cap.
   function typeDayCapOK(cand){
     if(!cand.type) return true;
+    if(exemptDaysForType[cand.type] && exemptDaysForType[cand.type].has(cand.day)) return true;
     const cap = typeDayCaps[cand.type];
     if(cap == null) return true;
     const daysSet = typeDaysUsed[cand.type] || new Set();
@@ -706,6 +717,7 @@ function optimizeWeek(child, activityOptionsByDay, rules){
   }
   function markTypeDay(cand){
     if(!cand.type) return;
+    if(exemptDaysForType[cand.type] && exemptDaysForType[cand.type].has(cand.day)) return;
     (typeDaysUsed[cand.type] = typeDaysUsed[cand.type] || new Set()).add(cand.day);
   }
 
