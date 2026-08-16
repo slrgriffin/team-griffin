@@ -17,7 +17,6 @@
       ],
       "a": [
         "Parcor · 5:30–7:00 pm @ SJ",
-        "TKD Advanced Evening · 7:30–8:20 pm @ Santa Teresa",
         "TKD Advanced · 4:05–4:55 pm @ Santa Teresa"
       ],
       "f": []
@@ -38,8 +37,7 @@
       ],
       "a": [
         "TKD Advanced · 4:05–4:55 pm @ Santa Teresa",
-        "Parcor · 5:30–7:00 pm @ SJ",
-        "TKD Advanced Evening · 7:30–8:20 pm @ Santa Teresa"
+        "Parcor · 5:30–7:00 pm @ SJ"
       ],
       "f": []
     },
@@ -443,7 +441,7 @@
         "end": "20:20",
         "location": "Santa Teresa",
         "type": "TKD",
-        "preferred": true
+        "preferred": false
       },
       {
         "child": "Nollen",
@@ -570,7 +568,7 @@
         "end": "20:20",
         "location": "Santa Teresa",
         "type": "TKD",
-        "preferred": true
+        "preferred": false
       },
       {
         "child": "Nollen",
