@@ -339,8 +339,7 @@
     <h1 id="week-title">This Week</h1>
     <div class="week-range" id="week-range">Loading…</div>
     <div class="progress-row">
-      <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
-      <div class="progress-label" id="progress-label">Summer &rsquo;26</div>
+      <div class="progress-label" id="progress-label" style="margin:0">2026–27 school year</div>
     </div>
   </header>
 
@@ -429,8 +428,7 @@
 <script>
 const RAW_JSON_URL = 'https://raw.githubusercontent.com/slrgriffin/team-griffin/main/schedule.json';
 const DOCS_JSON_URL = 'https://raw.githubusercontent.com/slrgriffin/team-griffin/main/documents.json';
-const SEASON_START = '2026-06-15';
-const SEASON_END   = '2026-08-14';
+const SCHOOL_YEAR_START = '2026-08-17'; // first day of 2026-27 school year
 const DAY_MS = 86400000;
 
 function isoDate(d){ return d.toISOString().slice(0,10); }
@@ -599,15 +597,15 @@ function render(data, docsData){
   document.getElementById('week-range').textContent =
     `${weekMonday.toLocaleDateString('en-US',{month:'short',day:'numeric'})} – ${sunday.toLocaleDateString('en-US',{month:'short',day:'numeric'})}`;
 
-  const weekNum = Math.floor((weekMonday - parseISO(SEASON_START)) / (7*DAY_MS)) + 1;
-  document.getElementById('week-title').textContent = `Week ${weekNum} of 9`;
+  const weekNum = Math.floor((weekMonday - parseISO(SCHOOL_YEAR_START)) / (7*DAY_MS)) + 1;
+  document.getElementById('week-title').textContent = `Week ${weekNum} of the school year`;
 
-  const start = parseISO(SEASON_START), end = parseISO(SEASON_END);
-  const pct = Math.min(100, Math.max(0, ((today-start)/(end-start))*100));
+  const start = parseISO(SCHOOL_YEAR_START);
   const dayNum = Math.round((today-start)/DAY_MS)+1;
-  const totalDays = Math.round((end-start)/DAY_MS)+1;
-  document.getElementById('progress-fill').style.width = pct+'%';
-  document.getElementById('progress-label').textContent = `Day ${dayNum} of ${totalDays} · Jun 15 – Aug 14`;
+  const beforeStart = today < start;
+  document.getElementById('progress-label').textContent = beforeStart
+    ? `Starts ${start.toLocaleDateString('en-US',{month:'short',day:'numeric'})} · 2026–27 school year`
+    : `Day ${dayNum} · 2026–27 school year`;
 
   let cardsHtml = '';
   for(let i=0;i<7;i++){
