@@ -106,7 +106,23 @@ function getMorningReminder() {
 function appendSection(lines, label, items) {
   if (!items || !items.length) return;
   lines.push(label + ':');
-  for (var i = 0; i < items.length; i++) lines.push('  • ' + items[i]);
+  var sorted = sortByTime(items);
+  for (var i = 0; i < sorted.length; i++) lines.push('  • ' + sorted[i]);
+}
+
+// Sorts activity strings (e.g. "Parcor · 5:30–7:00 pm @ SJ") by their start
+// time. Items with no parseable time sort to the end, in their original order.
+function timeSortKey(s) {
+  var m = String(s).match(/(\d{1,2})(?::(\d{2}))?\s*(am|pm)/i);
+  if (!m) return 999999;
+  var h = parseInt(m[1], 10) % 12;
+  var min = m[2] ? parseInt(m[2], 10) : 0;
+  var pm = /pm/i.test(m[3]);
+  return h * 60 + min + (pm ? 720 : 0);
+}
+function sortByTime(items) {
+  if (!items) return items;
+  return items.slice().sort(function (a, b) { return timeSortKey(a) - timeSortKey(b); });
 }
 
 function textOutput(text) {
