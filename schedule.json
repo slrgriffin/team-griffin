@@ -255,9 +255,14 @@
     },
     "2026-08-18": {
       "n": [
-        "Therapy · 3:30–4:30 pm @ Kaiser, Via Del Oro"
+        "Therapy · 3:30–4:30 pm @ Kaiser, Via Del Oro",
+        "Parcor · 5:30–7:00 pm @ SJ",
+        "Afterschool Program · 2:35–5:30 pm @ School"
       ],
-      "a": [],
+      "a": [
+        "Parcor · 5:30–7:00 pm @ SJ",
+        "TKD Advanced · 4:05–4:55 pm @ Santa Teresa"
+      ],
       "f": []
     }
   },
