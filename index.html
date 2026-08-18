@@ -453,11 +453,27 @@ const todayStr = isoDate(today);
 const weekMonday = mondayOf(today);
 const weekMondayStr = isoDate(weekMonday);
 
+// Sorts activity strings (e.g. "Parcor · 5:30–7:00 pm @ SJ") by their start
+// time. Items with no parseable time sort to the end, in their original order.
+function timeSortKey(s){
+  const m = String(s).match(/(\d{1,2})(?::(\d{2}))?\s*(am|pm)/i);
+  if(!m) return 999999;
+  const h = parseInt(m[1], 10) % 12;
+  const min = m[2] ? parseInt(m[2], 10) : 0;
+  const pm = /pm/i.test(m[3]);
+  return h * 60 + min + (pm ? 720 : 0);
+}
+function sortByTime(items){
+  if(!items) return items;
+  return items.slice().sort((a,b) => timeSortKey(a) - timeSortKey(b));
+}
+
 function renderPersonRow(cls, tag, items){
   if(!items || !items.length) return '';
+  const sorted = sortByTime(items);
   return `<div class="person-row">
     <span class="person-tag ${cls}">${tag}</span>
-    <span class="person-items">${items.join(' &nbsp;·&nbsp; ')}</span>
+    <span class="person-items">${sorted.join(' &nbsp;·&nbsp; ')}</span>
   </div>`;
 }
 
