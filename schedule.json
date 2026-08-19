@@ -397,7 +397,7 @@
         "end": "20:20",
         "location": "Santa Teresa",
         "type": "TKD",
-        "preferred": true
+        "preferred": false
       },
       {
         "child": "Nollen",
@@ -524,7 +524,7 @@
         "end": "20:20",
         "location": "Santa Teresa",
         "type": "TKD",
-        "preferred": false
+        "preferred": true
       },
       {
         "child": "Nollen",
@@ -728,10 +728,6 @@
         {
           "day": "Monday",
           "name": "TKD Advanced"
-        },
-        {
-          "day": "Thursday",
-          "name": "TKD Advanced Evening"
         }
       ]
     },
