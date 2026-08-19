@@ -6,6 +6,16 @@
 // token stored in Script Properties — it never touches the browser.
 //
 // Schema:
+//   activityOptions: { "<Weekday>": [{ child, name, start, end, location,
+//                     type, preferred, note? }, ...] } — single source of
+//                     truth for the schedule. Items flagged preferred: true
+//                     are the ones actually committed for that weekday; the
+//                     displayed/texted schedule is computed live from these
+//                     via buildDayFromOptions (nothing is pre-baked/stored).
+//   dateOverrides:   { "<date>": { n: [...], a: [...], f: [...] } } — your
+//                     explicit, independently-authored overrides for a
+//                     specific date (travel, tournaments, appointments).
+//                     Takes priority over the computed weekday schedule.
 //   dailyReminders:  [{ id, label }, ...]
 //   taskCompletions: { "<date>": { "<taskId>": true, ... } }  — sparse,
 //                     a key only exists when that task is done that day.
@@ -71,7 +81,7 @@ function getMorningReminder() {
   if (override && override.vac) {
     lines.push(override.vac);
   } else {
-    var day = override || (data.weeklyPattern || {})[dayName] || {};
+    var day = override || buildDayFromOptions(data, dayName);
     appendSection(lines, 'Nollen', day.n);
     appendSection(lines, 'Austin', day.a);
     appendSection(lines, 'Family', day.f);
@@ -211,10 +221,12 @@ function toggleTask(params) {
 // ── MARK AN ACTION ITEM COMPLETE FOR ONE WEEK (kept in data, not deleted) ─
 // ── MARK AN ACTION ITEM COMPLETE FOR ONE WEEK (kept in data, not deleted) ─
 // ── EDIT AN ACTIVITY OPTION'S FIELDS (from the timetable modal) ──────────
-// If the edited item is someone's "preferred" (currently selected) pick,
-// this automatically rewrites the matching string in weeklyPattern AND in
-// every dateOverride that falls on this weekday — so the morning text and
-// newsletter both pick up the change immediately, no manual reconcile step.
+// The morning text and newsletter both compute the day's schedule live from
+// activityOptions (see buildDayFromOptions), so a plain edit here already
+// takes effect everywhere with no separate sync step. If the edited item is
+// someone's "preferred" (currently selected) pick, this additionally
+// rewrites the matching string in any dateOverride that falls on this
+// weekday, so explicit date overrides don't go stale.
 function editActivity(params) {
   var day = params.day;
   var index = Number(params.index);
@@ -244,7 +256,7 @@ function editActivity(params) {
   }
 }
 
-// ── KEEP weeklyPattern / dateOverrides IN SYNC WITH PREFERRED ACTIVITY EDITS
+// ── COMPUTE THE COMMITTED SCHEDULE LIVE / KEEP dateOverrides IN SYNC ─────
 function pad2(n) { return (n < 10 ? '0' : '') + n; }
 
 function to12Hour(hhmm) {
@@ -260,33 +272,51 @@ function formatActivityString(item) {
   var timeStr = (s.ampm === e.ampm)
     ? (s.h + ':' + pad2(s.m) + '\u2013' + e.h + ':' + pad2(e.m) + ' ' + e.ampm)
     : (s.h + ':' + pad2(s.m) + ' ' + s.ampm + '\u2013' + e.h + ':' + pad2(e.m) + ' ' + e.ampm);
-  return item.name + ' \u00b7 ' + timeStr + (item.location ? ' @ ' + item.location : '');
+  var str = item.name + ' \u00b7 ' + timeStr + (item.location ? ' @ ' + item.location : '');
+  if (item.note) str += ' ' + item.note;
+  return str;
 }
 
 function childKeys(child) {
   if (child === 'Both') return ['n', 'a'];
   if (child === 'Nollen') return ['n'];
   if (child === 'Austin') return ['a'];
-  return []; // 'None' or anything else — no one's pattern to sync
+  return []; // 'None' or anything else — not assigned to anyone's schedule
 }
 
 var WEEKDAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 
+// ── LIVE-COMPUTE THE DAY'S SCHEDULE FROM activityOptions ─────────────────
+// schedule.json used to store a separately-maintained "weeklyPattern" copy
+// of the committed schedule, which drifted out of sync with activityOptions
+// whenever the options were edited directly (times, locations, etc.) rather
+// than through the modal. This computes the same shape fresh every time from
+// the single source of truth: whichever activityOptions entries are flagged
+// preferred: true for that weekday.
+function buildDayFromOptions(data, dayName) {
+  var opts = (data.activityOptions || {})[dayName] || [];
+  var day = { n: [], a: [], f: [] };
+  opts.forEach(function (item) {
+    if (!item.preferred) return;
+    var str = formatActivityString(item);
+    childKeys(item.child).forEach(function (k) {
+      day[k].push(str);
+    });
+  });
+  return day;
+}
+
+// dateOverrides store their own independent, explicitly-authored day lists
+// (not derived from activityOptions), but some overrides intentionally keep
+// a normal recurring item's text alongside the one-off items for that date.
+// If a preferred activity's time/name/child changes, this rewrites the
+// matching string in any dateOverride that falls on this weekday, so those
+// explicit overrides don't go stale.
 function syncPatternForActivity(data, day, oldItem, newItem) {
   var oldStr = formatActivityString(oldItem);
   var newStr = formatActivityString(newItem);
   var oldKeys = childKeys(oldItem.child);
   var newKeys = childKeys(newItem.child);
-
-  data.weeklyPattern[day] = data.weeklyPattern[day] || { n: [], a: [], f: [] };
-  oldKeys.forEach(function (k) {
-    data.weeklyPattern[day][k] = (data.weeklyPattern[day][k] || []).filter(function (s) { return s !== oldStr; });
-  });
-  newKeys.forEach(function (k) {
-    var arr = data.weeklyPattern[day][k] || [];
-    if (arr.indexOf(newStr) === -1) arr.push(newStr);
-    data.weeklyPattern[day][k] = arr;
-  });
 
   var dayIndex = WEEKDAY_NAMES.indexOf(day);
   Object.keys(data.dateOverrides || {}).forEach(function (dateStr) {
