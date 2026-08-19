@@ -258,6 +258,7 @@
     color:var(--ink-soft);cursor:pointer;margin-top:.2rem;
   }
   .tt-toggle input{width:1rem;height:1rem;accent-color:var(--pine);}
+  .tt-toggle-row{display:flex;flex-wrap:wrap;gap:1rem;}
 
   .timetable{
     border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card);
@@ -853,7 +854,7 @@ function hasAnyConflict(list, i){
 
 const PX_PER_MIN = 1.5;
 let currentData = null;
-let filterState = { people: new Set(['Nollen','Austin']), types: null, optimizedOnly: true };
+let filterState = { people: new Set(['Nollen','Austin']), types: null, showOptimized: true, showOptional: true };
 
 // Assigns overlapping activities to side-by-side lanes within one child's half
 // of a day column (same technique day-view calendars use for conflicting events).
@@ -882,11 +883,18 @@ function personMatches(child){
   return filterState.people.has(child);
 }
 
+// Three states for a non-unassigned activity: "optimized" (part of the
+// live-picked schedule, _picked===true), "optional" (tagged optional —
+// available but never auto-picked), or a genuine conflict (lost out to
+// something else / a cap and isn't tagged optional). The two checkboxes
+// independently control the first two; a bare conflict has no toggle and
+// stays hidden — it's just a losing alternative, not a real choice.
 function passesFilters(a){
   if(!personMatches(a.child)) return false;
   if(filterState.types && !filterState.types.has(a.type||'Other')) return false;
-  if(filterState.optimizedOnly && !a._picked) return false;
-  return true;
+  if(a.optional) return filterState.showOptional;
+  if(a._picked) return filterState.showOptimized;
+  return false;
 }
 
 function layoutChild(activitiesTagged, rangeStartMin, rangeEndMin, leftPct, widthPct){
@@ -998,9 +1006,10 @@ function renderFilterBar(data){
   ).join('');
 
   return `<div class="tt-filters">
-    <label class="tt-toggle" style="margin:0 0 .6rem">
-      <input type="checkbox" id="filter-optimized" ${filterState.optimizedOnly?'checked':''}> Optimized schedule only (hide conflicts)
-    </label>
+    <div class="tt-toggle-row" style="margin:0 0 .6rem">
+      <label class="tt-toggle"><input type="checkbox" id="filter-optimized" ${filterState.showOptimized?'checked':''}> Optimized</label>
+      <label class="tt-toggle"><input type="checkbox" id="filter-optional" ${filterState.showOptional?'checked':''}> Optional</label>
+    </div>
     <div class="tt-filter-group">${peopleChips}</div>
     <div class="tt-filter-group">${typeChips}</div>
   </div>`;
@@ -1020,7 +1029,10 @@ document.getElementById('activities-panel').addEventListener('click', (e) => {
 });
 document.getElementById('activities-panel').addEventListener('change', (e) => {
   if(e.target.id === 'filter-optimized'){
-    filterState.optimizedOnly = e.target.checked;
+    filterState.showOptimized = e.target.checked;
+    if(currentData) renderActivitiesTab(currentData);
+  } else if(e.target.id === 'filter-optional'){
+    filterState.showOptional = e.target.checked;
     if(currentData) renderActivitiesTab(currentData);
   }
 });
@@ -1114,7 +1126,6 @@ function renderActivitiesTab(data){
   const legend = `<div class="tt-legend">
     <span class="tt-swatch" style="background:rgba(193,101,47,.5);border:1px solid var(--nollen)"></span>Nollen
     &nbsp;&nbsp;<span class="tt-swatch" style="background:rgba(59,110,143,.5);border:1px solid var(--austin)"></span>Austin
-    &nbsp;&nbsp;<span class="tt-swatch" style="border:1px dashed #B8492F"></span>conflict (loses out to something else at that time)
     &nbsp;&nbsp;<span class="tt-swatch" style="border:1px dashed var(--ink-soft)"></span>optional (available, never auto-picked)<br>
     Tell Claude about a new class, a dropped one, or a time change — this recalculates next load, no manual re-run needed.
   </div>`;
