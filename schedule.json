@@ -361,7 +361,7 @@
         "end": "16:55",
         "location": "Santa Teresa",
         "type": "TKD",
-        "preferred": true
+        "preferred": false
       },
       {
         "child": "Nollen",
@@ -397,7 +397,7 @@
         "end": "20:20",
         "location": "Santa Teresa",
         "type": "TKD",
-        "preferred": false
+        "preferred": true
       },
       {
         "child": "Nollen",
@@ -488,7 +488,7 @@
         "start": "16:05",
         "end": "16:55",
         "location": "Santa Teresa",
-        "preferred": true,
+        "preferred": false,
         "type": "TKD"
       },
       {
@@ -551,7 +551,7 @@
         "start": "16:00",
         "end": "16:50",
         "location": "Santa Teresa",
-        "preferred": false,
+        "preferred": true,
         "type": "TKD"
       },
       {
@@ -726,16 +726,8 @@
     "excludedOnDay": {
       "Austin": [
         {
-          "day": "Friday",
-          "name": "TKD Advanced"
-        },
-        {
           "day": "Monday",
           "name": "TKD Advanced"
-        },
-        {
-          "day": "Tuesday",
-          "name": "TKD Advanced Evening"
         },
         {
           "day": "Thursday",
