@@ -1,70 +1,4 @@
 {
-  "weeklyPattern": {
-    "Monday": {
-      "n": [
-        "TKD Black Belt \u00b7 4:50\u20135:40 pm @ Santa Teresa"
-      ],
-      "a": [
-        "Basic Shooting and Passing \u00b7 5:15\u20136:15 pm @ Silver Creek"
-      ],
-      "f": []
-    },
-    "Tuesday": {
-      "n": [
-        "Parcor \u00b7 5:30\u20137:00 pm @ SJ",
-        "Afterschool Program \u00b7 2:35\u20135:30 pm @ School"
-      ],
-      "a": [
-        "Parcor \u00b7 5:30\u20137:00 pm @ SJ",
-        "TKD Advanced \u00b7 4:05\u20134:55 pm @ Santa Teresa"
-      ],
-      "f": []
-    },
-    "Wednesday": {
-      "n": [
-        "Afterschool Program \u00b7 2:35\u20136:00 pm @ School"
-      ],
-      "a": [
-        "Travel - Conditioning and Practice \u00b7 4:15\u20136:15 pm @ Silver Creek"
-      ],
-      "f": []
-    },
-    "Thursday": {
-      "n": [
-        "Parcor \u00b7 5:30\u20137:00 pm @ SJ",
-        "Afterschool Program \u00b7 2:35\u20135:30 pm @ School"
-      ],
-      "a": [
-        "TKD Advanced \u00b7 4:05\u20134:55 pm @ Santa Teresa",
-        "Parcor \u00b7 5:30\u20137:00 pm @ SJ"
-      ],
-      "f": []
-    },
-    "Friday": {
-      "n": [
-        "TKD Black Belt \u00b7 6:05\u20136:40 pm @ Santa Teresa"
-      ],
-      "a": [
-        "TKD XMA \u00b7 6:45\u20137:35 pm @ Santa Teresa"
-      ],
-      "f": []
-    },
-    "Saturday": {
-      "n": [
-        "TKD Sparring \u00b7 11:05\u201311:40 am @ Santa Teresa",
-        "TKD Black Belt \u00b7 11:40 am\u201312:30 pm @ Santa Teresa"
-      ],
-      "a": [
-        "Game \u00b7 10:00 am\u201312:30 pm @ Silver Creek (times may vary)"
-      ],
-      "f": []
-    },
-    "Sunday": {
-      "n": [],
-      "a": [],
-      "f": []
-    }
-  },
   "dateOverrides": {
     "2026-07-06": {
       "n": [
@@ -426,7 +360,8 @@
         "start": "16:05",
         "end": "16:55",
         "location": "Santa Teresa",
-        "type": "TKD"
+        "type": "TKD",
+        "preferred": true
       },
       {
         "child": "Nollen",
@@ -739,7 +674,8 @@
         "end": "12:30",
         "location": "Plex",
         "type": "Hockey",
-        "preferred": true
+        "preferred": true,
+        "note": "(times may vary)"
       }
     ],
     "Sunday": [
