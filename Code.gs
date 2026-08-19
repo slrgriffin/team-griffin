@@ -7,11 +7,16 @@
 //
 // Schema:
 //   activityOptions: { "<Weekday>": [{ child, name, start, end, location,
-//                     type, preferred, note? }, ...] } — single source of
-//                     truth for the schedule. Items flagged preferred: true
-//                     are the ones actually committed for that weekday; the
-//                     displayed/texted schedule is computed live from these
-//                     via buildDayFromOptions (nothing is pre-baked/stored).
+//                     type, preferred, optional?, note? }, ...] } — single
+//                     source of truth for the schedule. Items flagged
+//                     preferred: true are the ones actually committed for
+//                     that weekday; the displayed/texted schedule is
+//                     computed live from these via buildDayFromOptions
+//                     (nothing is pre-baked/stored). Items flagged
+//                     optional: true are real, available choices that are
+//                     never auto-selected as filler by the Activities tab's
+//                     optimizer — they only become part of the schedule if
+//                     explicitly marked preferred.
 //   dateOverrides:   { "<date>": { n: [...], a: [...], f: [...] } } — your
 //                     explicit, independently-authored overrides for a
 //                     specific date (travel, tournaments, appointments).
@@ -245,6 +250,10 @@ function editActivity(params) {
       if (params.start) item.start = params.start;
       if (params.end) item.end = params.end;
       if (params.type) item.type = params.type;
+      if (params.optional !== undefined) {
+        if (params.optional === 'true') item.optional = true;
+        else delete item.optional;
+      }
       list[index] = item;
       data.activityOptions[day] = list;
 
