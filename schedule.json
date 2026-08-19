@@ -463,8 +463,7 @@
         "start": "18:20",
         "end": "19:10",
         "location": "Santa Teresa",
-        "type": "TKD",
-        "optional": true
+        "type": "TKD"
       },
       {
         "child": "Nollen",
