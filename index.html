@@ -468,6 +468,43 @@ function sortByTime(items){
   return items.slice().sort((a,b) => timeSortKey(a) - timeSortKey(b));
 }
 
+function pad2(n){ return (n<10?'0':'')+n; }
+function to12Hour(hhmm){
+  const [h,m] = hhmm.split(':').map(Number);
+  const ampm = h>=12 ? 'pm':'am';
+  let h12 = h%12; if(h12===0) h12=12;
+  return {h:h12, m, ampm};
+}
+function formatActivityString(item){
+  const s = to12Hour(item.start), e = to12Hour(item.end);
+  const timeStr = (s.ampm===e.ampm)
+    ? `${s.h}:${pad2(s.m)}\u2013${e.h}:${pad2(e.m)} ${e.ampm}`
+    : `${s.h}:${pad2(s.m)} ${s.ampm}\u2013${e.h}:${pad2(e.m)} ${e.ampm}`;
+  let str = `${item.name} \u00b7 ${timeStr}${item.location ? ' @ '+item.location : ''}`;
+  if(item.note) str += ' ' + item.note;
+  return str;
+}
+function childKeysForPattern(child){
+  if(child==='Both') return ['n','a'];
+  if(child==='Nollen') return ['n'];
+  if(child==='Austin') return ['a'];
+  return []; // 'None' or anything else — not assigned to anyone's schedule
+}
+// Computes the day's committed schedule live from activityOptions (whichever
+// entries are flagged preferred: true), rather than reading a separately
+// stored copy — so an edit to activityOptions shows up here immediately
+// with no separate reconcile step.
+function buildDayFromOptions(data, dayName){
+  const opts = (data.activityOptions||{})[dayName] || [];
+  const day = {n:[], a:[], f:[]};
+  opts.forEach(item => {
+    if(!item.preferred) return;
+    const str = formatActivityString(item);
+    childKeysForPattern(item.child).forEach(k => day[k].push(str));
+  });
+  return day;
+}
+
 function renderPersonRow(cls, tag, items){
   if(!items || !items.length) return '';
   const sorted = sortByTime(items);
@@ -487,7 +524,7 @@ function renderDayCard(date, data){
   if(override && override.vac){
     bodyHtml = `<div class="vac-banner">${override.vac}</div>`;
   } else {
-    const day = override || (data.weeklyPattern || {})[dn] || {n:[],a:[],f:[]};
+    const day = override || buildDayFromOptions(data, dn);
     const schoolToday = (data.schoolItems || []).filter(it => it.date === dStr && !it.completed);
     const schoolLabels = schoolToday.map(it => `${it.type === 'Event' ? '' : (it.type + ' due: ')}${it.title}${it.child === 'Both' ? '' : ' ('+it.child+')'}`);
     const rows = [
