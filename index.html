@@ -328,6 +328,23 @@
     background:repeating-linear-gradient(135deg,rgba(184,73,47,.10),rgba(184,73,47,.10) 4px,rgba(184,73,47,.20) 4px,rgba(184,73,47,.20) 8px);
     border:1px dashed #B8492F;
   }
+  /* Optional: a real, available choice that's intentionally excluded from
+     auto-fill — visually calm/neutral, not a warning like tt-conflict. */
+  .tt-activity.tt-optional{
+    background:repeating-linear-gradient(135deg,rgba(91,86,76,.07),rgba(91,86,76,.07) 5px,rgba(91,86,76,.14) 5px,rgba(91,86,76,.14) 10px);
+    border:1px dashed var(--ink-soft);
+  }
+  .tt-activity.tt-optional .tt-act-name::after{
+    content:" · optional";
+    font-style:italic;
+    opacity:.75;
+    font-weight:400;
+  }
+  .modal-field .opt-checkbox{
+    display:flex;align-items:center;gap:.4rem;margin-top:.35rem;
+    text-transform:none;font-weight:600;letter-spacing:normal;color:var(--ink);cursor:pointer;
+  }
+  .modal-field .opt-checkbox input{width:auto;margin:0;accent-color:var(--pine);}
   .tt-act-name{font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .tt-act-time{color:var(--ink-soft);white-space:nowrap;overflow:hidden;font-size:.56rem;}
 </style>
@@ -385,6 +402,9 @@
       <label class="modal-field">Start<input type="time" id="modal-start"></label>
       <label class="modal-field">End<input type="time" id="modal-end"></label>
     </div>
+    <label class="modal-field">
+      <span class="opt-checkbox"><input type="checkbox" id="modal-optional"> Optional (available, but never auto-picked as filler)</span>
+    </label>
     <div class="modal-actions">
       <button id="modal-cancel">Cancel</button>
       <button id="modal-save" class="primary">Save</button>
@@ -749,7 +769,10 @@ function optimizeWeek(child, activityOptionsByDay, rules){
   });
 
   const preferred = all.filter(a=>a.preferred);
-  const alts = all.filter(a=>!a.preferred);
+  // Optional items are real, visible options — but never auto-selected as
+  // filler. They only end up "picked" if someone explicitly marks them
+  // preferred via the edit modal.
+  const alts = all.filter(a=>!a.preferred && !a.optional);
   const used = {};
   const typeDaysUsed = {}; // type -> Set of distinct (non-exempt) days already picked for that type
   preferred.forEach(a => {
@@ -877,7 +900,7 @@ function layoutChild(activitiesTagged, rangeStartMin, rangeEndMin, leftPct, widt
     const height = Math.max(14, (cEnd - cStart) * PX_PER_MIN);
     const laneW = widthPct / laneCount;
     const left = leftPct + act.lane * laneW;
-    const cls = act._picked ? 'tt-picked' : 'tt-conflict';
+    const cls = act._picked ? 'tt-picked' : (act.optional ? 'tt-optional' : 'tt-conflict');
     const childCls = act.child==='Nollen' ? 'tt-n' : act.child==='Austin' ? 'tt-a' : act.child==='Both' ? 'tt-both' : 'tt-none';
     const tip = `${act.child}: ${act.name} · ${formatTime12(act.start)}–${formatTime12(act.end)} @ ${act.location}` + (act.docRef ? ` · 📄 ${act.docRef.summaryShort}` : '');
     return `<div class="tt-activity ${cls} ${childCls}" style="top:${top}px;height:${height}px;left:${left}%;width:${laneW-1}%" title="${tip}" data-day="${act._day}" data-index="${act._origIndex}">
@@ -1014,6 +1037,7 @@ function openActivityModal(day, index){
   document.getElementById('modal-type').value = item.type || 'Other';
   document.getElementById('modal-start').value = item.start;
   document.getElementById('modal-end').value = item.end;
+  document.getElementById('modal-optional').checked = !!item.optional;
   const statusEl = document.getElementById('modal-status');
   statusEl.textContent = '';
   statusEl.className = '';
@@ -1039,6 +1063,7 @@ document.getElementById('modal-save').addEventListener('click', async () => {
   const type = document.getElementById('modal-type').value;
   const start = document.getElementById('modal-start').value;
   const end = document.getElementById('modal-end').value;
+  const optional = document.getElementById('modal-optional').checked;
   const statusEl = document.getElementById('modal-status');
 
   if(!name || !child || !start || !end){
@@ -1058,14 +1083,14 @@ document.getElementById('modal-save').addEventListener('click', async () => {
 
   const url = `${SCRIPT_URL}?mode=editActivity&day=${encodeURIComponent(day)}&index=${index}`
     + `&name=${encodeURIComponent(name)}&child=${encodeURIComponent(child)}`
-    + `&type=${encodeURIComponent(type)}&start=${start}&end=${end}`;
+    + `&type=${encodeURIComponent(type)}&start=${start}&end=${end}&optional=${optional}`;
   fetch(url, { mode: 'no-cors' }).catch(()=>{});
 
   confirmWrite(
     null,
     (d) => {
       const item = (d.activityOptions[day] || [])[index];
-      return !!item && item.name===name && item.child===child && item.type===type && item.start===start && item.end===end;
+      return !!item && item.name===name && item.child===child && item.type===type && item.start===start && item.end===end && !!item.optional===optional;
     },
     () => {
       statusEl.textContent = 'Saved ✓';
@@ -1089,7 +1114,8 @@ function renderActivitiesTab(data){
   const legend = `<div class="tt-legend">
     <span class="tt-swatch" style="background:rgba(193,101,47,.5);border:1px solid var(--nollen)"></span>Nollen
     &nbsp;&nbsp;<span class="tt-swatch" style="background:rgba(59,110,143,.5);border:1px solid var(--austin)"></span>Austin
-    &nbsp;&nbsp;<span class="tt-swatch" style="border:1px dashed #B8492F"></span>conflict (loses out to something else at that time)<br>
+    &nbsp;&nbsp;<span class="tt-swatch" style="border:1px dashed #B8492F"></span>conflict (loses out to something else at that time)
+    &nbsp;&nbsp;<span class="tt-swatch" style="border:1px dashed var(--ink-soft)"></span>optional (available, never auto-picked)<br>
     Tell Claude about a new class, a dropped one, or a time change — this recalculates next load, no manual re-run needed.
   </div>`;
 
