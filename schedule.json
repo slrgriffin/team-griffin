@@ -728,6 +728,22 @@
         {
           "day": "Monday",
           "name": "TKD Advanced"
+        },
+        {
+          "day": "Tuesday",
+          "name": "TKD Advanced"
+        },
+        {
+          "day": "Tuesday",
+          "name": "TKD Advanced Evening"
+        },
+        {
+          "day": "Thursday",
+          "name": "TKD Advanced"
+        },
+        {
+          "day": "Wednesday",
+          "name": "TKD Advanced"
         }
       ]
     },
