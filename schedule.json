@@ -568,8 +568,7 @@
         "start": "16:15",
         "end": "17:15",
         "location": "Plex",
-        "type": "Hockey",
-        "optional": true
+        "type": "Hockey"
       }
     ],
     "Friday": [
