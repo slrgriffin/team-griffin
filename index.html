@@ -202,6 +202,16 @@
   }
   .doc-filter-btn.active{background:var(--school);color:#fff;border-color:var(--school);}
 
+  .link-card{
+    display:flex;align-items:center;gap:.6rem;background:var(--card);border:1px solid var(--line);
+    border-radius:10px;padding:.65rem .8rem;margin-bottom:.5rem;text-decoration:none;
+  }
+  .link-card:hover{background:rgba(0,0,0,.03);}
+  .link-card-body{flex:1;min-width:0;}
+  .link-card-title{font-size:.87rem;font-weight:700;color:var(--ink);}
+  .link-card-desc{font-size:.78rem;color:var(--ink-soft);margin-top:.15rem;line-height:1.4;}
+  .link-card-arrow{color:var(--pine);font-size:1rem;flex-shrink:0;}
+
   .checklist-box{
     background:var(--card);border:1px solid var(--line);border-radius:10px;padding:.4rem .5rem;
   }
@@ -450,12 +460,6 @@
 
 <script>
 const RAW_JSON_URL = 'https://raw.githubusercontent.com/slrgriffin/team-griffin/main/schedule.json';
-// Used only for write-confirmation polling. raw.githubusercontent.com sits
-// behind a CDN with real caching lag, so checking it after a save can wait
-// out stale cache for a long time even though the commit already landed.
-// The Contents API reflects the git ref immediately, so polling it instead
-// gets confirmation in ~1-3s instead of up to 160s.
-const CONTENTS_API_URL = 'https://api.github.com/repos/slrgriffin/team-griffin/contents/schedule.json';
 const DOCS_JSON_URL = 'https://raw.githubusercontent.com/slrgriffin/team-griffin/main/documents.json';
 const SCHOOL_YEAR_START = '2026-08-17'; // first day of 2026-27 school year
 const SCHOOL_YEAR_END   = '2027-06-11'; // last day of 2026-27 school year
@@ -612,35 +616,17 @@ function renderActionItems(items, week){
 // (e.g. the unauthenticated API's 60/hr-per-IP limit, shared by every
 // device on the home network, gets hit) it falls back to polling the raw
 // CDN with longer spacing, same as before, as a safety net.
-async function confirmWrite(el, checkFn, onConfirmed, onGaveUp){
-  const apiDelays = [700, 1200, 2000];
-  for(const delay of apiDelays){
-    await new Promise(r=>setTimeout(r, delay));
-    try{
-      const res = await fetch(CONTENTS_API_URL + '?t=' + Date.now(), {
-        headers: { 'Accept': 'application/vnd.github.v3+json' }
-      });
-      if(res.ok){
-        const meta = await res.json();
-        const bytes = Uint8Array.from(atob(meta.content), c => c.charCodeAt(0));
-        const d = JSON.parse(new TextDecoder('utf-8').decode(bytes));
-        if(checkFn(d)){ onConfirmed(); return; }
-      } else if(res.status === 403){
-        break; // rate-limited — stop hitting the API, fall back to the CDN
-      }
-    }catch(e){ /* keep trying */ }
+// The Apps Script web app returns real CORS headers and a synchronous
+// {success, message} JSON body (~1-3s round trip) — no need to fire-and-forget
+// and then poll a CDN-cached copy of schedule.json to find out what happened.
+async function postWrite(url){
+  try{
+    const res = await fetch(url);
+    if(!res.ok) return { success: false, message: 'HTTP ' + res.status };
+    return await res.json();
+  }catch(err){
+    return { success: false, message: err.message };
   }
-  for(let i=0;i<8;i++){
-    await new Promise(r=>setTimeout(r,4000));
-    try{
-      const res = await fetch(RAW_JSON_URL + '?t=' + Date.now());
-      if(res.ok){
-        const d = await res.json();
-        if(checkFn(d)){ onConfirmed(); return; }
-      }
-    }catch(e){ /* keep polling */ }
-  }
-  onGaveUp();
 }
 
 // One delegated handler covers both day-card task chips and action items,
@@ -648,25 +634,26 @@ async function confirmWrite(el, checkFn, onConfirmed, onGaveUp){
 document.getElementById('main').addEventListener('click', (e) => {
   const chip = e.target.closest('.task-chip');
   if(chip){
-    if(chip.dataset.pending) return; // already confirming a previous tap
+    if(chip.dataset.pending) return; // already saving a previous tap
     chip.dataset.pending = '1';
     chip.classList.remove('unconfirmed');
     chip.classList.add('pending');
     const date = chip.dataset.taskDate, taskId = chip.dataset.taskId;
-    chip.classList.toggle('done'); // optimistic flip, verified below
+    chip.classList.toggle('done'); // optimistic flip, corrected below if it fails
     const expectDone = chip.classList.contains('done');
-    fetch(`${SCRIPT_URL}?mode=toggleTask&date=${date}&taskId=${taskId}`, { mode: 'no-cors' }).catch(()=>{});
 
-    confirmWrite(
-      chip,
-      (d) => !!((d.taskCompletions||{})[date]||{})[taskId] === expectDone,
-      () => { chip.classList.remove('pending'); delete chip.dataset.pending; },
-      () => {
-        chip.classList.remove('pending');
+    postWrite(`${SCRIPT_URL}?mode=toggleTask&date=${date}&taskId=${taskId}`).then(result => {
+      chip.classList.remove('pending');
+      delete chip.dataset.pending;
+      if(result.success){
+        currentData.taskCompletions = currentData.taskCompletions || {};
+        currentData.taskCompletions[date] = currentData.taskCompletions[date] || {};
+        currentData.taskCompletions[date][taskId] = expectDone;
+      } else {
+        chip.classList.toggle('done'); // revert the optimistic flip
         chip.classList.add('unconfirmed');
-        delete chip.dataset.pending;
       }
-    );
+    });
     return;
   }
 
@@ -676,21 +663,20 @@ document.getElementById('main').addEventListener('click', (e) => {
     row.dataset.pending = '1';
     row.classList.add('pending');
     const i = Number(row.dataset.i), week = row.dataset.week;
-    fetch(`${SCRIPT_URL}?mode=completeAction&week=${week}&index=${i}`, { mode: 'no-cors' }).catch(()=>{});
 
-    confirmWrite(
-      row,
-      (d) => !!(((d.weeklyNotes||{})[week]||[])[i]||{}).completed,
-      () => row.remove(),
-      () => {
+    postWrite(`${SCRIPT_URL}?mode=completeAction&week=${week}&index=${i}`).then(result => {
+      if(result.success){
+        row.remove();
+        if(((currentData.weeklyNotes||{})[week]||[])[i]) currentData.weeklyNotes[week][i].completed = true;
+      } else {
         row.classList.remove('pending');
         row.classList.add('unconfirmed');
         delete row.dataset.pending;
         if(!row.querySelector('.tiny-warn')){
-          row.insertAdjacentHTML('beforeend', '<div class="tiny-warn">Didn\'t confirm — try again?</div>');
+          row.insertAdjacentHTML('beforeend', '<div class="tiny-warn">Save failed — try again?</div>');
         }
       }
-    );
+    });
   }
 });
 
@@ -1126,28 +1112,22 @@ document.getElementById('modal-save').addEventListener('click', async () => {
   const url = `${SCRIPT_URL}?mode=editActivity&day=${encodeURIComponent(day)}&index=${index}`
     + `&name=${encodeURIComponent(name)}&child=${encodeURIComponent(child)}`
     + `&type=${encodeURIComponent(type)}&start=${start}&end=${end}&optional=${optional}`;
-  fetch(url, { mode: 'no-cors' }).catch(()=>{});
+  const result = await postWrite(url);
 
-  confirmWrite(
-    null,
-    (d) => {
-      const item = (d.activityOptions[day] || [])[index];
-      return !!item && item.name===name && item.child===child && item.type===type && item.start===start && item.end===end && !!item.optional===optional;
-    },
-    () => {
-      statusEl.textContent = 'Saved ✓';
-      statusEl.className = 'ok';
-      setTimeout(() => {
-        closeActivityModal();
-        load(); // full refresh so both timetables reflect the change
-      }, 600);
-    },
-    () => {
-      statusEl.textContent = "Saved, but the page is slow to pick it up — it'll appear shortly. Refresh in a minute if it doesn't.";
-      statusEl.className = 'ok';
-      document.getElementById('modal-save').disabled = false;
-    }
-  );
+  if(result.success){
+    currentData.activityOptions[day] = currentData.activityOptions[day] || [];
+    currentData.activityOptions[day][index] = { name, child, type, start, end, optional };
+    statusEl.textContent = 'Saved ✓';
+    statusEl.className = 'ok';
+    setTimeout(() => {
+      closeActivityModal();
+      renderActivitiesTab(currentData); // instant, from local state — no round trip needed
+    }, 300);
+  } else {
+    statusEl.textContent = 'Save failed: ' + (result.message || 'unknown error') + ' — try again.';
+    statusEl.className = 'err';
+    document.getElementById('modal-save').disabled = false;
+  }
 });
 
 function renderActivitiesTab(data){
@@ -1211,6 +1191,17 @@ function renderSchoolTab(data, docsData){
       </div>`).join('')
     : `<div class="school-empty">No communications logged yet — tell Claude about one and it'll show up here.</div>`;
 
+  const links = data.schoolLinks || [];
+  const linksHtml = links.length
+    ? links.map(l => `<a class="link-card" href="${l.url}" target="_blank" rel="noopener">
+        <div class="link-card-body">
+          <div class="link-card-title">${l.title}</div>
+          ${l.description ? `<div class="link-card-desc">${l.description}</div>` : ''}
+        </div>
+        <span class="link-card-arrow">↗</span>
+      </a>`).join('')
+    : `<div class="school-empty">No links saved yet.</div>`;
+
   document.getElementById('school-panel').innerHTML = `
     <div class="section-label">🎓 Assignments, Projects &amp; Events</div>
     <button class="school-add-btn" id="school-add-btn">+ Add School Item</button>
@@ -1218,6 +1209,8 @@ function renderSchoolTab(data, docsData){
     <div class="section-label">📨 Communications</div>
     ${commsHtml}
     <a class="comm-log-link" id="comm-view-all-link" href="#">Open full Documents archive →</a>
+    <div class="section-label">🔗 Links</div>
+    ${linksHtml}
   `;
 }
 
@@ -1303,28 +1296,25 @@ document.getElementById('school-modal-save').addEventListener('click', async () 
   if(selectedDoc){
     url += `&docSummary=${encodeURIComponent(selectedDoc.summaryShort)}&docUrl=${encodeURIComponent(selectedDoc.driveUrl)}`;
   }
-  fetch(url, { mode: 'no-cors' }).catch(()=>{});
+  const result = await postWrite(url);
 
-  confirmWrite(
-    null,
-    (d) => {
-      const it = (d.schoolItems||[]).find(x => x.id === id);
-      if(!it || it.title!==title || it.child!==child || it.type!==type || it.date!==date || !!it.completed!==completed) return false;
-      const wantDoc = selectedDoc ? selectedDoc.id : null;
-      const gotDoc = it.docRef ? it.docRef.id : null;
-      return wantDoc === gotDoc;
-    },
-    () => {
-      statusEl.textContent = 'Saved ✓';
-      statusEl.className = 'ok';
-      setTimeout(() => { closeSchoolModal(); load(); }, 600);
-    },
-    () => {
-      statusEl.textContent = "Saved, but the page is slow to pick it up — it'll appear shortly. Refresh in a minute if it doesn't. (No need to press Save again — it already went through.)";
-      statusEl.className = 'ok';
-      setTimeout(() => { closeSchoolModal(); load(); }, 3000);
-    }
-  );
+  if(result.success){
+    const newItem = { id, title, child, type, date, notes, completed };
+    if(selectedDoc) newItem.docRef = { id: selectedDoc.id, summaryShort: selectedDoc.summaryShort, driveUrl: selectedDoc.driveUrl };
+    currentData.schoolItems = currentData.schoolItems || [];
+    const idx = currentData.schoolItems.findIndex(x => x.id === id);
+    if(idx >= 0) currentData.schoolItems[idx] = newItem; else currentData.schoolItems.push(newItem);
+    statusEl.textContent = 'Saved ✓';
+    statusEl.className = 'ok';
+    setTimeout(() => {
+      closeSchoolModal();
+      render(currentData, latestDocsData); // instant, from local state
+    }, 300);
+  } else {
+    statusEl.textContent = 'Save failed: ' + (result.message || 'unknown error') + ' — try again.';
+    statusEl.className = 'err';
+    document.getElementById('school-modal-save').disabled = false;
+  }
 });
 
 document.getElementById('school-modal-delete').addEventListener('click', async () => {
@@ -1335,23 +1325,21 @@ document.getElementById('school-modal-delete').addEventListener('click', async (
   statusEl.textContent = 'Deleting…';
   statusEl.className = '';
 
-  const url = `${SCRIPT_URL}?mode=deleteSchoolItem&id=${encodeURIComponent(id)}`;
-  fetch(url, { mode: 'no-cors' }).catch(()=>{});
+  const result = await postWrite(`${SCRIPT_URL}?mode=deleteSchoolItem&id=${encodeURIComponent(id)}`);
 
-  confirmWrite(
-    null,
-    (d) => !(d.schoolItems||[]).some(x => x.id === id),
-    () => {
-      statusEl.textContent = 'Deleted ✓';
-      statusEl.className = 'ok';
-      setTimeout(() => { closeSchoolModal(); load(); }, 600);
-    },
-    () => {
-      statusEl.textContent = "Deleted, but the page is slow to pick it up — it'll clear shortly. Refresh in a minute if it doesn't. (No need to press Delete again.)";
-      statusEl.className = 'ok';
-      setTimeout(() => { closeSchoolModal(); load(); }, 3000);
-    }
-  );
+  if(result.success){
+    currentData.schoolItems = (currentData.schoolItems || []).filter(x => x.id !== id);
+    statusEl.textContent = 'Deleted ✓';
+    statusEl.className = 'ok';
+    setTimeout(() => {
+      closeSchoolModal();
+      render(currentData, latestDocsData); // instant, from local state
+    }, 300);
+  } else {
+    statusEl.textContent = 'Delete failed: ' + (result.message || 'unknown error') + ' — try again.';
+    statusEl.className = 'err';
+    document.getElementById('school-modal-save').disabled = false;
+  }
 });
 
 // ── Documents tab: full archive from documents.json ────────────────────
