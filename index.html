@@ -259,6 +259,7 @@
   }
   .tt-toggle input{width:1rem;height:1rem;accent-color:var(--pine);}
   .tt-toggle-row{display:flex;flex-wrap:wrap;gap:1rem;}
+  .tt-toggle-disabled{opacity:.45;cursor:default;}
 
   .timetable{
     border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card);
@@ -883,17 +884,19 @@ function personMatches(child){
   return filterState.people.has(child);
 }
 
-// Three states for a non-unassigned activity: "optimized" (part of the
-// live-picked schedule, _picked===true), "optional" (tagged optional —
-// available but never auto-picked), or a genuine conflict (lost out to
-// something else / a cap and isn't tagged optional). The two checkboxes
-// independently control the first two; a bare conflict has no toggle and
-// stays hidden — it's just a losing alternative, not a real choice.
+// Filter semantics: "Optimized" is the primary lens. When it's ON, only the
+// committed schedule shows — plus optional items too, if "Optional" is also
+// checked (Optional only matters as a sub-filter while Optimized is on).
+// When "Optimized" is OFF, everything shows (picked, optional, and genuine
+// conflicts alike), each colored per its real state, so you can see the
+// whole picture — Optional has no effect in that state since nothing's
+// being hidden to begin with.
 function passesFilters(a){
   if(!personMatches(a.child)) return false;
   if(filterState.types && !filterState.types.has(a.type||'Other')) return false;
+  if(!filterState.showOptimized) return true;
+  if(a._picked) return true;
   if(a.optional) return filterState.showOptional;
-  if(a._picked) return filterState.showOptimized;
   return false;
 }
 
@@ -1008,7 +1011,7 @@ function renderFilterBar(data){
   return `<div class="tt-filters">
     <div class="tt-toggle-row" style="margin:0 0 .6rem">
       <label class="tt-toggle"><input type="checkbox" id="filter-optimized" ${filterState.showOptimized?'checked':''}> Optimized</label>
-      <label class="tt-toggle"><input type="checkbox" id="filter-optional" ${filterState.showOptional?'checked':''}> Optional</label>
+      <label class="tt-toggle${filterState.showOptimized?'':' tt-toggle-disabled'}"><input type="checkbox" id="filter-optional" ${filterState.showOptional?'checked':''} ${filterState.showOptimized?'':'disabled'}> Optional</label>
     </div>
     <div class="tt-filter-group">${peopleChips}</div>
     <div class="tt-filter-group">${typeChips}</div>
@@ -1126,6 +1129,7 @@ function renderActivitiesTab(data){
   const legend = `<div class="tt-legend">
     <span class="tt-swatch" style="background:rgba(193,101,47,.5);border:1px solid var(--nollen)"></span>Nollen
     &nbsp;&nbsp;<span class="tt-swatch" style="background:rgba(59,110,143,.5);border:1px solid var(--austin)"></span>Austin
+    &nbsp;&nbsp;<span class="tt-swatch" style="border:1px dashed #B8492F"></span>conflict (loses out to something else / overlaps a required item)
     &nbsp;&nbsp;<span class="tt-swatch" style="border:1px dashed var(--ink-soft)"></span>optional (available, never auto-picked)<br>
     Tell Claude about a new class, a dropped one, or a time change — this recalculates next load, no manual re-run needed.
   </div>`;
