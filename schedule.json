@@ -557,8 +557,7 @@
         "start": "16:00",
         "end": "16:50",
         "location": "Santa Teresa",
-        "type": "TKD",
-        "optional": true
+        "type": "TKD"
       },
       {
         "child": "Nollen",
@@ -739,12 +738,6 @@
     },
     "onlyTypeOnDay": {
       "Nollen": [
-        {
-          "day": "Friday",
-          "type": "TKD"
-        }
-      ],
-      "Austin": [
         {
           "day": "Friday",
           "type": "TKD"
