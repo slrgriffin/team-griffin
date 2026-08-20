@@ -450,6 +450,12 @@
 
 <script>
 const RAW_JSON_URL = 'https://raw.githubusercontent.com/slrgriffin/team-griffin/main/schedule.json';
+// Used only for write-confirmation polling. raw.githubusercontent.com sits
+// behind a CDN with real caching lag, so checking it after a save can wait
+// out stale cache for a long time even though the commit already landed.
+// The Contents API reflects the git ref immediately, so polling it instead
+// gets confirmation in ~1-3s instead of up to 160s.
+const CONTENTS_API_URL = 'https://api.github.com/repos/slrgriffin/team-griffin/contents/schedule.json';
 const DOCS_JSON_URL = 'https://raw.githubusercontent.com/slrgriffin/team-griffin/main/documents.json';
 const SCHOOL_YEAR_START = '2026-08-17'; // first day of 2026-27 school year
 const SCHOOL_YEAR_END   = '2027-06-11'; // last day of 2026-27 school year
@@ -600,11 +606,32 @@ function renderActionItems(items, week){
   </div>`).join('');
 }
 
-// Polls the raw JSON (cache-busted each try) until `checkFn` confirms the
-// write actually landed, or gives up after ~40s and flags it as unconfirmed.
+// Confirms a write landed. Checks the GitHub Contents API first (reflects
+// the commit immediately, no CDN cache lag) for a few quick tries — this is
+// the common case and usually confirms in 1-4s. If that's unavailable
+// (e.g. the unauthenticated API's 60/hr-per-IP limit, shared by every
+// device on the home network, gets hit) it falls back to polling the raw
+// CDN with longer spacing, same as before, as a safety net.
 async function confirmWrite(el, checkFn, onConfirmed, onGaveUp){
-  for(let i=0;i<20;i++){
-    await new Promise(r=>setTimeout(r,8000));
+  const apiDelays = [700, 1200, 2000];
+  for(const delay of apiDelays){
+    await new Promise(r=>setTimeout(r, delay));
+    try{
+      const res = await fetch(CONTENTS_API_URL + '?t=' + Date.now(), {
+        headers: { 'Accept': 'application/vnd.github.v3+json' }
+      });
+      if(res.ok){
+        const meta = await res.json();
+        const bytes = Uint8Array.from(atob(meta.content), c => c.charCodeAt(0));
+        const d = JSON.parse(new TextDecoder('utf-8').decode(bytes));
+        if(checkFn(d)){ onConfirmed(); return; }
+      } else if(res.status === 403){
+        break; // rate-limited — stop hitting the API, fall back to the CDN
+      }
+    }catch(e){ /* keep trying */ }
+  }
+  for(let i=0;i<8;i++){
+    await new Promise(r=>setTimeout(r,4000));
     try{
       const res = await fetch(RAW_JSON_URL + '?t=' + Date.now());
       if(res.ok){
