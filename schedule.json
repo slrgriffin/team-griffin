@@ -802,15 +802,6 @@
         "summaryShort": "Clark's Meet & Greet and New Family Orientation is Friday, Aug 14, 2026 — Grades 1-6 (Nollen and Austin) meet 1:30-2:30pm, with New Family Orientation & tours 2:45-3:30pm in the Forum. Watch for the teacher's email around 11am with the classroom number; a parent/guardian must accompany students. Free library books, a photo-op station, T-shirt sales, and Mel's Grub Hut food truck will also be on campus.",
         "driveUrl": "https://docs.google.com/document/d/1Kqln6JlN-vvq2BD6-mmMH6k1HuBuQkymh6ixRKzfqXQ/edit"
       }
-    },
-    {
-      "id": "sch-speedtest01",
-      "title": "Speed Test",
-      "child": "Austin",
-      "type": "Event",
-      "date": "2026-08-22",
-      "notes": "",
-      "completed": false
     }
   ],
   "communicationsLog": {
