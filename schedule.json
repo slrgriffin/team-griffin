@@ -816,5 +816,13 @@
         "summary": "From Brian Yee (director). First day Mon Aug 17 in Room C106 at Carolyn Clark, right after dismissal. Daily schedule: check-in 2:35, recess 2:45-3:15, homework/work block 3:15-4:30, recess 4:30-5:00, iPad/extra work 5:00-5:40, cleanup 5:40-6:00. Pickup by 6:00pm with ID. Reply needed re: which days (3-day/4-day plan). Contacts: Brian Yee 408-679-8196, JM Malit 408-712-1307."
       }
     ]
-  }
+  },
+  "schoolLinks": [
+    {
+      "id": "link-cc-donate",
+      "title": "Carolyn Clark Donate Page",
+      "url": "https://cclark.eesd.org/donate",
+      "description": "Official school donation form — field trips, science camp, a specific classroom/teacher, or the general school fund."
+    }
+  ]
 }
