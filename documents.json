@@ -119,6 +119,21 @@
         "6th-grade",
         "payment-required"
       ]
+    },
+    {
+      "id": "doc-20260820-classroom-updates",
+      "title": "Classroom Updates & Reminders",
+      "uploadedDate": "2026-08-20",
+      "driveUrl": "https://docs.google.com/document/d/19RoIsj84zQdAykqDcHkybirLYPvKv8nyLvOZnWyM2gc/edit",
+      "summaryLong": "Mrs. Marcias sent a general classroom update. Two forms are still outstanding class-wide: the blue Code of Conduct Contract and the yellow SJSU Student Teaching Video Release (check whether Nollen's copies have been turned in). The $25 supply donation covers the class T-shirt and Essentials Binder. Field trip (Alcatraz/SF Giants) permission forms are due September 1, and all chaperone spots are now filled, though she'll keep a waitlist for anyone still interested. Students brought home an Ancient Greece Pre-Test needing a parent/guardian signature — it's not graded, just a baseline check before the unit starts. She also re-reminded families to join the PTA.",
+      "summaryShort": "Field trip permission forms are due Sept 1 (chaperone spots are full, but a waitlist is available). Check whether Nollen's Code of Conduct Contract (blue) and SJSU Video Release (yellow) forms have been turned in — both still outstanding class-wide. An Ancient Greece Pre-Test also came home needing a parent signature; it's ungraded.",
+      "child": "Nollen",
+      "tags": [
+        "classroom-update",
+        "forms",
+        "field-trip",
+        "deadline"
+      ]
     }
   ]
 }
