@@ -202,6 +202,16 @@
   }
   .doc-filter-btn.active{background:var(--school);color:#fff;border-color:var(--school);}
 
+  .link-card{
+    display:flex;align-items:center;gap:.6rem;background:var(--card);border:1px solid var(--line);
+    border-radius:10px;padding:.65rem .8rem;margin-bottom:.5rem;text-decoration:none;
+  }
+  .link-card:hover{background:rgba(0,0,0,.03);}
+  .link-card-body{flex:1;min-width:0;}
+  .link-card-title{font-size:.87rem;font-weight:700;color:var(--ink);}
+  .link-card-desc{font-size:.78rem;color:var(--ink-soft);margin-top:.15rem;line-height:1.4;}
+  .link-card-arrow{color:var(--pine);font-size:1rem;flex-shrink:0;}
+
   .checklist-box{
     background:var(--card);border:1px solid var(--line);border-radius:10px;padding:.4rem .5rem;
   }
@@ -269,6 +279,8 @@
     color:var(--ink-soft);cursor:pointer;margin-top:.2rem;
   }
   .tt-toggle input{width:1rem;height:1rem;accent-color:var(--pine);}
+  .tt-toggle-row{display:flex;flex-wrap:wrap;gap:1rem;}
+  .tt-toggle-disabled{opacity:.45;cursor:default;}
 
   .timetable{
     border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--card);
@@ -339,6 +351,23 @@
     background:repeating-linear-gradient(135deg,rgba(184,73,47,.10),rgba(184,73,47,.10) 4px,rgba(184,73,47,.20) 4px,rgba(184,73,47,.20) 8px);
     border:1px dashed #B8492F;
   }
+  /* Optional: a real, available choice that's intentionally excluded from
+     auto-fill — visually calm/neutral, not a warning like tt-conflict. */
+  .tt-activity.tt-optional{
+    background:repeating-linear-gradient(135deg,rgba(91,86,76,.07),rgba(91,86,76,.07) 5px,rgba(91,86,76,.14) 5px,rgba(91,86,76,.14) 10px);
+    border:1px dashed var(--ink-soft);
+  }
+  .tt-activity.tt-optional .tt-act-name::after{
+    content:" · optional";
+    font-style:italic;
+    opacity:.75;
+    font-weight:400;
+  }
+  .modal-field .opt-checkbox{
+    display:flex;align-items:center;gap:.4rem;margin-top:.35rem;
+    text-transform:none;font-weight:600;letter-spacing:normal;color:var(--ink);cursor:pointer;
+  }
+  .modal-field .opt-checkbox input{width:auto;margin:0;accent-color:var(--pine);}
   .tt-act-name{font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .tt-act-time{color:var(--ink-soft);white-space:nowrap;overflow:hidden;font-size:.56rem;}
 </style>
@@ -396,6 +425,9 @@
       <label class="modal-field">Start<input type="time" id="modal-start"></label>
       <label class="modal-field">End<input type="time" id="modal-end"></label>
     </div>
+    <label class="modal-field">
+      <span class="opt-checkbox"><input type="checkbox" id="modal-optional"> Optional (available, but never auto-picked as filler)</span>
+    </label>
     <div class="modal-actions">
       <button id="modal-cancel">Cancel</button>
       <button id="modal-save" class="primary">Save</button>
@@ -464,11 +496,64 @@ const todayStr = isoDate(today);
 const weekMonday = mondayOf(today);
 const weekMondayStr = isoDate(weekMonday);
 
+// Sorts activity strings (e.g. "Parcor · 5:30–7:00 pm @ SJ") by their start
+// time. Items with no parseable time sort to the end, in their original order.
+function timeSortKey(s){
+  const m = String(s).match(/(\d{1,2})(?::(\d{2}))?\s*(am|pm)/i);
+  if(!m) return 999999;
+  const h = parseInt(m[1], 10) % 12;
+  const min = m[2] ? parseInt(m[2], 10) : 0;
+  const pm = /pm/i.test(m[3]);
+  return h * 60 + min + (pm ? 720 : 0);
+}
+function sortByTime(items){
+  if(!items) return items;
+  return items.slice().sort((a,b) => timeSortKey(a) - timeSortKey(b));
+}
+
+function pad2(n){ return (n<10?'0':'')+n; }
+function to12Hour(hhmm){
+  const [h,m] = hhmm.split(':').map(Number);
+  const ampm = h>=12 ? 'pm':'am';
+  let h12 = h%12; if(h12===0) h12=12;
+  return {h:h12, m, ampm};
+}
+function formatActivityString(item){
+  const s = to12Hour(item.start), e = to12Hour(item.end);
+  const timeStr = (s.ampm===e.ampm)
+    ? `${s.h}:${pad2(s.m)}\u2013${e.h}:${pad2(e.m)} ${e.ampm}`
+    : `${s.h}:${pad2(s.m)} ${s.ampm}\u2013${e.h}:${pad2(e.m)} ${e.ampm}`;
+  let str = `${item.name} \u00b7 ${timeStr}${item.location ? ' @ '+item.location : ''}`;
+  if(item.note) str += ' ' + item.note;
+  return str;
+}
+function childKeysForPattern(child){
+  if(child==='Both') return ['n','a'];
+  if(child==='Nollen') return ['n'];
+  if(child==='Austin') return ['a'];
+  return []; // 'None' or anything else — not assigned to anyone's schedule
+}
+// Computes the day's committed schedule live from activityOptions (whichever
+// entries are flagged preferred: true), rather than reading a separately
+// stored copy — so an edit to activityOptions shows up here immediately
+// with no separate reconcile step.
+function buildDayFromOptions(data, dayName){
+  const opts = (data.activityOptions||{})[dayName] || [];
+  const day = {n:[], a:[], f:[]};
+  opts.forEach(item => {
+    if(!item.preferred) return;
+    const str = formatActivityString(item);
+    childKeysForPattern(item.child).forEach(k => day[k].push(str));
+  });
+  return day;
+}
+
 function renderPersonRow(cls, tag, items){
   if(!items || !items.length) return '';
+  const sorted = sortByTime(items);
   return `<div class="person-row">
     <span class="person-tag ${cls}">${tag}</span>
-    <span class="person-items">${items.join(' &nbsp;·&nbsp; ')}</span>
+    <span class="person-items">${sorted.join(' &nbsp;·&nbsp; ')}</span>
   </div>`;
 }
 
@@ -482,7 +567,7 @@ function renderDayCard(date, data){
   if(override && override.vac){
     bodyHtml = `<div class="vac-banner">${override.vac}</div>`;
   } else {
-    const day = override || (data.weeklyPattern || {})[dn] || {n:[],a:[],f:[]};
+    const day = override || buildDayFromOptions(data, dn);
     const schoolToday = (data.schoolItems || []).filter(it => it.date === dStr && !it.completed);
     const schoolLabels = schoolToday.map(it => `${it.type === 'Event' ? '' : (it.type + ' due: ')}${it.title}${it.child === 'Both' ? '' : ' ('+it.child+')'}`);
     const rows = [
@@ -536,20 +621,23 @@ function renderActionItems(items, week){
   </div>`).join('');
 }
 
-// Polls the raw JSON (cache-busted each try) until `checkFn` confirms the
-// write actually landed, or gives up after ~40s and flags it as unconfirmed.
-async function confirmWrite(el, checkFn, onConfirmed, onGaveUp){
-  for(let i=0;i<20;i++){
-    await new Promise(r=>setTimeout(r,8000));
-    try{
-      const res = await fetch(RAW_JSON_URL + '?t=' + Date.now());
-      if(res.ok){
-        const d = await res.json();
-        if(checkFn(d)){ onConfirmed(); return; }
-      }
-    }catch(e){ /* keep polling */ }
+// Confirms a write landed. Checks the GitHub Contents API first (reflects
+// the commit immediately, no CDN cache lag) for a few quick tries — this is
+// the common case and usually confirms in 1-4s. If that's unavailable
+// (e.g. the unauthenticated API's 60/hr-per-IP limit, shared by every
+// device on the home network, gets hit) it falls back to polling the raw
+// CDN with longer spacing, same as before, as a safety net.
+// The Apps Script web app returns real CORS headers and a synchronous
+// {success, message} JSON body (~1-3s round trip) — no need to fire-and-forget
+// and then poll a CDN-cached copy of schedule.json to find out what happened.
+async function postWrite(url){
+  try{
+    const res = await fetch(url);
+    if(!res.ok) return { success: false, message: 'HTTP ' + res.status };
+    return await res.json();
+  }catch(err){
+    return { success: false, message: err.message };
   }
-  onGaveUp();
 }
 
 // One delegated handler covers both day-card task chips and action items,
@@ -557,25 +645,26 @@ async function confirmWrite(el, checkFn, onConfirmed, onGaveUp){
 document.getElementById('main').addEventListener('click', (e) => {
   const chip = e.target.closest('.task-chip');
   if(chip){
-    if(chip.dataset.pending) return; // already confirming a previous tap
+    if(chip.dataset.pending) return; // already saving a previous tap
     chip.dataset.pending = '1';
     chip.classList.remove('unconfirmed');
     chip.classList.add('pending');
     const date = chip.dataset.taskDate, taskId = chip.dataset.taskId;
-    chip.classList.toggle('done'); // optimistic flip, verified below
+    chip.classList.toggle('done'); // optimistic flip, corrected below if it fails
     const expectDone = chip.classList.contains('done');
-    fetch(`${SCRIPT_URL}?mode=toggleTask&date=${date}&taskId=${taskId}`, { mode: 'no-cors' }).catch(()=>{});
 
-    confirmWrite(
-      chip,
-      (d) => !!((d.taskCompletions||{})[date]||{})[taskId] === expectDone,
-      () => { chip.classList.remove('pending'); delete chip.dataset.pending; },
-      () => {
-        chip.classList.remove('pending');
+    postWrite(`${SCRIPT_URL}?mode=toggleTask&date=${date}&taskId=${taskId}`).then(result => {
+      chip.classList.remove('pending');
+      delete chip.dataset.pending;
+      if(result.success){
+        currentData.taskCompletions = currentData.taskCompletions || {};
+        currentData.taskCompletions[date] = currentData.taskCompletions[date] || {};
+        currentData.taskCompletions[date][taskId] = expectDone;
+      } else {
+        chip.classList.toggle('done'); // revert the optimistic flip
         chip.classList.add('unconfirmed');
-        delete chip.dataset.pending;
       }
-    );
+    });
     return;
   }
 
@@ -585,21 +674,20 @@ document.getElementById('main').addEventListener('click', (e) => {
     row.dataset.pending = '1';
     row.classList.add('pending');
     const i = Number(row.dataset.i), week = row.dataset.week;
-    fetch(`${SCRIPT_URL}?mode=completeAction&week=${week}&index=${i}`, { mode: 'no-cors' }).catch(()=>{});
 
-    confirmWrite(
-      row,
-      (d) => !!(((d.weeklyNotes||{})[week]||[])[i]||{}).completed,
-      () => row.remove(),
-      () => {
+    postWrite(`${SCRIPT_URL}?mode=completeAction&week=${week}&index=${i}`).then(result => {
+      if(result.success){
+        row.remove();
+        if(((currentData.weeklyNotes||{})[week]||[])[i]) currentData.weeklyNotes[week][i].completed = true;
+      } else {
         row.classList.remove('pending');
         row.classList.add('unconfirmed');
         delete row.dataset.pending;
         if(!row.querySelector('.tiny-warn')){
-          row.insertAdjacentHTML('beforeend', '<div class="tiny-warn">Didn\'t confirm — try again?</div>');
+          row.insertAdjacentHTML('beforeend', '<div class="tiny-warn">Save failed — try again?</div>');
         }
       }
-    );
+    });
   }
 });
 
@@ -752,7 +840,10 @@ function optimizeWeek(child, activityOptionsByDay, rules){
   });
 
   const preferred = all.filter(a=>a.preferred);
-  const alts = all.filter(a=>!a.preferred);
+  // Optional items are real, visible options — but never auto-selected as
+  // filler. They only end up "picked" if someone explicitly marks them
+  // preferred via the edit modal.
+  const alts = all.filter(a=>!a.preferred && !a.optional);
   const used = {};
   const typeDaysUsed = {}; // type -> Set of distinct (non-exempt) days already picked for that type
   preferred.forEach(a => {
@@ -833,7 +924,7 @@ function hasAnyConflict(list, i){
 
 const PX_PER_MIN = 1.5;
 let currentData = null;
-let filterState = { people: new Set(['Nollen','Austin']), types: null, optimizedOnly: true };
+let filterState = { people: new Set(['Nollen','Austin']), types: null, showOptimized: true, showOptional: true };
 
 // Assigns overlapping activities to side-by-side lanes within one child's half
 // of a day column (same technique day-view calendars use for conflicting events).
@@ -862,11 +953,20 @@ function personMatches(child){
   return filterState.people.has(child);
 }
 
+// Filter semantics: "Optimized" is the primary lens. When it's ON, only the
+// committed schedule shows — plus optional items too, if "Optional" is also
+// checked (Optional only matters as a sub-filter while Optimized is on).
+// When "Optimized" is OFF, everything shows (picked, optional, and genuine
+// conflicts alike), each colored per its real state, so you can see the
+// whole picture — Optional has no effect in that state since nothing's
+// being hidden to begin with.
 function passesFilters(a){
   if(!personMatches(a.child)) return false;
   if(filterState.types && !filterState.types.has(a.type||'Other')) return false;
-  if(filterState.optimizedOnly && !a._picked) return false;
-  return true;
+  if(!filterState.showOptimized) return true;
+  if(a._picked) return true;
+  if(a.optional) return filterState.showOptional;
+  return false;
 }
 
 function layoutChild(activitiesTagged, rangeStartMin, rangeEndMin, leftPct, widthPct){
@@ -880,7 +980,7 @@ function layoutChild(activitiesTagged, rangeStartMin, rangeEndMin, leftPct, widt
     const height = Math.max(14, (cEnd - cStart) * PX_PER_MIN);
     const laneW = widthPct / laneCount;
     const left = leftPct + act.lane * laneW;
-    const cls = act._picked ? 'tt-picked' : 'tt-conflict';
+    const cls = act._picked ? 'tt-picked' : (act.optional ? 'tt-optional' : 'tt-conflict');
     const childCls = act.child==='Nollen' ? 'tt-n' : act.child==='Austin' ? 'tt-a' : act.child==='Both' ? 'tt-both' : 'tt-none';
     const tip = `${act.child}: ${act.name} · ${formatTime12(act.start)}–${formatTime12(act.end)} @ ${act.location}` + (act.docRef ? ` · 📄 ${act.docRef.summaryShort}` : '');
     return `<div class="tt-activity ${cls} ${childCls}" style="top:${top}px;height:${height}px;left:${left}%;width:${laneW-1}%" title="${tip}" data-day="${act._day}" data-index="${act._origIndex}">
@@ -978,9 +1078,10 @@ function renderFilterBar(data){
   ).join('');
 
   return `<div class="tt-filters">
-    <label class="tt-toggle" style="margin:0 0 .6rem">
-      <input type="checkbox" id="filter-optimized" ${filterState.optimizedOnly?'checked':''}> Optimized schedule only (hide conflicts)
-    </label>
+    <div class="tt-toggle-row" style="margin:0 0 .6rem">
+      <label class="tt-toggle"><input type="checkbox" id="filter-optimized" ${filterState.showOptimized?'checked':''}> Optimized</label>
+      <label class="tt-toggle${filterState.showOptimized?'':' tt-toggle-disabled'}"><input type="checkbox" id="filter-optional" ${filterState.showOptional?'checked':''} ${filterState.showOptimized?'':'disabled'}> Optional</label>
+    </div>
     <div class="tt-filter-group">${peopleChips}</div>
     <div class="tt-filter-group">${typeChips}</div>
   </div>`;
@@ -1000,7 +1101,10 @@ document.getElementById('activities-panel').addEventListener('click', (e) => {
 });
 document.getElementById('activities-panel').addEventListener('change', (e) => {
   if(e.target.id === 'filter-optimized'){
-    filterState.optimizedOnly = e.target.checked;
+    filterState.showOptimized = e.target.checked;
+    if(currentData) renderActivitiesTab(currentData);
+  } else if(e.target.id === 'filter-optional'){
+    filterState.showOptional = e.target.checked;
     if(currentData) renderActivitiesTab(currentData);
   }
 });
@@ -1017,6 +1121,7 @@ function openActivityModal(day, index){
   document.getElementById('modal-type').value = item.type || 'Other';
   document.getElementById('modal-start').value = item.start;
   document.getElementById('modal-end').value = item.end;
+  document.getElementById('modal-optional').checked = !!item.optional;
   const statusEl = document.getElementById('modal-status');
   statusEl.textContent = '';
   statusEl.className = '';
@@ -1042,6 +1147,7 @@ document.getElementById('modal-save').addEventListener('click', async () => {
   const type = document.getElementById('modal-type').value;
   const start = document.getElementById('modal-start').value;
   const end = document.getElementById('modal-end').value;
+  const optional = document.getElementById('modal-optional').checked;
   const statusEl = document.getElementById('modal-status');
 
   if(!name || !child || !start || !end){
@@ -1061,29 +1167,23 @@ document.getElementById('modal-save').addEventListener('click', async () => {
 
   const url = `${SCRIPT_URL}?mode=editActivity&day=${encodeURIComponent(day)}&index=${index}`
     + `&name=${encodeURIComponent(name)}&child=${encodeURIComponent(child)}`
-    + `&type=${encodeURIComponent(type)}&start=${start}&end=${end}`;
-  fetch(url, { mode: 'no-cors' }).catch(()=>{});
+    + `&type=${encodeURIComponent(type)}&start=${start}&end=${end}&optional=${optional}`;
+  const result = await postWrite(url);
 
-  confirmWrite(
-    null,
-    (d) => {
-      const item = (d.activityOptions[day] || [])[index];
-      return !!item && item.name===name && item.child===child && item.type===type && item.start===start && item.end===end;
-    },
-    () => {
-      statusEl.textContent = 'Saved ✓';
-      statusEl.className = 'ok';
-      setTimeout(() => {
-        closeActivityModal();
-        load(); // full refresh so both timetables reflect the change
-      }, 600);
-    },
-    () => {
-      statusEl.textContent = "Saved, but the page is slow to pick it up — it'll appear shortly. Refresh in a minute if it doesn't.";
-      statusEl.className = 'ok';
-      document.getElementById('modal-save').disabled = false;
-    }
-  );
+  if(result.success){
+    currentData.activityOptions[day] = currentData.activityOptions[day] || [];
+    currentData.activityOptions[day][index] = { name, child, type, start, end, optional };
+    statusEl.textContent = 'Saved ✓';
+    statusEl.className = 'ok';
+    setTimeout(() => {
+      closeActivityModal();
+      renderActivitiesTab(currentData); // instant, from local state — no round trip needed
+    }, 300);
+  } else {
+    statusEl.textContent = 'Save failed: ' + (result.message || 'unknown error') + ' — try again.';
+    statusEl.className = 'err';
+    document.getElementById('modal-save').disabled = false;
+  }
 });
 
 function renderActivitiesTab(data){
@@ -1092,7 +1192,8 @@ function renderActivitiesTab(data){
   const legend = `<div class="tt-legend">
     <span class="tt-swatch" style="background:rgba(193,101,47,.5);border:1px solid var(--nollen)"></span>Nollen
     &nbsp;&nbsp;<span class="tt-swatch" style="background:rgba(59,110,143,.5);border:1px solid var(--austin)"></span>Austin
-    &nbsp;&nbsp;<span class="tt-swatch" style="border:1px dashed #B8492F"></span>conflict (loses out to something else at that time)<br>
+    &nbsp;&nbsp;<span class="tt-swatch" style="border:1px dashed #B8492F"></span>conflict (loses out to something else / overlaps a required item)
+    &nbsp;&nbsp;<span class="tt-swatch" style="border:1px dashed var(--ink-soft)"></span>optional (available, never auto-picked)<br>
     Tell Claude about a new class, a dropped one, or a time change — this recalculates next load, no manual re-run needed.
   </div>`;
 
@@ -1146,6 +1247,17 @@ function renderSchoolTab(data, docsData){
       </div>`).join('')
     : `<div class="school-empty">No communications logged yet — tell Claude about one and it'll show up here.</div>`;
 
+  const links = data.schoolLinks || [];
+  const linksHtml = links.length
+    ? links.map(l => `<a class="link-card" href="${l.url}" target="_blank" rel="noopener">
+        <div class="link-card-body">
+          <div class="link-card-title">${l.title}</div>
+          ${l.description ? `<div class="link-card-desc">${l.description}</div>` : ''}
+        </div>
+        <span class="link-card-arrow">↗</span>
+      </a>`).join('')
+    : `<div class="school-empty">No links saved yet.</div>`;
+
   document.getElementById('school-panel').innerHTML = `
     <div class="section-label">🎓 Assignments, Projects &amp; Events</div>
     <button class="school-add-btn" id="school-add-btn">+ Add School Item</button>
@@ -1153,6 +1265,8 @@ function renderSchoolTab(data, docsData){
     <div class="section-label">📨 Communications</div>
     ${commsHtml}
     <a class="comm-log-link" id="comm-view-all-link" href="#">Open full Documents archive →</a>
+    <div class="section-label">🔗 Links</div>
+    ${linksHtml}
   `;
 }
 
@@ -1238,28 +1352,25 @@ document.getElementById('school-modal-save').addEventListener('click', async () 
   if(selectedDoc){
     url += `&docSummary=${encodeURIComponent(selectedDoc.summaryShort)}&docUrl=${encodeURIComponent(selectedDoc.driveUrl)}`;
   }
-  fetch(url, { mode: 'no-cors' }).catch(()=>{});
+  const result = await postWrite(url);
 
-  confirmWrite(
-    null,
-    (d) => {
-      const it = (d.schoolItems||[]).find(x => x.id === id);
-      if(!it || it.title!==title || it.child!==child || it.type!==type || it.date!==date || !!it.completed!==completed) return false;
-      const wantDoc = selectedDoc ? selectedDoc.id : null;
-      const gotDoc = it.docRef ? it.docRef.id : null;
-      return wantDoc === gotDoc;
-    },
-    () => {
-      statusEl.textContent = 'Saved ✓';
-      statusEl.className = 'ok';
-      setTimeout(() => { closeSchoolModal(); load(); }, 600);
-    },
-    () => {
-      statusEl.textContent = "Saved, but the page is slow to pick it up — it'll appear shortly. Refresh in a minute if it doesn't. (No need to press Save again — it already went through.)";
-      statusEl.className = 'ok';
-      setTimeout(() => { closeSchoolModal(); load(); }, 3000);
-    }
-  );
+  if(result.success){
+    const newItem = { id, title, child, type, date, notes, completed };
+    if(selectedDoc) newItem.docRef = { id: selectedDoc.id, summaryShort: selectedDoc.summaryShort, driveUrl: selectedDoc.driveUrl };
+    currentData.schoolItems = currentData.schoolItems || [];
+    const idx = currentData.schoolItems.findIndex(x => x.id === id);
+    if(idx >= 0) currentData.schoolItems[idx] = newItem; else currentData.schoolItems.push(newItem);
+    statusEl.textContent = 'Saved ✓';
+    statusEl.className = 'ok';
+    setTimeout(() => {
+      closeSchoolModal();
+      render(currentData, latestDocsData); // instant, from local state
+    }, 300);
+  } else {
+    statusEl.textContent = 'Save failed: ' + (result.message || 'unknown error') + ' — try again.';
+    statusEl.className = 'err';
+    document.getElementById('school-modal-save').disabled = false;
+  }
 });
 
 document.getElementById('school-modal-delete').addEventListener('click', async () => {
@@ -1270,23 +1381,21 @@ document.getElementById('school-modal-delete').addEventListener('click', async (
   statusEl.textContent = 'Deleting…';
   statusEl.className = '';
 
-  const url = `${SCRIPT_URL}?mode=deleteSchoolItem&id=${encodeURIComponent(id)}`;
-  fetch(url, { mode: 'no-cors' }).catch(()=>{});
+  const result = await postWrite(`${SCRIPT_URL}?mode=deleteSchoolItem&id=${encodeURIComponent(id)}`);
 
-  confirmWrite(
-    null,
-    (d) => !(d.schoolItems||[]).some(x => x.id === id),
-    () => {
-      statusEl.textContent = 'Deleted ✓';
-      statusEl.className = 'ok';
-      setTimeout(() => { closeSchoolModal(); load(); }, 600);
-    },
-    () => {
-      statusEl.textContent = "Deleted, but the page is slow to pick it up — it'll clear shortly. Refresh in a minute if it doesn't. (No need to press Delete again.)";
-      statusEl.className = 'ok';
-      setTimeout(() => { closeSchoolModal(); load(); }, 3000);
-    }
-  );
+  if(result.success){
+    currentData.schoolItems = (currentData.schoolItems || []).filter(x => x.id !== id);
+    statusEl.textContent = 'Deleted ✓';
+    statusEl.className = 'ok';
+    setTimeout(() => {
+      closeSchoolModal();
+      render(currentData, latestDocsData); // instant, from local state
+    }, 300);
+  } else {
+    statusEl.textContent = 'Delete failed: ' + (result.message || 'unknown error') + ' — try again.';
+    statusEl.className = 'err';
+    document.getElementById('school-modal-save').disabled = false;
+  }
 });
 
 // ── Documents tab: full archive from documents.json ────────────────────
