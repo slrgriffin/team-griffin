@@ -149,6 +149,20 @@
         "project",
         "rsvp"
       ]
+    },
+    {
+      "id": "doc-20260925-forgotten-island-trip",
+      "title": "Forgotten Island Field Trip Permission Slip",
+      "uploadedDate": "2026-09-15",
+      "driveUrl": "https://docs.google.com/document/d/14AEwhYRxz6zWeVn5BKb6noYmw_S6uPTC0R4UjxzUoV4/edit",
+      "summaryLong": "Nollen's class is taking a field trip to AMC Theaters Eastridge on Friday, September 25 to see the movie \"Forgotten Island,\" leaving Carolyn Clark Elementary at 9:15 AM via bus and returning after a 10:00 AM showing. Cost is $20 (covers ticket and bus), due with the signed slip by Friday, September 18. Justin completed the permission slip: permission granted, $20 paid by check, and declined the chaperone option.",
+      "summaryShort": "Permission slip for Nollen's Sept 25 \"Forgotten Island\" field trip \u2014 $20 due Sept 18, form completed and paid.",
+      "child": "Nollen",
+      "tags": [
+        "field-trip",
+        "permission-slip",
+        "payment"
+      ]
     }
   ]
 }
