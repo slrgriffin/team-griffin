@@ -886,12 +886,12 @@
       },
       {
         "child": "Austin",
-        "name": "Advanced Shooting and Passing",
+        "name": "10U Travel Practice",
         "start": "17:00",
         "end": "18:00",
         "location": "Plex",
         "type": "Hockey",
-        "preferred": false
+        "preferred": true
       }
     ],
     "Wednesday": [
@@ -1196,6 +1196,10 @@
         {
           "day": "Monday",
           "name": "TKD Advanced"
+        },
+        {
+          "day": "Tuesday",
+          "name": "Parcor"
         }
       ]
     },
