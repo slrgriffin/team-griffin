@@ -789,7 +789,7 @@
         "end": "19:10",
         "location": "Santa Teresa",
         "type": "TKD",
-        "preferred": false
+        "preferred": true
       },
       {
         "child": "Nollen",
@@ -844,7 +844,7 @@
         "end": "19:00",
         "location": "SJ",
         "type": "Parcor",
-        "preferred": true
+        "preferred": false
       },
       {
         "child": "Nollen",
@@ -918,7 +918,7 @@
         "start": "17:30",
         "end": "19:00",
         "location": "SJ",
-        "preferred": false,
+        "preferred": true,
         "type": "Parcor"
       },
       {
@@ -928,7 +928,7 @@
         "end": "19:10",
         "location": "Santa Teresa",
         "type": "TKD",
-        "preferred": true
+        "preferred": false
       },
       {
         "child": "Nollen",
@@ -993,7 +993,7 @@
         "end": "20:20",
         "location": "Santa Teresa",
         "type": "TKD",
-        "preferred": true
+        "preferred": false
       },
       {
         "child": "Nollen",
@@ -1192,16 +1192,7 @@
       }
     ],
     "excludedOnDay": {
-      "Austin": [
-        {
-          "day": "Monday",
-          "name": "TKD Advanced"
-        },
-        {
-          "day": "Tuesday",
-          "name": "Parcor"
-        }
-      ]
+      "Austin": []
     },
     "onlyTypeOnDay": {
       "Nollen": [
