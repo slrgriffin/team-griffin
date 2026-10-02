@@ -1067,15 +1067,6 @@
       },
       {
         "child": "Austin",
-        "name": "Advanced Travel Clinic (10u & under)",
-        "start": "16:00",
-        "end": "17:00",
-        "location": "Plex",
-        "type": "Hockey",
-        "preferred": false
-      },
-      {
-        "child": "Austin",
         "name": "Youth Beginner Clinic",
         "start": "17:00",
         "end": "18:00",
