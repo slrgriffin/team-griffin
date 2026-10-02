@@ -436,8 +436,7 @@
         "Baseball Practice · 5:00pm–7:00pm @ Leyva Field A (Evergreen Little League)"
       ],
       "a": [
-        "TKD Advanced · 4:00–4:50 pm @ Santa Teresa",
-        "TKD XMA · 6:45–7:35 pm @ Santa Teresa"
+        "🏒 Give Blood. Play Hockey. begins @ Irvine"
       ],
       "f": []
     },
@@ -448,7 +447,7 @@
         "Baseball vs SJNLL MAJORS TEAM #2 (home) · 9:00am–11:00am @ Leyva Field A (Evergreen Little League)"
       ],
       "a": [
-        "Game · 10:00 am–12:30 pm @ Plex (times may vary)"
+        "Give Blood. Play Hockey. @ Irvine"
       ],
       "f": []
     },
@@ -562,6 +561,110 @@
       "a": [
         "Basic Shooting and Passing · 5:15–6:15 pm @ Plex",
         "10U Travel Clinic · 4:00–5:00 pm @ Silver Creek"
+      ],
+      "f": []
+    },
+    "2026-10-25": {
+      "n": [],
+      "a": [
+        "Last day of Give Blood. Play Hockey. @ Irvine"
+      ],
+      "f": []
+    },
+    "2026-11-27": {
+      "n": [
+        "TKD Black Belt · 6:05–6:40 pm @ Santa Teresa"
+      ],
+      "a": [
+        "🏒 NARCh Thanksgiving begins @ San Jose"
+      ],
+      "f": []
+    },
+    "2026-11-28": {
+      "n": [
+        "TKD Sparring · 11:05–11:40 am @ Santa Teresa",
+        "TKD Black Belt · 11:40 am–12:30 pm @ Santa Teresa"
+      ],
+      "a": [
+        "NARCh Thanksgiving @ San Jose"
+      ],
+      "f": []
+    },
+    "2026-11-29": {
+      "n": [],
+      "a": [
+        "Last day of NARCh Thanksgiving @ San Jose"
+      ],
+      "f": []
+    },
+    "2027-01-14": {
+      "n": [
+        "Parcor · 5:30–7:00 pm @ SJ",
+        "Afterschool Program · 2:35–5:30 pm @ School"
+      ],
+      "a": [
+        "🏒 NARCh Winternationals begins @ Irvine"
+      ],
+      "f": []
+    },
+    "2027-01-15": {
+      "n": [
+        "TKD Black Belt · 6:05–6:40 pm @ Santa Teresa"
+      ],
+      "a": [
+        "NARCh Winternationals @ Irvine"
+      ],
+      "f": []
+    },
+    "2027-01-16": {
+      "n": [
+        "TKD Sparring · 11:05–11:40 am @ Santa Teresa",
+        "TKD Black Belt · 11:40 am–12:30 pm @ Santa Teresa"
+      ],
+      "a": [
+        "NARCh Winternationals @ Irvine"
+      ],
+      "f": []
+    },
+    "2027-01-17": {
+      "n": [],
+      "a": [
+        "NARCh Winternationals @ Irvine"
+      ],
+      "f": []
+    },
+    "2027-01-18": {
+      "n": [
+        "TKD Black Belt · 4:50–5:40 pm @ Santa Teresa"
+      ],
+      "a": [
+        "Last day of NARCh Winternationals @ Irvine"
+      ],
+      "f": []
+    },
+    "2027-02-19": {
+      "n": [
+        "TKD Black Belt · 6:05–6:40 pm @ Santa Teresa"
+      ],
+      "a": [
+        "🏒 State Wars Winter Wars West begins @ Corona"
+      ],
+      "f": []
+    },
+    "2027-02-20": {
+      "n": [
+        "TKD Sparring · 11:05–11:40 am @ Santa Teresa",
+        "TKD Black Belt · 11:40 am–12:30 pm @ Santa Teresa"
+      ],
+      "a": [
+        "State Wars Winter Wars West @ Corona"
+      ],
+      "f": []
+    },
+    "2027-02-21": {
+      "n": [],
+      "a": [
+        "Last day of State Wars Winter Wars West @ Corona"
       ],
       "f": []
     }
