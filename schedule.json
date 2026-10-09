@@ -1379,6 +1379,62 @@
         "summaryShort": "Permission slip for Nollen's Sept 25 \"Forgotten Island\" field trip — $20 due Sept 18, form completed and paid.",
         "driveUrl": "https://docs.google.com/document/d/14AEwhYRxz6zWeVn5BKb6noYmw_S6uPTC0R4UjxzUoV4/edit"
       }
+    },
+    {
+      "id": "sch-20261008veggie",
+      "title": "Veggielution field trip",
+      "child": "Nollen",
+      "type": "Event",
+      "date": "2026-11-04",
+      "notes": "10:00 AM–1:30 PM. Parent sign-up on ParentSquare (6 spots).",
+      "completed": false,
+      "docRef": {
+        "id": "doc-20261008-veggielution",
+        "summaryShort": "Veggielution field trip Wed Nov 4, 10:00 AM–1:30 PM. Parent sign-up open on ParentSquare (6 spots).",
+        "driveUrl": "https://docs.google.com/document/d/17Q4nLdfvZtl-Qt8kFdLeodtI_mRMPZdwvlgNFZB6ijI/edit"
+      }
+    },
+    {
+      "id": "sch-20261008goodwill",
+      "title": "Goodwill Drive at school",
+      "child": "Both",
+      "type": "Event",
+      "date": "2026-10-10",
+      "notes": "8 AM–1 PM, school parking lot. Date TBC (post says Sat Oct 11; Oct 11 is Sun).",
+      "completed": false,
+      "docRef": {
+        "id": "doc-20261008-goodwill",
+        "summaryShort": "Goodwill donation drive this Saturday 8 AM–1 PM in the school parking lot. Post's date is inconsistent (Sat vs Oct 11, a Sunday) — logged as Sat Oct 10.",
+        "driveUrl": "https://docs.google.com/document/d/17WydbIG1UPat2HVFmiPRYpVMin35DMKu6hDbnCGwavw/edit"
+      }
+    },
+    {
+      "id": "sch-20261008talent",
+      "title": "Upper Grade Talent Show",
+      "child": "Both",
+      "type": "Event",
+      "date": "2026-10-09",
+      "notes": "6:00 PM, doors 5:45, Forum. Free.",
+      "completed": false,
+      "docRef": {
+        "id": "doc-20261008-talentshow",
+        "summaryShort": "Upper Grade Talent Show Fri Oct 9, 6:00 PM (doors 5:45) in the Forum. Free admission.",
+        "driveUrl": "https://docs.google.com/document/d/17saPsHHQkk-rCd9d5ZQqaRlT6AElvK8thO6pHv26Gyc/edit"
+      }
+    },
+    {
+      "id": "sch-20261008mixer",
+      "title": "All-Star Mixer — wear yellow",
+      "child": "Nollen",
+      "type": "Event",
+      "date": "2026-10-22",
+      "notes": "9:00–9:45 AM cafeteria. Bring item assigned to last name.",
+      "completed": false,
+      "docRef": {
+        "id": "doc-20261008-allstarmixer",
+        "summaryShort": "All-Star Mixer Thu Oct 22, 9:00–9:45 AM in the cafeteria — wear yellow. Bring the item assigned to last name G (check ParentSquare post for the list).",
+        "driveUrl": "https://docs.google.com/document/d/1kpCh1tV-hCaAJPXtAk5FPGZgqzfh-qJ6hU4Z-ZO0AXQ/edit"
+      }
     }
   ],
   "communicationsLog": {
