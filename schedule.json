@@ -1435,6 +1435,20 @@
         "summaryShort": "All-Star Mixer Thu Oct 22, 9:00–9:45 AM in the cafeteria — wear yellow. Bring the item assigned to last name G (check ParentSquare post for the list).",
         "driveUrl": "https://docs.google.com/document/d/1kpCh1tV-hCaAJPXtAk5FPGZgqzfh-qJ6hU4Z-ZO0AXQ/edit"
       }
+    },
+    {
+      "id": "sch-20261012eftask",
+      "title": "Task Initiation home connection (EF unit)",
+      "child": "Austin",
+      "type": "Assignment",
+      "date": "2026-10-31",
+      "notes": "Talk with Austin about getting started on tasks right away; practice starting homework/chores without reminders.",
+      "completed": false,
+      "docRef": {
+        "id": "doc-20261012-ef-task-initiation",
+        "summaryShort": "Austin's class is working on Task Initiation (getting started on work without waiting). Help at home by asking what he started right away today and what helps when starting feels hard. Nothing to return.",
+        "driveUrl": "https://docs.google.com/document/d/19fBmgyVPGk37o5q1JP-6bijeXvdSZOhy7Mpb40HS6jc/edit"
+      }
     }
   ],
   "communicationsLog": {
