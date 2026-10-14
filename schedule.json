@@ -426,7 +426,7 @@
         "Baseball Practice · 5:00pm–7:00pm @ Leyva Field B (Evergreen Little League)"
       ],
       "a": [
-        "Parcor · 5:30–7:00 pm @ SJ",
+        "10U Travel Practice · 5:15–6:15 pm @ Plex",
         "Conditioning Clinic · 4:15–5:15 pm @ Plex"
       ],
       "f": []
@@ -456,7 +456,7 @@
         "Baseball Practice · 5:00pm–7:00pm @ Leyva Field B (Evergreen Little League)"
       ],
       "a": [
-        "Parcor · 5:30–7:00 pm @ SJ",
+        "10U Travel Practice · 5:15–6:15 pm @ Plex",
         "Conditioning Clinic · 4:15–5:15 pm @ Plex"
       ],
       "f": []
@@ -487,7 +487,7 @@
         "Baseball Practice · 5:00pm–7:00pm @ Leyva Field B (Evergreen Little League)"
       ],
       "a": [
-        "Parcor · 5:30–7:00 pm @ SJ",
+        "10U Travel Practice · 5:15–6:15 pm @ Plex",
         "Conditioning Clinic · 4:15–5:15 pm @ Plex"
       ],
       "f": []
@@ -518,7 +518,7 @@
         "Baseball Practice · 5:00pm–7:00pm @ Leyva Field B (Evergreen Little League)"
       ],
       "a": [
-        "Parcor · 5:30–7:00 pm @ SJ",
+        "10U Travel Practice · 5:15–6:15 pm @ Plex",
         "Conditioning Clinic · 4:15–5:15 pm @ Plex"
       ],
       "f": []
@@ -950,7 +950,7 @@
         "end": "19:00",
         "location": "SJ",
         "type": "Parcor",
-        "preferred": false
+        "preferred": true
       },
       {
         "child": "Nollen",
@@ -968,8 +968,7 @@
         "end": "20:20",
         "location": "Santa Teresa",
         "type": "TKD",
-        "preferred": false,
-        "optional": true
+        "preferred": true
       },
       {
         "child": "Nollen",
@@ -989,15 +988,6 @@
         "type": "Hockey",
         "preferred": false,
         "optional": true
-      },
-      {
-        "child": "Austin",
-        "name": "10U Travel Practice",
-        "start": "17:00",
-        "end": "18:00",
-        "location": "Plex",
-        "type": "Hockey",
-        "preferred": true
       }
     ],
     "Wednesday": [
@@ -1024,7 +1014,7 @@
         "start": "17:30",
         "end": "19:00",
         "location": "SJ",
-        "preferred": true,
+        "preferred": false,
         "type": "Parcor"
       },
       {
@@ -1050,6 +1040,15 @@
         "name": "Conditioning Clinic",
         "start": "16:15",
         "end": "17:15",
+        "location": "Plex",
+        "type": "Hockey",
+        "preferred": true
+      },
+      {
+        "child": "Austin",
+        "name": "10U Travel Practice",
+        "start": "17:15",
+        "end": "18:15",
         "location": "Plex",
         "type": "Hockey",
         "preferred": true
@@ -1307,7 +1306,7 @@
         "TKD": 2
       },
       "Austin": {
-        "TKD": 2
+        "TKD": 3
       }
     }
   },
