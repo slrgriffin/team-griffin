@@ -931,8 +931,7 @@
         "end": "16:55",
         "location": "Santa Teresa",
         "type": "TKD",
-        "preferred": false,
-        "optional": true
+        "preferred": true
       },
       {
         "child": "Nollen",
@@ -968,7 +967,8 @@
         "end": "20:20",
         "location": "Santa Teresa",
         "type": "TKD",
-        "preferred": true
+        "preferred": false,
+        "optional": true
       },
       {
         "child": "Nollen",
@@ -1061,9 +1061,8 @@
         "start": "16:05",
         "end": "16:55",
         "location": "Santa Teresa",
-        "preferred": false,
-        "type": "TKD",
-        "optional": true
+        "preferred": true,
+        "type": "TKD"
       },
       {
         "child": "Nollen",
@@ -1098,7 +1097,8 @@
         "end": "20:20",
         "location": "Santa Teresa",
         "type": "TKD",
-        "preferred": true
+        "preferred": false,
+        "optional": true
       },
       {
         "child": "Nollen",
