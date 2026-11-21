@@ -1049,6 +1049,11 @@ function planRoute(data, stops){
       if(st.kind==='pick'){
         const dk = stops.findIndex(x=>x.kind==='drop' && x.block===st.block);
         if(dk >= 0 && !done[dk]) continue;
+      } else {
+        // A child can't be dropped at the next place until they've been
+        // picked up from every earlier activity that day.
+        const pending = stops.some((x,j)=>!done[j] && x.kind==='pick' && x.block.child===st.block.child && x.block.start < st.block.start);
+        if(pending) continue;
       }
       const d = site==null ? {min:0, known:true} : driveMin(data, site, st.site);
       const arrive = site==null ? st.open : t + d.min;
