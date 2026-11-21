@@ -931,7 +931,7 @@
         "name": "Jiu-Jitsu",
         "start": "17:30",
         "end": "18:15",
-        "location": "543 Capitol Expy, San Jose",
+        "location": "Capitol Expy",
         "type": "Jiu-Jitsu",
         "preferred": true
       }
@@ -1010,7 +1010,7 @@
         "name": "Jiu-Jitsu",
         "start": "17:30",
         "end": "18:15",
-        "location": "543 Capitol Expy, San Jose",
+        "location": "Capitol Expy",
         "type": "Jiu-Jitsu",
         "preferred": true
       },
@@ -1096,7 +1096,7 @@
         "name": "Jiu-Jitsu",
         "start": "17:30",
         "end": "18:15",
-        "location": "543 Capitol Expy, San Jose",
+        "location": "Capitol Expy",
         "type": "Jiu-Jitsu",
         "preferred": true
       }
@@ -1173,7 +1173,7 @@
         "name": "Jiu-Jitsu",
         "start": "17:30",
         "end": "18:15",
-        "location": "543 Capitol Expy, San Jose",
+        "location": "Capitol Expy",
         "type": "Jiu-Jitsu",
         "preferred": true
       }
@@ -1251,7 +1251,7 @@
         "name": "Jiu-Jitsu",
         "start": "17:30",
         "end": "18:15",
-        "location": "543 Capitol Expy, San Jose",
+        "location": "Capitol Expy",
         "type": "Jiu-Jitsu",
         "preferred": false,
         "optional": true
@@ -1544,5 +1544,48 @@
       "url": "https://cclark.eesd.org/donate",
       "description": "Official school donation form — field trips, science camp, a specific classroom/teacher, or the general school fund."
     }
-  ]
+  ],
+  "locations": {
+    "Plex": {
+      "site": "Silver Creek Sportsplex",
+      "address": "800 Embedded Way, San Jose, CA 95138"
+    },
+    "Silver Creek – Rink 2": {
+      "site": "Silver Creek Sportsplex",
+      "address": "800 Embedded Way, San Jose, CA 95138"
+    },
+    "SJ": {
+      "site": "Parkour",
+      "address": "2147 S Tenth St, San Jose, CA 95112"
+    },
+    "Capitol Expy": {
+      "site": "BJJ",
+      "address": "543 Capitol Expy, San Jose, CA 95136"
+    },
+    "School": {
+      "site": "Carolyn Clark Elementary",
+      "address": "3701 Rue Mirassou, San Jose, CA 95148",
+      "alreadyThere": true
+    }
+  },
+  "travelMinutes": {
+    "Silver Creek Sportsplex|Parkour": 18,
+    "Silver Creek Sportsplex|BJJ": 15,
+    "Parkour|BJJ": 13,
+    "Carolyn Clark Elementary|Silver Creek Sportsplex": 15,
+    "Carolyn Clark Elementary|Parkour": 22,
+    "Carolyn Clark Elementary|BJJ": 20
+  },
+  "logisticsRules": {
+    "dropEarliestMin": 15,
+    "dropLatestMin": 10,
+    "pickupGraceMin": 10,
+    "dressingMin": {
+      "Austin": {
+        "Hockey": 10
+      }
+    },
+    "tightSlackMin": 5,
+    "mergeSameSiteGapMin": 45
+  }
 }

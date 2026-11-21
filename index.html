@@ -370,6 +370,23 @@
   .modal-field .opt-checkbox input{width:auto;margin:0;accent-color:var(--pine);}
   .tt-act-name{font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .tt-act-time{color:var(--ink-soft);white-space:nowrap;overflow:hidden;font-size:.56rem;}
+  /* Drive plan */
+  .dp-card{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--good);border-radius:10px;padding:.6rem .8rem;margin:.5rem 0;}
+  .dp-card.dp-status-tight{border-left-color:#C9962F;}
+  .dp-card.dp-status-two{border-left-color:#C9962F;background:#FBF3E4;}
+  .dp-card.dp-status-bad{border-left-color:var(--overdue);background:#FBEDE8;}
+  .dp-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:.35rem;}
+  .dp-badge{font-size:.75rem;font-weight:600;color:var(--ink-soft);}
+  .dp-step{display:flex;align-items:center;gap:.45rem;font-size:.84rem;padding:.15rem 0;flex-wrap:wrap;}
+  .dp-time{font-variant-numeric:tabular-nums;font-weight:600;min-width:4.6rem;}
+  .dp-drive{font-size:.74rem;color:var(--ink-soft);padding-left:5.05rem;}
+  .dp-driver{font-size:.78rem;font-weight:600;margin:.4rem 0 .1rem;color:var(--pine);}
+  .dp-issue{font-size:.8rem;border-radius:6px;padding:.3rem .5rem;margin:.25rem 0 .4rem;line-height:1.4;}
+  .dp-warn{background:rgba(201,150,47,.15);}
+  .dp-bad{background:rgba(184,73,47,.15);color:var(--overdue);}
+  .dp-tight{color:var(--overdue);font-size:.76rem;font-weight:600;}
+  .dp-note{color:var(--ink-soft);font-size:.74rem;}
+  .dp-locs{font-size:.76rem;color:var(--ink-soft);margin-top:.6rem;line-height:1.6;}
 </style>
 </head>
 <body>
@@ -912,6 +929,174 @@ function optimizeWeek(child, activityOptionsByDay, rules){
   return new Set(picks.map(p => p.day + '|' + p.origIndex));
 }
 
+// ── Drive plan: travel-time feasibility for days with 2+ events ──────
+// Uses data.locations (name → {site,address}), data.travelMinutes
+// ("SiteA|SiteB" → minutes, either order) and data.logisticsRules.
+// Each picked activity becomes a "block" (back-to-back sessions at the same
+// site merge into one). A block has a drop window and a pickup window; the
+// route search then checks whether ONE driver can hit every window in some
+// order. If not, it checks each child alone (= two drivers).
+const UNKNOWN_DRIVE_MIN = 20;
+function logiRules(data){
+  return Object.assign({dropEarliestMin:15, dropLatestMin:10, pickupGraceMin:10,
+    dressingMin:{}, tightSlackMin:5, mergeSameSiteGapMin:45}, data.logisticsRules||{});
+}
+function siteOf(data, loc){
+  const L = (data.locations||{})[loc];
+  return (L && L.site) || loc || 'Unknown';
+}
+function driveMin(data, a, b){
+  if(a === b) return {min:0, known:true};
+  const t = data.travelMinutes || {};
+  const v = t[a+'|'+b] != null ? t[a+'|'+b] : t[b+'|'+a];
+  return v == null ? {min:UNKNOWN_DRIVE_MIN, known:false} : {min:v, known:true};
+}
+function buildBlocks(data, child, day, picks){
+  const R = logiRules(data);
+  const acts = (data.activityOptions[day]||[])
+    .map((a,i)=>({...a, _i:i}))
+    .filter(a => (a.child===child || a.child==='Both') && picks.has(day+'|'+a._i))
+    .sort((a,b)=>timeToMinutes(a.start)-timeToMinutes(b.start));
+  const blocks = [];
+  acts.forEach(a => {
+    const site = siteOf(data, a.location);
+    const s = timeToMinutes(a.start), e = timeToMinutes(a.end);
+    const pad = ((R.dressingMin[child]||{})[a.type]) || 0;
+    const last = blocks[blocks.length-1];
+    if(last && last.site===site && s - last.end <= R.mergeSameSiteGapMin){
+      last.end = Math.max(last.end, e); last.names.push(a.name);
+      last.padAfter = pad; return;
+    }
+    const L = (data.locations||{})[a.location] || {};
+    blocks.push({child, site, loc:a.location, start:s, end:e, names:[a.name], padBefore:pad, padAfter:pad, alreadyThere:!!L.alreadyThere});
+  });
+  blocks.forEach((b,k) => {
+    b.id = child+k;
+    b.drop = {open: b.start - b.padBefore - R.dropEarliestMin, close: b.start - b.padBefore - R.dropLatestMin};
+    b.pick = {open: b.end + b.padAfter, close: b.end + b.padAfter + R.pickupGraceMin};
+  });
+  return blocks;
+}
+function stopsFor(blocks){
+  const out = [];
+  blocks.forEach(b => {
+    // At school after class: the child is already there, so no drop-off stop.
+    if(!b.alreadyThere) out.push({kind:'drop', block:b, site:b.site, open:b.drop.open, close:b.drop.close});
+    out.push({kind:'pick', block:b, site:b.site, open:b.pick.open, close:b.pick.close});
+  });
+  return out;
+}
+// Exhaustive search (days have ≤ ~10 stops). Returns the plan that finishes
+// earliest (ties → least total driving), or null if no order works.
+function planRoute(data, stops){
+  if(!stops.length) return {steps:[], minSlack:Infinity, unknownLeg:false};
+  if(stops.length > 12) return null;
+  let best = null;
+  const done = new Array(stops.length).fill(false);
+  const steps = [];
+  function rec(t, site, driven, minSlack, unknownLeg){
+    if(steps.length === stops.length){
+      if(!best || t < best.end || (t === best.end && driven < best.driven))
+        best = {end:t, driven, minSlack, unknownLeg, steps: steps.map(s=>({...s}))};
+      return;
+    }
+    for(let k=0;k<stops.length;k++){
+      if(done[k]) continue;
+      const st = stops[k];
+      if(st.kind==='pick'){
+        const dk = stops.findIndex(x=>x.kind==='drop' && x.block===st.block);
+        if(dk >= 0 && !done[dk]) continue;
+      }
+      const d = site==null ? {min:0, known:true} : driveMin(data, site, st.site);
+      const arrive = site==null ? st.open : t + d.min;
+      if(arrive > st.close) continue;
+      const at = Math.max(arrive, st.open);
+      done[k] = true;
+      steps.push({stop:st, drive:site==null?0:d.min, driveKnown:d.known, arrive, at, wait:at-arrive, slack:st.close-arrive});
+      rec(at, st.site, driven + (site==null?0:d.min), Math.min(minSlack, st.close-arrive), unknownLeg || !d.known);
+      steps.pop(); done[k] = false;
+    }
+  }
+  rec(0, null, 0, Infinity, false);
+  return best;
+}
+function fmtMin(m){ const h=Math.floor(m/60), mm=m%60; return formatTime12(String(h).padStart(2,'0')+':'+String(mm).padStart(2,'0')); }
+
+function analyzeDay(data, day, picksByChild){
+  const R = logiRules(data);
+  const blocksByChild = {};
+  Object.keys(picksByChild).forEach(c => { blocksByChild[c] = buildBlocks(data, c, day, picksByChild[c]); });
+  const all = [].concat(...Object.values(blocksByChild));
+  if(all.length < 2) return null;
+  const issues = [];
+  const perChild = {};
+  Object.entries(blocksByChild).forEach(([c, bl]) => {
+    if(!bl.length) return;
+    perChild[c] = planRoute(data, stopsFor(bl));
+    if(!perChild[c]){
+      for(let k=0;k+1<bl.length;k++){
+        const a=bl[k], b=bl[k+1], d=driveMin(data,a.site,b.site).min;
+        if(a.pick.open + d > b.drop.close)
+          issues.push({level:'bad', text:`${c} can't make ${a.names.join(' + ')} → ${b.names.join(' + ')}: earliest pickup ${fmtMin(a.pick.open)} + ${d} min drive = ${fmtMin(a.pick.open+d)}, but drop-off must be by ${fmtMin(b.drop.close)}.`});
+      }
+    }
+  });
+  const combined = Object.keys(perChild).length > 1 ? planRoute(data, stopsFor(all)) : perChild[Object.keys(perChild)[0]];
+  let status;
+  if(issues.length) status = 'bad';
+  else if(combined) status = (combined.minSlack < R.tightSlackMin) ? 'tight' : 'ok';
+  else {
+    status = 'two';
+    // Explain: find the cross-child block pairs that can't share one driver
+    const kids = Object.keys(blocksByChild);
+    for(const a of blocksByChild[kids[0]]||[]) for(const b of blocksByChild[kids[1]]||[]){
+      if(planRoute(data, stopsFor([a,b]))) continue;
+      const d = driveMin(data, a.site, b.site).min;
+      issues.push({level:'warn', text:`${a.child} ${a.names.join(' + ')} (drop ${fmtMin(a.drop.open)}–${fmtMin(a.drop.close)}, pick ${fmtMin(a.pick.open)}–${fmtMin(a.pick.close)}) and ${b.child} ${b.names.join(' + ')} (drop ${fmtMin(b.drop.open)}–${fmtMin(b.drop.close)}, pick ${fmtMin(b.pick.open)}–${fmtMin(b.pick.close)}) are ${d} min apart — one driver can't cover both.`});
+    }
+  }
+  const unknown = (combined && combined.unknownLeg) || Object.values(perChild).some(p=>p && p.unknownLeg);
+  if(unknown) issues.push({level:'warn', text:`Some drive times aren't in the table yet — assumed ${UNKNOWN_DRIVE_MIN} min.`});
+  return {day, status, combined, perChild, issues};
+}
+
+function renderSteps(steps, R){
+  return steps.map(s => {
+    const b = s.stop.block;
+    const gap = s.wait >= 30 ? `free ${s.wait} min` : (s.wait ? `wait ${s.wait} min` : '');
+    const drive = s.drive ? `<div class="dp-drive">🚗 ${s.drive} min${s.driveKnown?'':' (est.)'}${gap?' · '+gap:''}</div>` : (gap?`<div class="dp-drive">${gap}</div>`:'');
+    const tight = s.slack < R.tightSlackMin ? ` <span class="dp-tight">⚠️ ${s.slack} min to spare</span>` : '';
+    const verb = s.stop.kind==='drop' ? 'Drop off' : 'Pick up';
+    const pad = s.stop.kind==='drop' ? b.padBefore : b.padAfter;
+    const dress = pad ? ` <span class="dp-note">(incl. ${pad} min dressing)</span>` : '';
+    return `${drive}<div class="dp-step"><span class="dp-time">${fmtMin(s.at)}</span><span class="person-tag ${b.child==='Nollen'?'tag-n':'tag-a'}">${b.child}</span>${verb} · ${b.names.join(' + ')} @ ${b.loc||'?'}${dress}${tight}</div>`;
+  }).join('');
+}
+
+function renderDrivePlan(data){
+  const opts = data.activityOptions || {};
+  const rules = data.optimizerRules || {};
+  const R = logiRules(data);
+  const picksByChild = { Nollen: optimizeWeek('Nollen', opts, rules), Austin: optimizeWeek('Austin', opts, rules) };
+  const label = {ok:'✅ One driver', tight:'⚠️ One driver — tight', two:'🚗🚗 Needs 2 drivers', bad:'❌ Can\'t make it'};
+  const cards = WEEK_DAYS.map(day => {
+    const a = analyzeDay(data, day, picksByChild);
+    if(!a) return '';
+    let body;
+    if(a.combined && a.status!=='bad') body = renderSteps(a.combined.steps, R);
+    else body = Object.entries(a.perChild).map(([c,p], k) =>
+      `<div class="dp-driver">Driver ${k+1} — ${c}</div>` + (p ? renderSteps(p.steps, R) : '<div class="dp-step">No workable order.</div>')).join('');
+    const issues = a.issues.map(i=>`<div class="dp-issue dp-${i.level}">${i.text}</div>`).join('');
+    return `<div class="dp-card dp-status-${a.status}"><div class="dp-head"><b>${day}</b><span class="dp-badge">${label[a.status]}</span></div>${issues}${body}</div>`;
+  }).join('');
+  const locs = Object.entries(data.locations||{}).filter(([n,l],i,arr)=>arr.findIndex(x=>x[1].site===l.site)===i)
+    .map(([n,l])=>`<div><b>${l.site}</b> (${n}) — ${l.address||''}</div>`).join('');
+  return `<div class="section-label">🚗 Drive Plan · days with 2+ stops</div>
+    <div class="tt-legend">Drop-off ${R.dropEarliestMin}–${R.dropLatestMin} min before start · pickup within ${R.pickupGraceMin} min of end · Austin hockey adds 10 min dressing each side. Drive times are estimates — tell Claude to correct any.</div>
+    ${cards || '<div class="free-day">No days with multiple stops.</div>'}
+    <div class="dp-locs">${locs}</div>`;
+}
+
 function hasAnyConflict(list, i){
   const a = list[i];
   const aS = timeToMinutes(a.start), aE = timeToMinutes(a.end);
@@ -1201,7 +1386,7 @@ function renderActivitiesTab(data){
   const weekend = buildTimetable('📅 Weekend · 8:00 am–2:00 pm', ['Saturday','Sunday'], '08:00', '14:00', data);
 
   document.getElementById('activities-panel').innerHTML =
-    '<div class="section-label">⚙️ Activity Optimizer</div>' + filterBar + legend + weekday + weekend;
+    '<div class="section-label">⚙️ Activity Optimizer</div>' + filterBar + legend + weekday + weekend + renderDrivePlan(data);
 }
 
 // ── School tab: Assignments/Projects/Events + Communications ──────────
