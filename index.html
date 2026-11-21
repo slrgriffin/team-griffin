@@ -968,11 +968,12 @@ function buildBlocks(data, child, day, picks){
       last.padAfter = pad; return;
     }
     const L = (data.locations||{})[a.location] || {};
-    blocks.push({child, site, loc:a.location, start:s, end:e, names:[a.name], padBefore:pad, padAfter:pad, alreadyThere:!!L.alreadyThere});
+    blocks.push({child, site, loc:a.location, start:s, end:e, names:[a.name], padBefore:pad, padAfter:pad, alreadyThere:!!L.alreadyThere,
+      earlyDrop: a.earlyDropMin != null ? a.earlyDropMin : R.dropEarliestMin}); // per-activity: OK to drop off earlier than usual
   });
   blocks.forEach((b,k) => {
     b.id = child+k;
-    b.drop = {open: b.start - b.padBefore - R.dropEarliestMin, close: b.start - b.padBefore - R.dropLatestMin};
+    b.drop = {open: b.start - b.padBefore - b.earlyDrop, close: b.start - b.padBefore - R.dropLatestMin};
     b.pick = {open: b.end + b.padAfter, close: b.end + b.padAfter + R.pickupGraceMin};
   });
   return blocks;
@@ -1067,9 +1068,10 @@ function renderSteps(steps, R){
     const drive = s.drive ? `<div class="dp-drive">🚗 ${s.drive} min${s.driveKnown?'':' (est.)'}${gap?' · '+gap:''}</div>` : (gap?`<div class="dp-drive">${gap}</div>`:'');
     const tight = s.slack < R.tightSlackMin ? ` <span class="dp-tight">⚠️ ${s.slack} min to spare</span>` : '';
     const verb = s.stop.kind==='drop' ? 'Drop off' : 'Pick up';
+    const early = (s.stop.kind==='drop' && b.start - s.at > logiRules(currentData||{}).dropEarliestMin) ? ` <span class="dp-note">(early drop-off OK)</span>` : '';
     const pad = s.stop.kind==='drop' ? b.padBefore : b.padAfter;
     const dress = pad ? ` <span class="dp-note">(incl. ${pad} min dressing)</span>` : '';
-    return `${drive}<div class="dp-step"><span class="dp-time">${fmtMin(s.at)}</span><span class="person-tag ${b.child==='Nollen'?'tag-n':'tag-a'}">${b.child}</span>${verb} · ${b.names.join(' + ')} @ ${b.loc||'?'}${dress}${tight}</div>`;
+    return `${drive}<div class="dp-step"><span class="dp-time">${fmtMin(s.at)}</span><span class="person-tag ${b.child==='Nollen'?'tag-n':'tag-a'}">${b.child}</span>${verb} · ${b.names.join(' + ')} @ ${b.loc||'?'}${dress}${early}${tight}</div>`;
   }).join('');
 }
 
