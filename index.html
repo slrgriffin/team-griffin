@@ -371,22 +371,39 @@
   .tt-act-name{font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .tt-act-time{color:var(--ink-soft);white-space:nowrap;overflow:hidden;font-size:.56rem;}
   /* Drive plan */
-  .dp-card{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--good);border-radius:10px;padding:.6rem .8rem;margin:.5rem 0;}
-  .dp-card.dp-status-tight{border-left-color:#C9962F;}
-  .dp-card.dp-status-two{border-left-color:#C9962F;background:#FBF3E4;}
-  .dp-card.dp-status-bad{border-left-color:var(--overdue);background:#FBEDE8;}
-  .dp-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:.35rem;}
-  .dp-badge{font-size:.75rem;font-weight:600;color:var(--ink-soft);}
-  .dp-step{display:flex;align-items:center;gap:.45rem;font-size:.84rem;padding:.15rem 0;flex-wrap:wrap;}
-  .dp-time{font-variant-numeric:tabular-nums;font-weight:600;min-width:4.6rem;}
-  .dp-drive{font-size:.74rem;color:var(--ink-soft);padding-left:5.05rem;}
-  .dp-driver{font-size:.78rem;font-weight:600;margin:.4rem 0 .1rem;color:var(--pine);}
-  .dp-issue{font-size:.8rem;border-radius:6px;padding:.3rem .5rem;margin:.25rem 0 .4rem;line-height:1.4;}
-  .dp-warn{background:rgba(201,150,47,.15);}
-  .dp-bad{background:rgba(184,73,47,.15);color:var(--overdue);}
-  .dp-tight{color:var(--overdue);font-size:.76rem;font-weight:600;}
+  .dp-step{display:flex;align-items:baseline;gap:.45rem;font-size:.82rem;padding:.08rem 0;}
+  .dp-time{font-variant-numeric:tabular-nums;font-weight:700;min-width:4.4rem;text-align:right;}
+  .dp-dot{width:.55rem;height:.55rem;border-radius:50%;flex-shrink:0;position:relative;top:-.05rem;}
+  .dp-dot.dn{background:var(--nollen);} .dp-dot.da{background:var(--austin);}
+  .dp-drive{font-size:.72rem;color:var(--ink-soft);padding-left:5.45rem;}
+  .dp-driver{font-size:.76rem;font-weight:700;margin:.35rem 0 .1rem;color:var(--pine);}
+  .dp-issue{font-size:.78rem;border-radius:6px;padding:.3rem .5rem;margin:.2rem 0 .35rem;line-height:1.4;}
+  .dp-warn{background:rgba(201,150,47,.16);}
+  .dp-bad{background:rgba(184,73,47,.14);color:var(--overdue);}
+  .dp-tight{color:var(--overdue);font-size:.74rem;font-weight:700;}
   .dp-note{color:var(--ink-soft);font-size:.74rem;}
-  .dp-locs{font-size:.76rem;color:var(--ink-soft);margin-top:.6rem;line-height:1.6;}
+  .dp-pill{display:inline-block;font-size:.7rem;font-weight:700;padding:.12rem .5rem;border-radius:99px;margin-top:.35rem;}
+  .dp-pill-ok{background:rgba(76,122,82,.15);color:var(--good);}
+  .dp-pill-tight,.dp-pill-two{background:rgba(201,150,47,.2);color:#8A5D12;}
+  .dp-pill-bad{background:rgba(184,73,47,.15);color:var(--overdue);}
+  .dp-locs{font-size:.74rem;color:var(--ink-soft);margin:.4rem 0 1rem;line-height:1.7;}
+  .day-drive{margin-top:.55rem;padding-top:.5rem;border-top:1px dashed var(--line);}
+  .day-drive-h{font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:.2rem;}
+  /* Weekly plan grid (Activities tab) */
+  .wp-grid{display:grid;grid-template-columns:3.2rem 1fr 1fr 1.35fr;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:.5rem;}
+  .wp-h{font-size:.7rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:.55rem .6rem;background:var(--pine);color:#fff;}
+  .wp-hn{background:var(--nollen);} .wp-ha{background:var(--austin);}
+  .wp-day,.wp-c{padding:.55rem .6rem;border-top:1px solid var(--line);font-size:.84rem;line-height:1.4;}
+  .wp-day{font-weight:800;color:var(--pine);}
+  .wp-ev+.wp-ev{margin-top:.35rem;}
+  .wp-t{font-variant-numeric:tabular-nums;white-space:nowrap;}
+  .wp-loc{color:var(--ink-soft);font-size:.74rem;}
+  @media (max-width:700px){
+    .wp-grid{grid-template-columns:2.6rem 1fr 1fr;}
+    .wp-h:nth-child(4){display:none;}
+    .wp-route{grid-column:2 / 4;border-top:none;padding-top:0;}
+    .dp-time{min-width:3.9rem;} .dp-drive{padding-left:4.95rem;}
+  }
 </style>
 </head>
 <body>
@@ -593,8 +610,12 @@ function renderDayCard(date, data){
       renderPersonRow('tag-f','Family', day.f),
       renderPersonRow('tag-s','School', schoolLabels),
     ].join('');
+    // Drive plan for this date — same items shown above (override strings or preferred activities).
+    const itemsFor = (child, key) => override ? overrideItems(data, override[key]) : preferredItems(data, dn, child);
+    const route = renderRoute(data, analyzeItems(data, {Nollen:itemsFor('Nollen','n'), Austin:itemsFor('Austin','a')}));
+    const driveHtml = route ? `<div class="day-drive"><div class="day-drive-h">🚗 Drive plan</div>${route}</div>` : '';
     bodyHtml = rows
-      ? `<div class="day-body">${rows}</div>`
+      ? `<div class="day-body">${rows}${driveHtml}</div>`
       : `<div class="day-body"><div class="free-day">Nothing scheduled</div></div>`;
   }
 
@@ -929,33 +950,56 @@ function optimizeWeek(child, activityOptionsByDay, rules){
   return new Set(picks.map(p => p.day + '|' + p.origIndex));
 }
 
-// ── Drive plan: travel-time feasibility for days with 2+ events ──────
-// Uses data.locations (name → {site,address}), data.travelMinutes
-// ("SiteA|SiteB" → minutes, either order) and data.logisticsRules.
-// Each picked activity becomes a "block" (back-to-back sessions at the same
-// site merge into one). A block has a drop window and a pickup window; the
-// route search then checks whether ONE driver can hit every window in some
-// order. If not, it checks each child alone (= two drivers).
+// ── Drive plan: travel-time feasibility for days with 2+ stops ───────
+// Uses data.locations (name → {site,address,alreadyThere}),
+// data.travelMinutes ("SiteA|SiteB" → minutes, either order) and
+// data.logisticsRules. Works on the SAME items This Week shows: activities
+// flagged preferred: true, or a date's dateOverrides entries (parsed from
+// their "Name · 5:30–6:15 pm @ Place" strings). Each item becomes a "block"
+// (back-to-back sessions at one site merge); a block has a drop window and a
+// pickup window. The route search checks whether ONE driver can hit every
+// window in some order; if not, it plans each child separately (2 drivers).
 const UNKNOWN_DRIVE_MIN = 20;
 function logiRules(data){
   return Object.assign({dropEarliestMin:15, dropLatestMin:10, pickupGraceMin:10,
     dressingMin:{}, tightSlackMin:5, mergeSameSiteGapMin:45}, data.logisticsRules||{});
 }
-function siteOf(data, loc){
-  const L = (data.locations||{})[loc];
-  return (L && L.site) || loc || 'Unknown';
-}
+function locInfo(data, loc){ return (data.locations||{})[loc] || {}; }
+function siteOf(data, loc){ return locInfo(data, loc).site || loc || 'Unknown'; }
 function driveMin(data, a, b){
   if(a === b) return {min:0, known:true};
   const t = data.travelMinutes || {};
   const v = t[a+'|'+b] != null ? t[a+'|'+b] : t[b+'|'+a];
   return v == null ? {min:UNKNOWN_DRIVE_MIN, known:false} : {min:v, known:true};
 }
-function buildBlocks(data, child, day, picks){
+
+// Items for a weekday pattern: the preferred activities (what This Week shows).
+function preferredItems(data, dayName, child){
+  return (data.activityOptions[dayName]||[])
+    .filter(a => a.preferred && (a.child===child || a.child==='Both'));
+}
+// Items for an override date, parsed back out of the display strings.
+// Unparseable lines (all-day notes, "Arrive at…" etc.) are skipped.
+function parseOverrideItem(str){
+  const m = str.match(/^(.*?) · (\d{1,2}):(\d{2})\s*(am|pm)?\s*[–-]\s*(\d{1,2}):(\d{2})\s*(am|pm)(?: @ (.+?))?(?: \(.*\))?$/i);
+  if(!m) return null;
+  const to24 = (h,mm,ap) => { h=Number(h)%12 + (ap.toLowerCase()==='pm'?12:0); return String(h).padStart(2,'0')+':'+mm; };
+  const endAp = m[7], startAp = m[4] || endAp;
+  let start = to24(m[2],m[3],startAp), end = to24(m[5],m[6],endAp);
+  if(!m[4] && timeToMinutes(start) > timeToMinutes(end)) start = to24(m[2],m[3],'am'); // "11:30–1:00 pm"
+  return {name:m[1].replace(/^[^\w]+/,'').trim(), start, end, location:(m[8]||'').trim()};
+}
+function overrideItems(data, strs){
+  return (strs||[]).map(parseOverrideItem).filter(Boolean).map(it => {
+    // Overrides carry no type: anything at the hockey rink counts as hockey.
+    if(/sportsplex/i.test(siteOf(data, it.location)) || /hockey|skat|mayhem|game/i.test(it.name)) it.type = 'Hockey';
+    return it;
+  });
+}
+
+function buildBlocks(data, child, items){
   const R = logiRules(data);
-  const acts = (data.activityOptions[day]||[])
-    .map((a,i)=>({...a, _i:i}))
-    .filter(a => (a.child===child || a.child==='Both') && picks.has(day+'|'+a._i))
+  const acts = items.filter(a => a.location).slice()
     .sort((a,b)=>timeToMinutes(a.start)-timeToMinutes(b.start));
   const blocks = [];
   acts.forEach(a => {
@@ -964,15 +1008,13 @@ function buildBlocks(data, child, day, picks){
     const pad = ((R.dressingMin[child]||{})[a.type]) || 0;
     const last = blocks[blocks.length-1];
     if(last && last.site===site && s - last.end <= R.mergeSameSiteGapMin){
-      last.end = Math.max(last.end, e); last.names.push(a.name);
-      last.padAfter = pad; return;
+      last.end = Math.max(last.end, e); last.names.push(a.name); last.padAfter = pad; return;
     }
-    const L = (data.locations||{})[a.location] || {};
-    blocks.push({child, site, loc:a.location, start:s, end:e, names:[a.name], padBefore:pad, padAfter:pad, alreadyThere:!!L.alreadyThere,
-      earlyDrop: a.earlyDropMin != null ? a.earlyDropMin : R.dropEarliestMin}); // per-activity: OK to drop off earlier than usual
+    blocks.push({child, site, loc:a.location, start:s, end:e, names:[a.name], padBefore:pad, padAfter:pad,
+      alreadyThere: !!locInfo(data, a.location).alreadyThere,
+      earlyDrop: a.earlyDropMin != null ? a.earlyDropMin : R.dropEarliestMin}); // per-activity: OK to drop off earlier
   });
   blocks.forEach((b,k) => {
-    b.id = child+k;
     b.drop = {open: b.start - b.padBefore - b.earlyDrop, close: b.start - b.padBefore - R.dropLatestMin};
     b.pick = {open: b.end + b.padAfter, close: b.end + b.padAfter + R.pickupGraceMin};
   });
@@ -1023,10 +1065,11 @@ function planRoute(data, stops){
 }
 function fmtMin(m){ const h=Math.floor(m/60), mm=m%60; return formatTime12(String(h).padStart(2,'0')+':'+String(mm).padStart(2,'0')); }
 
-function analyzeDay(data, day, picksByChild){
+// itemsByChild: { Nollen:[...], Austin:[...] } → analysis, or null if < 2 stops' worth.
+function analyzeItems(data, itemsByChild){
   const R = logiRules(data);
   const blocksByChild = {};
-  Object.keys(picksByChild).forEach(c => { blocksByChild[c] = buildBlocks(data, c, day, picksByChild[c]); });
+  Object.keys(itemsByChild).forEach(c => { blocksByChild[c] = buildBlocks(data, c, itemsByChild[c]); });
   const all = [].concat(...Object.values(blocksByChild));
   if(all.length < 2) return null;
   const issues = [];
@@ -1042,60 +1085,71 @@ function analyzeDay(data, day, picksByChild){
       }
     }
   });
-  const combined = Object.keys(perChild).length > 1 ? planRoute(data, stopsFor(all)) : perChild[Object.keys(perChild)[0]];
+  const kids = Object.keys(perChild);
+  const combined = kids.length > 1 ? planRoute(data, stopsFor(all)) : perChild[kids[0]];
   let status;
   if(issues.length) status = 'bad';
   else if(combined) status = (combined.minSlack < R.tightSlackMin) ? 'tight' : 'ok';
   else {
     status = 'two';
-    // Explain: find the cross-child block pairs that can't share one driver
-    const kids = Object.keys(blocksByChild);
     for(const a of blocksByChild[kids[0]]||[]) for(const b of blocksByChild[kids[1]]||[]){
       if(planRoute(data, stopsFor([a,b]))) continue;
       const d = driveMin(data, a.site, b.site).min;
-      issues.push({level:'warn', text:`${a.child} ${a.names.join(' + ')} (drop ${fmtMin(a.drop.open)}–${fmtMin(a.drop.close)}, pick ${fmtMin(a.pick.open)}–${fmtMin(a.pick.close)}) and ${b.child} ${b.names.join(' + ')} (drop ${fmtMin(b.drop.open)}–${fmtMin(b.drop.close)}, pick ${fmtMin(b.pick.open)}–${fmtMin(b.pick.close)}) are ${d} min apart — one driver can't cover both.`});
+      issues.push({level:'warn', text:`${a.child}'s ${a.names.join(' + ')} and ${b.child}'s ${b.names.join(' + ')} overlap and are ${d} min apart — one driver can't cover both.`});
     }
   }
   const unknown = (combined && combined.unknownLeg) || Object.values(perChild).some(p=>p && p.unknownLeg);
   if(unknown) issues.push({level:'warn', text:`Some drive times aren't in the table yet — assumed ${UNKNOWN_DRIVE_MIN} min.`});
-  return {day, status, combined, perChild, issues};
+  return {status, combined, perChild, issues};
 }
+const DP_LABEL = {ok:'One driver', tight:'One driver · tight', two:'Needs 2 drivers', bad:'Can\'t make it'};
 
-function renderSteps(steps, R){
+function renderSteps(data, steps){
+  const R = logiRules(data);
   return steps.map(s => {
     const b = s.stop.block;
     const gap = s.wait >= 30 ? `free ${s.wait} min` : (s.wait ? `wait ${s.wait} min` : '');
     const drive = s.drive ? `<div class="dp-drive">🚗 ${s.drive} min${s.driveKnown?'':' (est.)'}${gap?' · '+gap:''}</div>` : (gap?`<div class="dp-drive">${gap}</div>`:'');
-    const tight = s.slack < R.tightSlackMin ? ` <span class="dp-tight">⚠️ ${s.slack} min to spare</span>` : '';
-    const verb = s.stop.kind==='drop' ? 'Drop off' : 'Pick up';
-    const early = (s.stop.kind==='drop' && b.start - s.at > logiRules(currentData||{}).dropEarliestMin) ? ` <span class="dp-note">(early drop-off OK)</span>` : '';
+    const tight = s.slack < R.tightSlackMin ? ` <span class="dp-tight">${s.slack} min spare</span>` : '';
     const pad = s.stop.kind==='drop' ? b.padBefore : b.padAfter;
-    const dress = pad ? ` <span class="dp-note">(incl. ${pad} min dressing)</span>` : '';
-    return `${drive}<div class="dp-step"><span class="dp-time">${fmtMin(s.at)}</span><span class="person-tag ${b.child==='Nollen'?'tag-n':'tag-a'}">${b.child}</span>${verb} · ${b.names.join(' + ')} @ ${b.loc||'?'}${dress}${early}${tight}</div>`;
+    const dress = pad ? ` <span class="dp-note">(dress)</span>` : '';
+    const early = (s.stop.kind==='drop' && b.start - b.padBefore - s.at > R.dropEarliestMin) ? ` <span class="dp-note">(early)</span>` : '';
+    const verb = s.stop.kind==='drop' ? 'Drop' : 'Pick up';
+    return `${drive}<div class="dp-step"><span class="dp-time">${fmtMin(s.at)}</span><span class="dp-dot ${b.child==='Nollen'?'dn':'da'}"></span><span>${verb} ${b.child} @ ${b.loc||'?'}${dress}${early}${tight}</span></div>`;
   }).join('');
 }
+// Full route block (steps, or per-driver routes) + status pill + issues.
+function renderRoute(data, a){
+  if(!a) return '';
+  let body;
+  if(a.combined && a.status!=='bad') body = renderSteps(data, a.combined.steps);
+  else body = Object.entries(a.perChild).map(([c,p], k) =>
+    `<div class="dp-driver">Driver ${k+1} — ${c}</div>` + (p ? renderSteps(data, p.steps) : '<div class="dp-step">No workable order.</div>')).join('');
+  const issues = a.issues.map(i=>`<div class="dp-issue dp-${i.level}">${i.text}</div>`).join('');
+  return `${issues}${body}<span class="dp-pill dp-pill-${a.status}">${DP_LABEL[a.status]}</span>`;
+}
 
-function renderDrivePlan(data){
-  const opts = data.activityOptions || {};
-  const rules = data.optimizerRules || {};
+// Activities tab: the weekly plan as Day | Nollen | Austin | Drive plan.
+function renderWeekPlan(data){
   const R = logiRules(data);
-  const picksByChild = { Nollen: optimizeWeek('Nollen', opts, rules), Austin: optimizeWeek('Austin', opts, rules) };
-  const label = {ok:'✅ One driver', tight:'⚠️ One driver — tight', two:'🚗🚗 Needs 2 drivers', bad:'❌ Can\'t make it'};
-  const cards = WEEK_DAYS.map(day => {
-    const a = analyzeDay(data, day, picksByChild);
-    if(!a) return '';
-    let body;
-    if(a.combined && a.status!=='bad') body = renderSteps(a.combined.steps, R);
-    else body = Object.entries(a.perChild).map(([c,p], k) =>
-      `<div class="dp-driver">Driver ${k+1} — ${c}</div>` + (p ? renderSteps(p.steps, R) : '<div class="dp-step">No workable order.</div>')).join('');
-    const issues = a.issues.map(i=>`<div class="dp-issue dp-${i.level}">${i.text}</div>`).join('');
-    return `<div class="dp-card dp-status-${a.status}"><div class="dp-head"><b>${day}</b><span class="dp-badge">${label[a.status]}</span></div>${issues}${body}</div>`;
+  const evHtml = items => items.length ? items.slice().sort((x,y)=>timeToMinutes(x.start)-timeToMinutes(y.start)).map(a =>
+    `<div class="wp-ev"><b>${a.name}</b> <span class="wp-t">${formatTime12(a.start).replace(/ (am|pm)$/,'')}–${formatTime12(a.end)}</span>`
+    + `<div class="wp-loc">${a.location||''}${a.earlyDropMin?' · early drop-off OK':''}${a.note?' · '+a.note.replace(/[()]/g,''):''}</div></div>`).join('')
+    : '<div class="free-day">Free</div>';
+  const rows = WEEK_DAYS.map(day => {
+    const n = preferredItems(data, day, 'Nollen'), a = preferredItems(data, day, 'Austin');
+    const an = analyzeItems(data, {Nollen:n, Austin:a});
+    const route = an ? renderRoute(data, an) : '<div class="dp-note">Single stop — drop 10–15 min before' + (a.some(x=>(R.dressingMin.Austin||{})[x.type]) ? ' (hockey: 20–25)' : '') + '</div>';
+    return `<div class="wp-day">${day.slice(0,3)}</div><div class="wp-c">${evHtml(n)}</div><div class="wp-c">${evHtml(a)}</div><div class="wp-c wp-route">${(n.length||a.length)?route:''}</div>`;
   }).join('');
   const locs = Object.entries(data.locations||{}).filter(([n,l],i,arr)=>arr.findIndex(x=>x[1].site===l.site)===i)
-    .map(([n,l])=>`<div><b>${l.site}</b> (${n}) — ${l.address||''}</div>`).join('');
-  return `<div class="section-label">🚗 Drive Plan · days with 2+ stops</div>
-    <div class="tt-legend">Drop-off ${R.dropEarliestMin}–${R.dropLatestMin} min before start · pickup within ${R.pickupGraceMin} min of end · Austin hockey adds 10 min dressing each side. Drive times are estimates — tell Claude to correct any.</div>
-    ${cards || '<div class="free-day">No days with multiple stops.</div>'}
+    .map(([n,l])=>`<span><b>${l.site}</b> (${n}) — ${l.address||''}</span>`).join(' · ');
+  return `<div class="section-label">🗓️ Weekly Plan + Drive Times</div>
+    <div class="wp-grid">
+      <div class="wp-h"></div><div class="wp-h wp-hn">Nollen</div><div class="wp-h wp-ha">Austin</div><div class="wp-h">🚗 Drive plan</div>
+      ${rows}
+    </div>
+    <div class="tt-legend">Drop-off ${R.dropEarliestMin}–${R.dropLatestMin} min before start · pickup within ${R.pickupGraceMin} min of end · Austin's hockey adds 10 min each side for dressing. Drive times are estimates — tell Claude to correct any.</div>
     <div class="dp-locs">${locs}</div>`;
 }
 
@@ -1388,7 +1442,7 @@ function renderActivitiesTab(data){
   const weekend = buildTimetable('📅 Weekend · 8:00 am–2:00 pm', ['Saturday','Sunday'], '08:00', '14:00', data);
 
   document.getElementById('activities-panel').innerHTML =
-    '<div class="section-label">⚙️ Activity Optimizer</div>' + filterBar + legend + weekday + weekend + renderDrivePlan(data);
+    renderWeekPlan(data) + '<div class="section-label">⚙️ Activity Optimizer</div>' + filterBar + legend + weekday + weekend;
 }
 
 // ── School tab: Assignments/Projects/Events + Communications ──────────
