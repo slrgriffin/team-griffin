@@ -952,7 +952,7 @@
         "end": "19:00",
         "location": "SJ",
         "type": "Parcor",
-        "preferred": true
+        "preferred": false
       },
       {
         "child": "Austin",
@@ -987,7 +987,7 @@
         "child": "Nollen",
         "name": "Afterschool Program",
         "start": "14:35",
-        "end": "17:30",
+        "end": "17:15",
         "location": "School",
         "type": "Afterschool",
         "preferred": true
@@ -1105,7 +1105,7 @@
         "start": "17:30",
         "end": "19:00",
         "location": "SJ",
-        "preferred": true,
+        "preferred": false,
         "type": "Parcor"
       },
       {
@@ -1114,7 +1114,7 @@
         "start": "17:30",
         "end": "19:00",
         "location": "SJ",
-        "preferred": true,
+        "preferred": false,
         "type": "Parcor"
       },
       {
@@ -1141,7 +1141,7 @@
         "child": "Nollen",
         "name": "Afterschool Program",
         "start": "14:35",
-        "end": "17:30",
+        "end": "17:15",
         "location": "School",
         "type": "Afterschool",
         "preferred": true
@@ -1201,7 +1201,8 @@
         "start": "17:30",
         "end": "19:00",
         "location": "SJ",
-        "type": "Parcor"
+        "type": "Parcor",
+        "preferred": true
       },
       {
         "child": "Austin",
@@ -1209,7 +1210,8 @@
         "start": "17:30",
         "end": "19:00",
         "location": "SJ",
-        "type": "Parcor"
+        "type": "Parcor",
+        "preferred": true
       },
       {
         "child": "Nollen",
@@ -1235,7 +1237,8 @@
         "end": "18:15",
         "location": "543 Capitol Expy, San Jose",
         "type": "Jiu-Jitsu",
-        "preferred": true
+        "preferred": false,
+        "optional": true
       }
     ],
     "Saturday": [
@@ -1285,7 +1288,8 @@
         "start": "11:30",
         "end": "13:00",
         "location": "SJ",
-        "type": "Parcor"
+        "type": "Parcor",
+        "preferred": true
       },
       {
         "child": "Austin",
@@ -1293,7 +1297,8 @@
         "start": "11:30",
         "end": "13:00",
         "location": "SJ",
-        "type": "Parcor"
+        "type": "Parcor",
+        "preferred": false
       },
       {
         "child": "Austin",
