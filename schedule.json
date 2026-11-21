@@ -1148,8 +1148,7 @@
         "end": "20:20",
         "location": "Santa Teresa",
         "type": "TKD",
-        "preferred": false,
-        "optional": true
+        "preferred": true
       },
       {
         "child": "Nollen",
@@ -1188,8 +1187,7 @@
         "end": "16:50",
         "location": "Santa Teresa",
         "type": "TKD",
-        "preferred": false,
-        "optional": true
+        "preferred": true
       },
       {
         "child": "Nollen",
@@ -1568,6 +1566,10 @@
       "site": "Carolyn Clark Elementary",
       "address": "3701 Rue Mirassou, San Jose, CA 95148",
       "alreadyThere": true
+    },
+    "Santa Teresa": {
+      "site": "TKD",
+      "address": "6085 Snell Ave, San Jose, CA 95123"
     }
   },
   "travelMinutes": {
@@ -1576,7 +1578,11 @@
     "Parkour|BJJ": 13,
     "Carolyn Clark Elementary|Silver Creek Sportsplex": 15,
     "Carolyn Clark Elementary|Parkour": 22,
-    "Carolyn Clark Elementary|BJJ": 20
+    "Carolyn Clark Elementary|BJJ": 20,
+    "TKD|Silver Creek Sportsplex": 15,
+    "TKD|BJJ": 10,
+    "TKD|Parkour": 17,
+    "TKD|Carolyn Clark Elementary": 22
   },
   "logisticsRules": {
     "dropEarliestMin": 15,
