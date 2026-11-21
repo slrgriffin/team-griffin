@@ -1013,6 +1013,15 @@
         "location": "543 Capitol Expy, San Jose",
         "type": "Jiu-Jitsu",
         "preferred": true
+      },
+      {
+        "child": "Nollen",
+        "name": "Gardening Club",
+        "start": "14:30",
+        "end": "15:30",
+        "location": "School",
+        "type": "Club",
+        "preferred": true
       }
     ],
     "Wednesday": [
